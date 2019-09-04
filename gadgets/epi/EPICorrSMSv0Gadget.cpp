@@ -6,7 +6,7 @@
 //             longer, so it could take longer to compute.
 //           - Test the case that more repetitions are sent than the number specified in the xml header.
 
-#include "EPICorrSMSGadget.h"
+#include "EPICorrSMSv0Gadget.h"
 #include "ismrmrd/xml.h"
 #include "hoNDArray_fileio.h"
 
@@ -14,11 +14,11 @@ namespace Gadgetron {
 
 #define OE_PHASE_CORR_POLY_ORDER 4
 
-EPICorrSMSGadget::EPICorrSMSGadget() {}
+EPICorrSMSv0Gadget::EPICorrSMSv0Gadget() {}
 
-EPICorrSMSGadget::~EPICorrSMSGadget() {}
+EPICorrSMSv0Gadget::~EPICorrSMSv0Gadget() {}
 
-int EPICorrSMSGadget::process_config(ACE_Message_Block *mb) {
+int EPICorrSMSv0Gadget::process_config(ACE_Message_Block *mb) {
 
 
 
@@ -47,20 +47,6 @@ int EPICorrSMSGadget::process_config(ACE_Message_Block *mb) {
 
     ISMRMRD::IsmrmrdHeader h;
     ISMRMRD::deserialize(mb->rd_ptr(), h);
-
-
-    if (h.measurementInformation)
-    {
-        if (h.measurementInformation->measurementID)
-        {
-            measurement_id_ = *h.measurementInformation->measurementID;
-            GDEBUG("Measurement ID is %s\n", measurement_id_.c_str());
-        }
-    }
-
-    partial_name_stored_epi_dependency_ = this->generateEpiDependencyFilename(measurement_id_);
-    GDEBUG("Stored EPI dependency is %s\n", partial_name_stored_epi_dependency_.c_str());
-
 
     if (h.encoding.size() == 0) {
         GDEBUG("Number of encoding spaces: %d\n", h.encoding.size());
@@ -140,37 +126,36 @@ int EPICorrSMSGadget::process_config(ACE_Message_Block *mb) {
     corrpos_no_exp_save_.zeros();
     corrneg_no_exp_save_.zeros();
 
-    corrneg_output_format_analyze.create(readout);
-    corrpos_output_format_analyze.create(readout);
 
 
-    GDEBUG_STREAM("EPICorrSMSGadget configured");
+
+    GDEBUG_STREAM("EPICorrSMSv0Gadget configured");
     return 0;
 }
 
-int EPICorrSMSGadget::process(
+int EPICorrSMSv0Gadget::process(
         GadgetContainerMessage<ISMRMRD::AcquisitionHeader> *m1,
         GadgetContainerMessage<hoNDArray<std::complex<float> > > *m2) {
 
     //GDEBUG_STREAM("Nav: " << navNumber_ << "    " << "Echo: " << epiEchoNumber_ << std::endl);
 
-    ISMRMRD::AcquisitionHeader &hdr = *m1->getObjectPtr();
 
-    bool is_acq_multi_band=0;
+    bool is_acq_single_band = m1->getObjectPtr()->isFlagSet(ISMRMRD::ISMRMRD_ACQ_USER1);
+    bool is_acq_multi_band = m1->getObjectPtr()->isFlagSet(ISMRMRD::ISMRMRD_ACQ_USER2);
+    bool is_last_scan_in_slice = m1->getObjectPtr()->isFlagSet(ISMRMRD::ISMRMRD_ACQ_LAST_IN_SLICE);
+    bool is_first_scan_in_slice = m1->getObjectPtr()->isFlagSet(ISMRMRD::ISMRMRD_ACQ_FIRST_IN_SLICE);
+    bool is_last_in_encoding = m1->getObjectPtr()->isFlagSet(ISMRMRD::ISMRMRD_ACQ_LAST_IN_ENCODE_STEP1);
 
-    if(hdr.idx.user[0]==0 && !hdr.isFlagSet(ISMRMRD::ISMRMRD_ACQ_IS_PARALLEL_CALIBRATION)  )
-    {
-       is_acq_multi_band=1;
-    }
 
     // Get a reference to the acquisition header
+    ISMRMRD::AcquisitionHeader &hdr = *m1->getObjectPtr();
 
     // Pass on the non-EPI data (e.g. FLASH Calibration)
     if (hdr.encoding_space_ref > 0) {
         // It is enough to put the first one, since they are linked
         if (this->next()->putq(m1) == -1) {
             m1->release();
-            GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+            GERROR("EPICorrSMSv0Gadget::process, passing data on to next gadget");
             return -1;
         }
         return 0;
@@ -180,11 +165,11 @@ int EPICorrSMSGadget::process(
 
     // Make an armadillo matrix of the data
     // Pass on the multiband data
-    if (is_acq_multi_band==1)
+    if (is_acq_multi_band)
     {
         if (this->next()->putq(m1) == -1) {
             m1->release();
-            GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+            GERROR("EPICorrSMSv0Gadget::process, passing data on to next gadget");
             return -1;
         }
         return 0;
@@ -210,9 +195,10 @@ int EPICorrSMSGadget::process(
 
                 ISMRMRD::AcquisitionHeader &hdr = *data.first->getObjectPtr();
 
-                if (hdr.idx.user[0]==1)
+
+                if (is_acq_single_band)
                 {
-                //do nothing, the epi correction will be applied using an averaged navigator in the PrepGadget
+                //save the data for SMS EPI reco later
                 }
                 else
                 {
@@ -221,7 +207,7 @@ int EPICorrSMSGadget::process(
 
                 if (this->next()->putq(data.first) == -1) {
                     data.first->release();
-                    GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+                    GERROR("EPICorrSMSv0Gadget::process, passing data on to next gadget");
                     return -1;
                 }
             }
@@ -229,10 +215,15 @@ int EPICorrSMSGadget::process(
         }
     }
 
+
+
+
+
+
     return 0;
 }
 
-void EPICorrSMSGadget::apply_epi_correction(ISMRMRD::AcquisitionHeader &hdr, arma::cx_fmat &adata) {// Increment the echo number
+void EPICorrSMSv0Gadget::apply_epi_correction(ISMRMRD::AcquisitionHeader &hdr, arma::cx_fmat &adata) {// Increment the echo number
     epiEchoNumber_ += 1;
 
     if (epiEchoNumber_ == 0) {
@@ -264,7 +255,7 @@ void EPICorrSMSGadget::apply_epi_correction(ISMRMRD::AcquisitionHeader &hdr, arm
     }
 }
 
-void EPICorrSMSGadget::process_phase_correction_data(ISMRMRD::AcquisitionHeader &hdr,
+void EPICorrSMSv0Gadget::process_phase_correction_data(ISMRMRD::AcquisitionHeader &hdr,
                                                      arma::cx_fmat &adata) {// Increment the navigator counter
     navNumber_ += 1;
     //GDEBUG("Nav number: %i, %i\n",navNumber_,numNavigators_);
@@ -473,11 +464,11 @@ void EPICorrSMSGadget::process_phase_correction_data(ISMRMRD::AcquisitionHeader 
         // Odd and even phase corrections
         corrpos_ = exp(arma::cx_fvec(arma::zeros<arma::fvec>(Nx_), -0.5 * tvec));
         corrneg_ = exp(arma::cx_fvec(arma::zeros<arma::fvec>(Nx_), +0.5 * tvec));
-        corrComputed_ = true;       
+        corrComputed_ = true;
 
-         if (hdr.idx.user[0]==1  && hdr.idx.repetition==0)
+         if (hdr.isFlagSet(ISMRMRD::ISMRMRD_ACQ_USER1)  && hdr.idx.repetition==0)
          {
-            //std::cout << " hdr.idx.slice "<< hdr.idx.slice <<  " single band"<<  hdr.idx.user[0] << std::endl;
+            std::cout << " hdr.idx.slice "<< hdr.idx.slice <<  " single band"<< std::endl;
 
             corrpos_all_.col(hdr.idx.slice) = corrpos_;
             corrneg_all_.col(hdr.idx.slice) = corrneg_;
@@ -496,7 +487,7 @@ void EPICorrSMSGadget::process_phase_correction_data(ISMRMRD::AcquisitionHeader 
 }
 
 arma::fvec
-EPICorrSMSGadget::polynomial_correction(int Nx_, const arma::fvec &x, const arma::cx_fvec &ctemp_in, size_t set, size_t slc, size_t exc,
+EPICorrSMSv0Gadget::polynomial_correction(int Nx_, const arma::fvec &x, const arma::cx_fvec &ctemp_in, size_t set, size_t slc, size_t exc,
                                         float intercept) {// Fit the residuals (i.e., after removing the linear trend) to a polynomial.
     // You cannot fit the phase directly to the polynomial because it doesn't work
     //   in cases that the phase wraps across the image.
@@ -557,7 +548,7 @@ EPICorrSMSGadget::polynomial_correction(int Nx_, const arma::fvec &x, const arma
 //    function to initialize the arrays that will be used for the navigator parameters filtering
 //    - e_limits: encoding limits
 
-void EPICorrSMSGadget::init_arrays_for_nav_parameter_filtering(ISMRMRD::EncodingLimits e_limits) {
+void EPICorrSMSv0Gadget::init_arrays_for_nav_parameter_filtering(ISMRMRD::EncodingLimits e_limits) {
     // TO DO: Take into account the acceleration along E2:
 
     E2_ = e_limits.kspace_encoding_step_2 ? e_limits.kspace_encoding_step_2->maximum -
@@ -618,7 +609,7 @@ void EPICorrSMSGadget::init_arrays_for_nav_parameter_filtering(ISMRMRD::Encoding
 //
 //    Currently, it does a simple weighted linear fit.
 
-float EPICorrSMSGadget::filter_nav_correction_parameter(hoNDArray<float> &nav_corr_param_array,
+float EPICorrSMSv0Gadget::filter_nav_correction_parameter(hoNDArray<float> &nav_corr_param_array,
                                                         hoNDArray<float> &weights_array,
                                                         size_t exc,
                                                         size_t set,
@@ -627,13 +618,13 @@ float EPICorrSMSGadget::filter_nav_correction_parameter(hoNDArray<float> &nav_co
                                                         bool filter_in_complex_domain) {
     // If the array to be filtered doesn't have 3 dimensions, we are in big trouble:
     if (nav_corr_param_array.get_number_of_dimensions() != 3) {
-        GERROR("cbi_EPICorrSMSGadget::filter_nav_correction_parameter, incorrect number of dimensions of the array.\n");
+        GERROR("cbi_EPICorrSMSv0Gadget::filter_nav_correction_parameter, incorrect number of dimensions of the array.\n");
         return -1;
     }
 
     // The dimensions of the weights array should be the same as the parameter array:
     if (!nav_corr_param_array.dimensions_equal(&weights_array)) {
-        GERROR("cbi_EPICorrSMSGadget::filter_nav_correction_parameter, dimensions of the parameter and weights arrays don't match.\n");
+        GERROR("cbi_EPICorrSMSv0Gadget::filter_nav_correction_parameter, dimensions of the parameter and weights arrays don't match.\n");
         return -1;
     }
 
@@ -701,9 +692,9 @@ float EPICorrSMSGadget::filter_nav_correction_parameter(hoNDArray<float> &nav_co
 //    funtion to increase the size of the navigator parameter arrays used for filtering
 //    - delta_rep: how many more repetitions to add
 
-void EPICorrSMSGadget::increase_no_repetitions(size_t delta_rep) {
+void EPICorrSMSv0Gadget::increase_no_repetitions(size_t delta_rep) {
 
-    GDEBUG_STREAM("cbi_EPICorrSMSGadget WARNING: repetition number larger than what specified in header");
+    GDEBUG_STREAM("cbi_EPICorrSMSv0Gadget WARNING: repetition number larger than what specified in header");
 
     size_t REP = Nav_mag_.get_size(0) / E2_;   // current maximum number of repetitions
     size_t new_REP = REP + delta_rep;
@@ -782,11 +773,11 @@ void EPICorrSMSGadget::increase_no_repetitions(size_t delta_rep) {
 
 
 
-void EPICorrSMSGadget::fonction_qui_sauvegarde_sur_le_disk_les_corrections_par_coupes(int slice )
+void EPICorrSMSv0Gadget::fonction_qui_sauvegarde_sur_le_disk_les_corrections_par_coupes(int slice )
 {
     //GDEBUG("STEP 2 : EPI correction : slice %d , compteur_sb_sum %d  saving optimal ghost niquist correction \n", slice , compteur_sb_sum);
 
-    GDEBUG("STEP 2 : EPI correction : slice %d\n", slice);
+    GDEBUG("STEP 2 : EPI correction : slice %d", slice);
 
     std::ostringstream slice_index;
     slice_index << "_slice_" << slice;
@@ -802,30 +793,16 @@ void EPICorrSMSGadget::fonction_qui_sauvegarde_sur_le_disk_les_corrections_par_c
 
 
 
-    memcpy(&corrneg_output_format_analyze(0), &corrneg_(0) , sizeof(std::complex<float>)*readout);
-    memcpy(&corrpos_output_format_analyze(0), &corrpos_(0) , sizeof(std::complex<float>)*readout);
+    hoNDArray< std::complex<float> > corrneg_output_format_analyze;
+    corrneg_output_format_analyze.create(readout);
 
-    gt_exporter_.export_array_complex(corrneg_output_format_analyze, partial_name_stored_epi_dependency_ + "_corrneg" + slice_index.str());
-    gt_exporter_.export_array_complex(corrpos_output_format_analyze, partial_name_stored_epi_dependency_ + "_corrpos" + slice_index.str());
+    memcpy(&corrneg_output_format_analyze, &corrneg_, sizeof(std::complex<float>)*readout);
+    gt_exporter_.export_array_complex(corrneg_output_format_analyze, debug_folder_full_path_ + "corrneg_no_exp" + slice_index.str());
 
 }
 
-std::string EPICorrSMSGadget::generateEpiDependencyFilename(const std::string& measurement_id)
-{
-    std::string full_name_stored_epi_dependency;
-
-    epi_dependency_prefix_ = "GadgetronEpi";
-    epi_dependency_folder_ = std::string("/tmp/gadgetron/");
-
-    full_name_stored_epi_dependency = epi_dependency_folder_;
-    full_name_stored_epi_dependency.append("/");
-    full_name_stored_epi_dependency.append(epi_dependency_prefix_);
-    full_name_stored_epi_dependency.append("_");
-    full_name_stored_epi_dependency.append(measurement_id);
-
-    return full_name_stored_epi_dependency;
-}
 
 
-GADGET_FACTORY_DECLARE(EPICorrSMSGadget)
+
+GADGET_FACTORY_DECLARE(EPICorrSMSv0Gadget)
 }

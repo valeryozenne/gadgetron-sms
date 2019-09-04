@@ -1,5 +1,5 @@
-#ifndef EPICorrSMSGadget_H
-#define EPICorrSMSGadget_H
+#ifndef EPICorrSMSv0Gadget_H
+#define EPICorrSMSv0Gadget_H
 
 #include "Gadget.h"
 #include "hoNDArray.h"
@@ -20,12 +20,12 @@
 
 namespace Gadgetron {
 
-class EXPORTGADGETS_EPI EPICorrSMSGadget :
+class EXPORTGADGETS_EPI EPICorrSMSv0Gadget :
         public Gadget2<ISMRMRD::AcquisitionHeader, hoNDArray<std::complex<float> > > {
 public:
-    EPICorrSMSGadget();
+    EPICorrSMSv0Gadget();
 
-    virtual ~EPICorrSMSGadget();
+    virtual ~EPICorrSMSv0Gadget();
 
 protected:
     GADGET_PROPERTY(verboseMode, bool, "Verbose output", false);
@@ -160,19 +160,8 @@ protected:
      Gadgetron::ImageIOAnalyze gt_exporter_;
 
      // debug folder
-     std::string debug_folder_full_path_;    
-
-     std::string epi_dependency_folder_;
-     std::string epi_dependency_prefix_;
-     std::string measurement_id_;;
-     std::string partial_name_stored_epi_dependency_;
-     std::string full_name_stored_epi_dependency_;
-
-     std::string generateEpiDependencyFilename(const std::string& measurement_id);
-
-     hoNDArray< std::complex<float> > corrneg_output_format_analyze;
-     hoNDArray< std::complex<float> > corrpos_output_format_analyze;
+     std::string debug_folder_full_path_;
 
 };
 }
-#endif //EPICorrSMSGadget_H
+#endif //EPICorrSMSv0Gadget_H

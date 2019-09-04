@@ -92,6 +92,10 @@ set( gadgetron_smscore_header_files
         GenericReconSMSPrepGadget.h
         GenericReconSMSPostGadget.h
         GenericReconCartesianSliceGrappaGadget.h
+        GenericReconSMSv0Base.h
+        GenericReconSMSPrepv0Gadget.h
+        GenericReconSMSPostv0Gadget.h
+        GenericReconCartesianSliceGrappav0Gadget.h
 )
 
 set( gadgetron_smscore_src_files 
@@ -107,6 +111,11 @@ set( gadgetron_smscore_src_files
         GenericReconSMSPrepGadget.cpp
         GenericReconSMSPostGadget.cpp
         GenericReconCartesianSliceGrappaGadget.cpp
+        GenericReconSMSv0Base.cpp
+        GenericReconSMSPrepv0Gadget.cpp
+        GenericReconSMSPostv0Gadget.cpp
+        GenericReconCartesianSliceGrappav0Gadget.cpp
+
         )
 
 set( gadgetron_smscore_config_files    

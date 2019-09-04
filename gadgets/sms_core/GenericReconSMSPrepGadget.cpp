@@ -19,9 +19,6 @@ int GenericReconSMSPrepGadget::process_config(ACE_Message_Block* mb)
 {
     GADGET_CHECK_RETURN(BaseClass::process_config(mb) == GADGET_OK, GADGET_FAIL);
 
-
-
-
     return GADGET_OK;
 }
 
@@ -69,11 +66,13 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
             GDEBUG_STREAM("GenericSMSPrepGadget - incoming data array ref : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
         }
 
-        if (recon_bit_->rbit_[e].sb_)
+        if (recon_bit_->rbit_[e].data_.data_.get_number_of_elements() > 0)
         {
-            // std::cout << " je suis la structure qui contient les données single band" << std::endl;
 
-            hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].sb_->data_;
+            // std::cout << " je suis la structure qui contient les données single band et/ou multiband" << std::endl;
+
+            hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
+            hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit_->rbit_[e].data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
 
             size_t RO = data.get_size(0);
             size_t E1 = data.get_size(1);
@@ -82,113 +81,68 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
             size_t N = data.get_size(4);
             size_t S = data.get_size(5);
             size_t SLC = data.get_size(6);
+            size_t new_N=1;
 
             GDEBUG_STREAM("GenericSMSPrepGadget - incoming data array sb : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
 
-            save_4D_with_SLC_7(data, "FID_SB4D", os.str());
+            // create to new hoNDArray for the sb and mb data
+            // ideally the memory allocation should occurs once for the mb hoNDArray
 
-            reorganize_data(data, indice_sb);
+            hoNDArray< std::complex<float> > sb;
+            hoNDArray< std::complex<float> > sb_8D;
+            hoNDArray< ISMRMRD::AcquisitionHeader > headers_sb;
 
-            save_4D_with_SLC_7(data, "FID_SB4D_reorganize", os.str());
+            hoNDArray< std::complex<float> > mb;
+            hoNDArray< std::complex<float> > mb_8D;
+            hoNDArray< ISMRMRD::AcquisitionHeader > headers_mb;
 
-            hoNDArray< std::complex<float> > data8D;
-            data8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
-            create_stacks_of_slices(data, data8D);
+            headers_mb.create(E1, E2, new_N, S , SLC );
+            mb.create(RO, E1, E2, CHA, new_N, S , SLC );
+            mb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , new_N, S );
 
-            save_4D_with_STK_8(data8D, "FID_SB4D_create", os.str());
-
-            if (is_wip_sequence==1)
+            if (N>1)
             {
-                // si WIP on applique le blip caipi
-                apply_relative_phase_shift(data8D);
-                save_4D_with_STK_8(data8D, "FID_SB4D_relative_shift", os.str());
+                // now if the dimension along mb is >1 , it means that the containers got sb and mb data
+                // please remind that the user_0 paramter must be defined in N_dimension in BucketToBuffer
+                // so we need to separate them
+                // then process the singleband data
+                // latter we wiil process the mb data
+                // and finally concatenate them into a new containers with a higher dimension (for the stack dim)            }
 
-                // et on applique aussi l'offset de phase
-                // recupération de l'offset de position dans la direction de coupe
-                hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit_->rbit_[e].sb_->headers_;
-                get_header_and_position_and_gap(data, headers_,  E1);
+                headers_sb.create(E1, E2, new_N, S , SLC );
+                sb.create(RO, E1, E2, CHA, new_N, S , SLC );
+                sb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , new_N, S );
 
-                apply_absolute_phase_shift(data8D);
-                save_4D_with_STK_8(data8D, "FID_SB4D_absolute_shift", os.str());
+                //TODO instead of using sb and headers_sb , it should be better to create something like  "recon_bit_sb->rbit_[e] "
+                extract_sb_and_mb_from_data( recon_bit_->rbit_[e], sb,  mb, headers_sb,  headers_mb);
 
-            }
-            else if (is_cmrr_sequence==1 && is_wip_sequence==0)
-            {
-                // si CMMR on ne fait rien
+                //TODO and then send it to the next function
+                pre_process_sb_data(sb, sb_8D, headers_sb, e);
+
             }
             else
             {
-                GERROR("is_wip_sequence && is_cmrr_sequence");
+                // only mb data
+                 mb = recon_bit_->rbit_[e].data_.data_;
+                 headers_mb = recon_bit_->rbit_[e].data_.headers_;
             }
 
-            //apply the average slice navigator
-
-            load_epi_data();
-
-            //prepare epi data
-
-            prepare_epi_data();
-
-            save_4D_with_STK_8(data8D, "FID_SB_avant_epi_nav", os.str());
-
-            apply_ghost_correction_with_STK6(data8D, recon_bit_->rbit_[e].sb_->headers_ ,  acceFactorSMSE1_[e] , false);
-
-            save_4D_with_STK_8(data8D, "FID_SB_apres_epi_nav", os.str());
-
-            m1->getObjectPtr()->rbit_[e].sb_->data_ = data8D;
-
-        }
-
-        if (recon_bit_->rbit_[e].data_.data_.get_number_of_elements() > 0)
-        {
-            // std::cout << " je suis la structure qui contient les données multi band" << std::endl;
-
-            hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
-
-            size_t RO = data.get_size(0);
-            size_t E1 = data.get_size(1);
-            size_t E2 = data.get_size(2);
-            size_t CHA = data.get_size(3);
-            size_t N = data.get_size(4);
-            size_t S = data.get_size(5);
-            size_t SLC = data.get_size(6);
-
-            GDEBUG_STREAM("GenericSMSPrepGadget - incoming data array data: [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
+            //then apply standard proccesing on mb
 
             if (!debug_folder_full_path_.empty())
             {
-                gt_exporter_.export_array_complex(data, debug_folder_full_path_ + "mb" + os.str());
+            save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(mb, "FID_MB4D", os.str());
             }
 
-            save_4D_with_SLC_7(data, "FID_MB4D", os.str());
+            pre_process_mb_data(mb, mb_8D,headers_mb , e);
 
-            remove_extra_dimension_and_permute_stack_dimension(data);
+            // il nous faut remettre les données avec les dimensions de N = 2 pour les envoyer aux gadgets suivant
+            // est-ce vraiment necessaire ??
 
-            save_4D_with_SLC_7(data, "FID_MB4D_remove", os.str());
-
-            size_t STK = data.get_size(6);
-
-            GDEBUG_STREAM("GenericSMSPrepGadget - incoming data array data: [RO E1 E2 CHA N S STK ] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N <<  " " << S << " " << STK  << "]");
-
-            // code usefull only for matlab comparison
-            // reorganize_data(data, indice_mb);
-            // save_4D_data(data, "FID_MB4D_reorganize", os.str());
-            // reorganize_data(data, arma::conv_to<arma::uvec>::from(order_of_acquisition_mb));
-
-            show_size(data,"FID_MB4D_reorganize_again" );
-            save_4D_with_SLC_7(data, "FID_MB4D_reorganize_again", os.str());
-
-            //apply the average slice navigator
-
-            save_4D_with_SLC_7(data, "FID_MB_avant_epi_nav", os.str());
-
-            apply_ghost_correction_with_STK7(data, recon_bit_->rbit_[e].data_.headers_ ,  acceFactorSMSE1_[e] , false);
-
-            save_4D_with_SLC_7(data, "FID_MB_apres_epi_nav", os.str());
-
-            //m1->getObjectPtr()->rbit_[e].data_.data_ = data;
+            // m1->getObjectPtr()->rbit_[e].sb_->data_ = data8D;
 
         }
+
     }
 
     if (perform_timing.value()) { gt_timer_.stop(); }
@@ -202,11 +156,232 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
     return GADGET_OK;
 }
 
-
-
-
-void GenericReconSMSPrepGadget::get_header_and_position_and_gap(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > headers_, size_t E1)
+//sur les données single band
+void GenericReconSMSPrepGadget::pre_process_sb_data(hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& sb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, size_t e)
 {
+    // three steps are necessary
+    // 1) to reorganize the slices in the stack of slices according the to the slice acceleration
+    // 2) to apply (or not depending of the sequence implementation) a blip caipi shift along the y
+    // 3) to apply the averaged epi ghost correction
+
+    reorganize_sb_data_to_8D(sb, sb_8D, e);
+
+    apply_blip_caipi_shift(sb_8D, h_sb,  e);
+
+    apply_averaged_epi_ghost_correction(sb_8D, h_sb, e);
+
+}
+
+
+void GenericReconSMSPrepGadget::reorganize_sb_data_to_8D(hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& sb_8D, size_t e)
+{
+    std::stringstream os;
+    os << "_encoding_" << e;
+    std::string suffix = os.str();
+
+    if (!debug_folder_full_path_.empty())
+    {
+    save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(sb, "FID_SB4D", os.str());
+    }
+
+    permute_slices_index(sb, indice_sb);
+
+    if (!debug_folder_full_path_.empty())
+    {
+    save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(sb, "FID_SB4D_permute_slices", os.str());
+    }
+
+    create_stacks_of_slices(sb, sb_8D);
+
+    if (!debug_folder_full_path_.empty())
+    {
+    save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB4D_create_stacks", os.str());
+    }
+}
+
+
+void GenericReconSMSPrepGadget::apply_blip_caipi_shift(hoNDArray< std::complex<float> >& sb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_sb, size_t e)
+{
+    std::stringstream os;
+    os << "_encoding_" << e;
+    std::string suffix = os.str();
+
+    if (is_wip_sequence==1)
+    {
+        // si WIP on applique le blip caipi
+        apply_relative_phase_shift(sb_8D);
+
+        if (!debug_folder_full_path_.empty())
+        {
+        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB4D_relative_shift", os.str());
+        }
+
+        // et on applique aussi l'offset de phase
+        // recupération de l'offset de position dans la direction de coupe
+        get_header_and_position_and_gap(sb_8D, headers_sb);
+
+        apply_absolute_phase_shift(sb_8D);
+
+        if (!debug_folder_full_path_.empty())
+        {
+        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB4D_absolute_shift", os.str());
+        }
+
+    }
+    else if (is_cmrr_sequence==1 && is_wip_sequence==0)
+    {
+        // si CMMR on ne fait rien
+    }
+    else
+    {
+        GERROR("is_wip_sequence && is_cmrr_sequence");
+    }
+}
+
+
+void GenericReconSMSPrepGadget::apply_averaged_epi_ghost_correction(hoNDArray< std::complex<float> >& sb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_sb, size_t e)
+{
+    std::stringstream os;
+    os << "_encoding_" << e;
+    std::string suffix = os.str();
+
+    //apply the average slice navigator
+
+    load_epi_data();
+
+    //prepare epi data
+
+    prepare_epi_data();
+
+    if (!debug_folder_full_path_.empty())
+    {
+    save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB_avant_epi_nav", os.str());
+    }
+
+    apply_ghost_correction_with_STK6(sb_8D, headers_sb ,  acceFactorSMSE1_[e] , false);
+
+    if (!debug_folder_full_path_.empty())
+    {
+    save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB_apres_epi_nav", os.str());
+    }
+
+}
+
+void GenericReconSMSPrepGadget::pre_process_mb_data(hoNDArray< std::complex<float> >& mb, hoNDArray< std::complex<float> >& mb_8D,hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb, size_t e)
+{
+
+    std::stringstream os;
+    os << "_encoding_" << e;
+    std::string suffix = os.str();
+
+    // a remplacer par mb_8;
+
+    reorganize_mb_data_to_8D(mb, mb_8D);
+    /*remove_extra_dimension_and_permute_stack_dimension(mb);
+
+    if (!debug_folder_full_path_.empty())
+    {
+    save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(mb, "FID_MB4D_remove", os.str());
+    }
+
+    size_t STK = mb.get_size(6);
+
+    // code usefull only for matlab comparison
+    // reorganize_data(data, indice_mb);
+    // save_4D_data(data, "FID_MB4D_reorganize", os.str());
+    // reorganize_data(data, arma::conv_to<arma::uvec>::from(order_of_acquisition_mb));
+
+    show_size(data,"FID_MB4D_reorganize_again" );
+    if (!debug_folder_full_path_.empty())
+    {
+        save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(data, "FID_MB4D_reorganize_again", os.str());
+    }
+
+    //apply the average slice navigator
+
+    save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(data, "FID_MB_avant_epi_nav", os.str());
+
+    apply_ghost_correction_with_STK7(data, recon_bit_->rbit_[e].data_.headers_ ,  acceFactorSMSE1_[e] , false);
+
+    save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(data, "FID_MB_apres_epi_nav", os.str());
+
+    //m1->getObjectPtr()->rbit_[e].data_.data_ = data;
+
+    */
+
+}
+
+
+//sur les données single band
+void GenericReconSMSPrepGadget::extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb)
+{
+    //TODO instead of creating a new sb and sb_header i t would be easier to create a new reconbit
+
+    hoNDArray< std::complex<float> >& data = recon_bit.data_.data_;
+    hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit.data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
+
+    size_t RO=data.get_size(0);
+    size_t E1=data.get_size(1);
+    size_t E2=data.get_size(2);
+    size_t CHA=data.get_size(3);
+    size_t N=data.get_size(4);
+    size_t S=data.get_size(5);
+    size_t SLC=data.get_size(6);
+
+    size_t hE1=headers_.get_size(0);
+    size_t hE2=headers_.get_size(1);
+    size_t hN=headers_.get_size(2);
+    size_t hS=headers_.get_size(3);
+    size_t hSLC=headers_.get_size(4);
+
+    GDEBUG_STREAM("GenericSMSPrepGadget - incoming headers_ array : [E1, E2, N, S, LOC] - [" << hE1 << " " << hE2 << " " << hN << " " << hS << " " << hSLC << "]");
+
+    if (N!=2)
+    {
+        GERROR_STREAM("size(N) should be equal to 2 ");
+    }
+
+    size_t n, s, slc;
+
+    for (slc = 0; slc < SLC; slc++)
+    {
+        for (s = 0; s < S; s++)
+        {
+            for (n = 0; n < N; n++)
+            {
+                std::complex<float> * in = &(data(0, 0, 0, 0, n, s, slc));
+                std::complex<float> * out_sb = &(sb(0, 0, 0, 0, 0, s, slc));
+                std::complex<float> * out_mb = &(mb(0, 0, 0, 0, 0, s, slc));
+
+                ISMRMRD::AcquisitionHeader *in_h=&(headers_(0,0,n,s,slc));
+                ISMRMRD::AcquisitionHeader *out_h_sb=&(h_sb(0,0,0,s,slc));
+                ISMRMRD::AcquisitionHeader *out_h_mb=&(h_mb(0,0,0,s,slc));
+
+                if (n==1)
+                {
+                    memcpy(out_sb , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+                    memcpy(out_h_sb , in_h, sizeof(ISMRMRD::AcquisitionHeader)*E1*E2);
+                }
+                else
+                {
+                    memcpy(out_mb , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+                    memcpy(out_h_mb , in_h, sizeof(ISMRMRD::AcquisitionHeader)*E1*E2);
+                }
+            }
+        }
+    }
+
+    // how to put
+    // sb  ( hoNDArray< std::complex<float> > )
+    // and h_sb  (hoNDArray< ISMRMRD::AcquisitionHeader > headers_)
+    // into recon_bit.data_,  what is the contructor of recon_bit.data_;
+
+}
+
+
+void GenericReconSMSPrepGadget::get_header_and_position_and_gap(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > headers_)
+{
+    size_t E1 = data.get_size(1);
     size_t SLC=lNumberOfSlices_;
     size_t STK=lNumberOfStacks_;
     size_t MB=MB_factor;
@@ -287,8 +462,8 @@ void GenericReconSMSPrepGadget::get_header_and_position_and_gap(hoNDArray< std::
 
             if (z_offset_geo(index(m+1))>z_offset_geo(index(m)))
             {
-                // GDEBUG_STREAM("distance au centre de la coupe la proche: " <<z_offset_geo(index(m))) );
-                // GDEBUG_STREAM("distance entre les coupes simultanées: " <<  z_offset_geo(index(m+1))-z_offset_geo(index(m))) );
+                 GDEBUG_STREAM("distance au centre de la coupe la proche: " <<z_offset_geo(index(m))) ;
+                 GDEBUG_STREAM("distance entre les coupes simultanées: " <<  z_offset_geo(index(m+1))-z_offset_geo(index(m))) ;
 
                 z_gap(m)=z_offset_geo(index(m+1))-z_offset_geo(index(m));
             }
@@ -296,11 +471,11 @@ void GenericReconSMSPrepGadget::get_header_and_position_and_gap(hoNDArray< std::
         }
     }
 
-    // std::cout << z_gap<< std::endl;
+    std::cout << z_gap<< std::endl;
 }
 
 
-void GenericReconSMSPrepGadget::reorganize_data(hoNDArray< std::complex<float> >& data, arma::uvec indice)
+void GenericReconSMSPrepGadget::permute_slices_index(hoNDArray< std::complex<float> >& data, arma::uvec indice)
 {
     size_t RO=data.get_size(0);
     size_t E1=data.get_size(1);
@@ -393,6 +568,54 @@ void GenericReconSMSPrepGadget::remove_extra_dimension_and_permute_stack_dimensi
 
 
 
+void GenericReconSMSPrepGadget::reorganize_mb_data_to_8D(hoNDArray< std::complex<float> >& mb,hoNDArray< std::complex<float> >& mb_8D )
+{
+    size_t RO=mb.get_size(0);
+    size_t E1=mb.get_size(1);
+    size_t E2=mb.get_size(2);
+    size_t CHA=mb.get_size(3);
+    size_t N=mb.get_size(4);
+    size_t S=mb.get_size(5);
+    size_t SLC=mb.get_size(6);
+
+    //mb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , new_N, S );
+
+    //hoNDArray< std::complex<float> > FID_MB;
+    //FID_MB.create(RO, E1, E2, CHA,  N, S , lNumberOfStacks_ );
+
+    //size_t nb_elements_multiband = data.get_number_of_elements()/MB_factor;
+
+    size_t index_in;
+    size_t index_out;
+
+    size_t n, s;
+    for (int a = 0; a < lNumberOfStacks_; a++)
+    {
+        index_in=indice_slice_mb[a];
+        index_out=indice_mb[a];
+
+        for (s = 0; s < S; s++)
+        {
+            size_t usedS = s;
+            if (usedS >= S) usedS = S - 1;
+
+            for (n = 0; n < N; n++)
+            {
+                size_t usedN = n;
+                if (usedN >= N) usedN = N - 1;
+
+                std::complex<float> * in = &(mb(0, 0, 0, 0, n, s, index_in));
+                std::complex<float> * out = &(mb_8D(0, 0, 0, 0,  0, index_out, 0, s));
+
+                memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+
+            }
+        }
+    }
+
+}
+
+
 
 //sur les données single band
 void GenericReconSMSPrepGadget::create_stacks_of_slices(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack)
@@ -423,9 +646,7 @@ void GenericReconSMSPrepGadget::create_stacks_of_slices(hoNDArray< std::complex<
             {
                 for (n = 0; n < N; n++)
                 {
-
                     std::complex<float> * in = &(data(0, 0, 0, 0, n, s, index));
-
                     std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
 
                     memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);

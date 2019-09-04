@@ -34,7 +34,6 @@ namespace Gadgetron {
             GWARN_STREAM("Incoming recon_bit has more encoding spaces than the protocol : " << recon_bit_->rbit_.size() << " instead of " << num_encoding_spaces_);
         }
 
-
         // for every encoding space, prepare the recon_bit_->rbit_[e].ref_
         size_t e, n, s, slc;
         for (e = 0; e < recon_bit_->rbit_.size(); e++)
@@ -71,8 +70,6 @@ namespace Gadgetron {
                 hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
                 hoNDArray< ISMRMRD::AcquisitionHeader > headers_ = recon_bit_->rbit_[e].data_.headers_;
                 ISMRMRD::AcquisitionHeader &  curr_headers = headers_(0, 0, 0, 0, 1);
-
-
 
                 size_t RO = data.get_size(0);
                 size_t E1 = data.get_size(1);

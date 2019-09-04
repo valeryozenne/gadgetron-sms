@@ -28,3 +28,4 @@ tags
 test/integration/*.xprot
 test/integration/*.xml
 .atom-build.json
+CMakeLists.txt.user*

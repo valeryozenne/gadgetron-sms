@@ -1,4 +1,4 @@
-/** \file   GenericReconSMSBase.h
+/** \file   GenericReconSMSv0Base.h
     \brief  This is the class gadget for both 2DT and 3DT cartesian reconstruction to convert the data into eigen channel, working on the IsmrmrdReconData.
             If incoming data has the ref, ref data will be used to compute KLT coefficients
     \author Hui Xue
@@ -15,16 +15,16 @@
 
 namespace Gadgetron {
 
-    class EXPORTGADGETSSMSCORE GenericReconSMSBase : public GenericReconDataBase
+    class EXPORTGADGETSSMSCORE GenericReconSMSv0Base : public GenericReconDataBase
     {
     public:
-        GADGET_DECLARE(GenericReconSMSBase);
+        GADGET_DECLARE(GenericReconSMSv0Base);
 
         typedef GenericReconDataBase BaseClass;
         //typedef hoNDKLT< std::complex<float> > KLTType;
 
-        GenericReconSMSBase();
-        ~GenericReconSMSBase();
+        GenericReconSMSv0Base();
+        ~GenericReconSMSv0Base();
 
         /// ------------------------------------------------------------------------------------
         /// parameters to control the reconstruction
@@ -113,7 +113,7 @@ namespace Gadgetron {
 
         virtual void save_4D_data(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
-        virtual void save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
+        virtual void save_4D_with_SLC_7(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
         virtual void save_4D_with_STK_5(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
@@ -121,7 +121,7 @@ namespace Gadgetron {
 
         virtual void save_4D_with_STK_7(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
-        virtual void save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
+        virtual void save_4D_with_STK_8(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
         virtual void save_4D_8D_kspace(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 

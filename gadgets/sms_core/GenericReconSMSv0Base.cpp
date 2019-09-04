@@ -1,5 +1,5 @@
 
-#include "GenericReconSMSBase.h"
+#include "GenericReconSMSv0Base.h"
 #include <iomanip>
 
 #include "hoNDArray_reductions.h"
@@ -8,15 +8,15 @@
 
 namespace Gadgetron {
 
-GenericReconSMSBase::GenericReconSMSBase() : BaseClass()
+GenericReconSMSv0Base::GenericReconSMSv0Base() : BaseClass()
 {
 }
 
-GenericReconSMSBase::~GenericReconSMSBase()
+GenericReconSMSv0Base::~GenericReconSMSv0Base()
 {
 }
 
-int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
+int GenericReconSMSv0Base::process_config(ACE_Message_Block* mb)
 {
     GADGET_CHECK_RETURN(BaseClass::process_config(mb) == GADGET_OK, GADGET_FAIL);
 
@@ -30,11 +30,15 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
         GDEBUG("Error parsing ISMRMRD Header");
     }
 
+
+
     ISMRMRD::EncodingSpace e_space = h.encoding[0].encodedSpace;
 
     dimensions_.push_back(e_space.matrixSize.x);
     dimensions_.push_back(e_space.matrixSize.y);
     dimensions_.push_back(e_space.matrixSize.z);
+
+
 
 
     /////////////////////////////////
@@ -222,7 +226,7 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
     return GADGET_OK;
 }
 
-int GenericReconSMSBase::process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1)
+int GenericReconSMSv0Base::process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1)
 {
 
     return GADGET_OK;
@@ -231,7 +235,7 @@ int GenericReconSMSBase::process(Gadgetron::GadgetContainerMessage< IsmrmrdRecon
 
 
 
-void GenericReconSMSBase::save_4D_data(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
+void GenericReconSMSv0Base::save_4D_data(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
 {
     size_t X1 = input.get_size(0);
     size_t X2 = input.get_size(1);
@@ -262,7 +266,7 @@ void GenericReconSMSBase::save_4D_data(hoNDArray< std::complex<float> >& input, 
 
 
 
-void GenericReconSMSBase::save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
+void GenericReconSMSv0Base::save_4D_with_SLC_7(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
 {
     size_t RO = input.get_size(0);
     size_t E1 = input.get_size(1);
@@ -275,7 +279,7 @@ void GenericReconSMSBase::save_7D_containers_as_4D_matrix_with_a_loop_along_the_
     if ( N> 1 || S> 1  )
     {
 
-        GERROR_STREAM(" save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim failed ... ");
+        GERROR_STREAM(" save_4D_with_SLC failed ... ");
     }
 
     hoNDArray< std::complex<float> > output;
@@ -297,7 +301,7 @@ void GenericReconSMSBase::save_7D_containers_as_4D_matrix_with_a_loop_along_the_
 }
 
 
-void GenericReconSMSBase::save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
+void GenericReconSMSv0Base::save_4D_with_STK_8(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
 {
     size_t RO = input.get_size(0);
     size_t E1 = input.get_size(1);
@@ -336,7 +340,7 @@ void GenericReconSMSBase::save_8D_containers_as_4D_matrix_with_a_loop_along_the_
 }
 
 
-void GenericReconSMSBase::save_4D_with_STK_5(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
+void GenericReconSMSv0Base::save_4D_with_STK_5(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
 {
     size_t RO = input.get_size(0);
     size_t E1 = input.get_size(1);
@@ -374,7 +378,7 @@ void GenericReconSMSBase::save_4D_with_STK_5(hoNDArray< std::complex<float> >& i
 
 
 
-void GenericReconSMSBase::save_4D_with_STK_6(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
+void GenericReconSMSv0Base::save_4D_with_STK_6(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
 {
     size_t RO = input.get_size(0);
     size_t E1 = input.get_size(1);
@@ -401,7 +405,7 @@ void GenericReconSMSBase::save_4D_with_STK_6(hoNDArray< std::complex<float> >& i
     output.clear();
 }
 
-void GenericReconSMSBase::save_4D_with_STK_7(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
+void GenericReconSMSv0Base::save_4D_with_STK_7(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
 {
     size_t RO = input.get_size(0);
     size_t E1 = input.get_size(1);
@@ -438,7 +442,7 @@ void GenericReconSMSBase::save_4D_with_STK_7(hoNDArray< std::complex<float> >& i
 }
 
 
-void GenericReconSMSBase::save_4D_8D_kspace(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
+void GenericReconSMSv0Base::save_4D_8D_kspace(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
 {
     size_t RO = input.get_size(0);
     size_t E1 = input.get_size(1);
@@ -481,7 +485,7 @@ void GenericReconSMSBase::save_4D_8D_kspace(hoNDArray< std::complex<float> >& in
 
 
 
-arma::ivec GenericReconSMSBase::map_interleaved_acquisitions(int number_of_slices, bool no_reordering )
+arma::ivec GenericReconSMSv0Base::map_interleaved_acquisitions(int number_of_slices, bool no_reordering )
 {
 
     arma::ivec index(number_of_slices);
@@ -533,7 +537,7 @@ arma::ivec GenericReconSMSBase::map_interleaved_acquisitions(int number_of_slice
 }
 
 
-arma::imat GenericReconSMSBase::get_map_slice_single_band(int MB_factor, int lNumberOfStacks, arma::ivec order_of_acquisition_mb, bool no_reordering)
+arma::imat GenericReconSMSv0Base::get_map_slice_single_band(int MB_factor, int lNumberOfStacks, arma::ivec order_of_acquisition_mb, bool no_reordering)
 {
     arma::imat output(lNumberOfStacks, MB_factor);
     output.zeros();
@@ -559,7 +563,8 @@ arma::imat GenericReconSMSBase::get_map_slice_single_band(int MB_factor, int lNu
 }
 
 
-void GenericReconSMSBase::show_size(hoNDArray< std::complex<float> >& input, std::string name)
+
+void GenericReconSMSv0Base::show_size(hoNDArray< std::complex<float> >& input, std::string name)
 {
     size_t RO = input.get_size(0);
     size_t E1 = input.get_size(1);
@@ -570,12 +575,12 @@ void GenericReconSMSBase::show_size(hoNDArray< std::complex<float> >& input, std
     size_t X7 = input.get_size(6);
     size_t X8 = input.get_size(7);
 
-    GDEBUG_STREAM("GenericReconSMSBase - "<<  name << ": [X1 X2 X3 X4 X5 X6 X7 X8 ] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << X5 <<  " " << X6 << " " << X7 << " " << X8  << "]");
+    GDEBUG_STREAM("GenericReconSMSv0Base - "<<  name << ": [X1 X2 X3 X4 X5 X6 X7 X8 ] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << X5 <<  " " << X6 << " " << X7 << " " << X8  << "]");
 }
 
 
 
-void GenericReconSMSBase::load_epi_data()
+void GenericReconSMSv0Base::load_epi_data()
 {
     ///------------------------------------------------------------------------
     /// FR relecture des corrections single band EPI
@@ -596,16 +601,16 @@ void GenericReconSMSBase::load_epi_data()
         std::ostringstream oslc;
         oslc << s;
 
-        arma::cx_fvec corrneg=Gadgetron::LoadCplxVectorFromtheDisk("/tmp/", "gadgetron/", "corrneg_slice_",   oslc.str(),  ".bin");
-        arma::cx_fvec corrpos=Gadgetron::LoadCplxVectorFromtheDisk("/tmp/", "gadgetron/", "corrpos_slice_",   oslc.str(),  ".bin");
+        arma::cx_fvec corrneg=Gadgetron::LoadCplxVectorFromtheDisk("/tmp/", "gadgetron/", "corrneg_",   oslc.str(),  ".bin");
+        arma::cx_fvec corrpos=Gadgetron::LoadCplxVectorFromtheDisk("/tmp/", "gadgetron/", "corrpos_",   oslc.str(),  ".bin");
 
-        arma::cx_fvec corrneg_no_exp=Gadgetron::LoadCplxVectorFromtheDisk("/tmp/", "gadgetron/", "corrneg_no_exp_slice_",   oslc.str(),  ".bin");
-        arma::cx_fvec corrpos_no_exp=Gadgetron::LoadCplxVectorFromtheDisk("/tmp/", "gadgetron/", "corrpos_no_exp_slice_",   oslc.str(),  ".bin");
+        arma::cx_fvec corrneg_no_exp=Gadgetron::LoadCplxVectorFromtheDisk("/tmp/", "gadgetron/", "corrneg_no_exp_",   oslc.str(),  ".bin");
+        arma::cx_fvec corrpos_no_exp=Gadgetron::LoadCplxVectorFromtheDisk("/tmp/", "gadgetron/", "corrpos_no_exp_",   oslc.str(),  ".bin");
 
         /*if (s==2)
         {
-           std::cout << exp(corrneg_no_exp)<< std::endl;
-           std::cout << exp(corrpos_no_exp)<< std::endl;
+            std::cout << exp(corrneg_no_exp)<< std::endl;
+            //std::cout << exp(corrpos_no_exp)<< std::endl;
         }*/
 
         GADGET_CHECK_THROW( size(corrneg,0) == dimensions_[0] );
@@ -635,7 +640,7 @@ void GenericReconSMSBase::load_epi_data()
 
 
 
-void GenericReconSMSBase::compute_mean_epi_nav(hoNDArray< std::complex<float> >& input,  hoNDArray< std::complex<float> >& output)
+void GenericReconSMSv0Base::compute_mean_epi_nav(hoNDArray< std::complex<float> >& input,  hoNDArray< std::complex<float> >& output)
 {
 
     size_t RO=input.get_size(0);
@@ -663,7 +668,7 @@ void GenericReconSMSBase::compute_mean_epi_nav(hoNDArray< std::complex<float> >&
 }
 
 
-void GenericReconSMSBase::reorganize_nav(hoNDArray< std::complex<float> >& data, arma::uvec indice)
+void GenericReconSMSv0Base::reorganize_nav(hoNDArray< std::complex<float> >& data, arma::uvec indice)
 {
     size_t RO=data.get_size(0);
     size_t SLC=data.get_size(1);
@@ -686,7 +691,7 @@ void GenericReconSMSBase::reorganize_nav(hoNDArray< std::complex<float> >& data,
 }
 
 //sur les données single band
-void GenericReconSMSBase::create_stacks_of_nav(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack)
+void GenericReconSMSv0Base::create_stacks_of_nav(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack)
 {
     size_t RO=data.get_size(0);
     size_t SLC=data.get_size(1);
@@ -715,7 +720,7 @@ void GenericReconSMSBase::create_stacks_of_nav(hoNDArray< std::complex<float> >&
 
 
 
-void GenericReconSMSBase::prepare_epi_data()
+void GenericReconSMSv0Base::prepare_epi_data()
 {
     size_t RO=epi_nav_neg_.get_size(0);
 
@@ -773,7 +778,7 @@ void GenericReconSMSBase::prepare_epi_data()
 
 
 
-void GenericReconSMSBase::define_usefull_parameters(IsmrmrdReconBit &recon_bit, size_t e)
+void GenericReconSMSv0Base::define_usefull_parameters(IsmrmrdReconBit &recon_bit, size_t e)
 {
 
     size_t start_E1_SB(0), end_E1_SB(0);
@@ -846,7 +851,7 @@ void GenericReconSMSBase::define_usefull_parameters(IsmrmrdReconBit &recon_bit, 
 }
 
 
-int GenericReconSMSBase::get_reduced_E1_size(size_t start_E1 , size_t end_E1 , size_t acc )
+int GenericReconSMSv0Base::get_reduced_E1_size(size_t start_E1 , size_t end_E1 , size_t acc )
 {
     int output;
 
@@ -860,7 +865,7 @@ int GenericReconSMSBase::get_reduced_E1_size(size_t start_E1 , size_t end_E1 , s
 }
 
 
-void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool optimal )
+void GenericReconSMSv0Base::apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool optimal )
 {
     size_t RO = data.get_size(0);
     size_t E1 = data.get_size(1);
@@ -968,7 +973,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
 
 
 
-void GenericReconSMSBase::apply_ghost_correction_with_STK7(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool optimal )
+void GenericReconSMSv0Base::apply_ghost_correction_with_STK7(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool optimal )
 {
     size_t RO = data.get_size(0);
     size_t E1 = data.get_size(1);
@@ -1057,5 +1062,5 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK7(hoNDArray< std::compl
 
 
 
-GADGET_FACTORY_DECLARE(GenericReconSMSBase)
+GADGET_FACTORY_DECLARE(GenericReconSMSv0Base)
 }
