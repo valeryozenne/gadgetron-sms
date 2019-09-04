@@ -204,6 +204,7 @@ namespace Gadgetron
   public:
     IsmrmrdDataBuffered data_;
     boost::optional<IsmrmrdDataBuffered> ref_;
+    boost::optional<IsmrmrdDataBuffered> sb_;
 
     IsmrmrdReconBit() {}
     IsmrmrdReconBit(const IsmrmrdReconBit& obj)

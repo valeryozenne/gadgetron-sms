@@ -377,6 +377,7 @@ namespace Gadgetron {
             bucket->datastats_[espace].segment.insert(m1->getObjectPtr()->idx.segment);
             bucket->datastats_[espace].average.insert(m1->getObjectPtr()->idx.average);
             bucket->datastats_[espace].repetition.insert(m1->getObjectPtr()->idx.repetition);
+            bucket->datastats_[espace].user_0.insert(m1->getObjectPtr()->idx.user[0]);
         }
 
         if (ISMRMRD::FlagBit(ISMRMRD::ISMRMRD_ACQ_IS_PARALLEL_CALIBRATION).isSet(m1->getObjectPtr()->flags) ||
@@ -394,7 +395,8 @@ namespace Gadgetron {
             bucket->refstats_[espace].set.insert(m1->getObjectPtr()->idx.set);
             bucket->refstats_[espace].segment.insert(m1->getObjectPtr()->idx.segment);
             bucket->refstats_[espace].average.insert(m1->getObjectPtr()->idx.average);
-            bucket->refstats_[espace].repetition.insert(m1->getObjectPtr()->idx.repetition);
+            bucket->refstats_[espace].repetition.insert(m1->getObjectPtr()->idx.repetition);            
+            bucket->refstats_[espace].user_0.insert(m1->getObjectPtr()->idx.user[0]);
         }
 
         //We can release the data now. It is reference counted and counter have been incremented through operations above. 

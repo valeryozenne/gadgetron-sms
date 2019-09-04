@@ -40,7 +40,8 @@ set( mri_core_header_files
         mri_core_dependencies.h 
         mri_core_acquisition_bucket.h
         mri_core_girf_correction.h
-        mri_core_partial_fourier.h )
+        mri_core_partial_fourier.h 
+        mri_core_slice_grappa.h)
 
 set( mri_core_source_files
         mri_core_utility.cpp 
@@ -49,7 +50,7 @@ set( mri_core_source_files
         mri_core_kspace_filter.cpp
         mri_core_coil_map_estimation.cpp 
         mri_core_dependencies.cpp 
-        mri_core_partial_fourier.cpp mri_core_girf_correction.cpp )
+        mri_core_partial_fourier.cpp mri_core_girf_correction.cpp mri_core_slice_grappa.cpp)
 
 add_library(gadgetron_toolbox_mri_core SHARED 
      ${mri_core_header_files} ${mri_core_source_files} )

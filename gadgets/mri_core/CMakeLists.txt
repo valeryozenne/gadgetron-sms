@@ -136,7 +136,10 @@ set( gadgetron_mricore_header_files GadgetMRIHeaders.h
                                     NHLBICompression.h
                                     ImageAccumulatorGadget.h
                                     ImageArraySendMixin.h
-                                    ImageArraySendMixin.hpp )
+                                    ImageArraySendMixin.hpp
+                                    WriteSingleBandFlagsGadget.h
+                                    GenericReconSizeGadget.h
+                                    )
 
 set( gadgetron_mricore_src_files AcquisitionPassthroughGadget.cpp 
                                 AcquisitionFinishGadget.cpp 
@@ -195,6 +198,8 @@ set( gadgetron_mricore_src_files AcquisitionPassthroughGadget.cpp
                                 RateLimitGadget.cpp
                                 NoiseSummaryGadget.cpp
                                 ImageAccumulatorGadget.cpp
+                                WriteSingleBandFlagsGadget.cpp
+                                GenericReconSizeGadget.cpp
         )
 
 set( gadgetron_mricore_config_files

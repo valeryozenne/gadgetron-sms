@@ -834,6 +834,9 @@ void grappa3d_calib(const hoNDArray<T>& acsSrc, const hoNDArray<T>& acsDst,
             }
         }
 
+
+
+
         SolveLinearSystem_Tikhonov(A, B, x, thres);
 
         memcpy(ker.begin(), x.begin(), ker.get_number_of_bytes());

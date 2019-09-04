@@ -9,12 +9,14 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/toolboxes/core/cpu/math
   ${CMAKE_SOURCE_DIR}/toolboxes/gadgettools
   ${CMAKE_SOURCE_DIR}/toolboxes/mri/epi
+  ${CMAKE_SOURCE_DIR}/toolboxes/mri_core
   ${ARMADILLO_INCLUDE_DIRS}
 )
 
 add_library(gadgetron_epi SHARED 
   EPIReconXGadget.h EPIReconXGadget.cpp
   EPICorrGadget.h EPICorrGadget.cpp
+  EPICorrSMSGadget.h EPICorrSMSGadget.cpp
   EPIPackNavigatorGadget.h EPIPackNavigatorGadget.cpp
   FFTXGadget.h FFTXGadget.cpp
   CutXGadget.h CutXGadget.cpp
@@ -32,6 +34,7 @@ target_link_libraries(
   gadgetron_toolbox_cpufft
   gadgetron_toolbox_cpucore_math
   gadgetron_toolbox_log
+  gadgetron_toolbox_mri_core
   ${ISMRMRD_LIBRARIES}
   optimized ${ACE_LIBRARIES} debug ${ACE_DEBUG_LIBRARY} 
 )

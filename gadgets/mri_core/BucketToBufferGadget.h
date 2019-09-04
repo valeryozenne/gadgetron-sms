@@ -45,6 +45,7 @@ namespace Gadgetron{
                  "set",
                  "segment",
                  "slice",
+                 "user_0",
                  "");
 
       GADGET_PROPERTY_LIMITS(S_dimension, std::string, "S-Dimensions", "", 
@@ -56,6 +57,7 @@ namespace Gadgetron{
                  "set",
                  "segment",
                  "slice",
+                 "user_0",
                  "");
 
       GADGET_PROPERTY(split_slices, bool, "Split slices", false);

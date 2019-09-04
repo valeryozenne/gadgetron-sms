@@ -26,6 +26,7 @@ namespace Gadgetron
       std::set<uint16_t> set;
       std::set<uint16_t> segment;
       std::set<uint16_t> average;
+      std::set<uint16_t> user_0;
   };
 
   /** 
@@ -163,8 +164,10 @@ namespace Gadgetron
   public:
     std::vector< IsmrmrdAcquisitionData > data_;
     std::vector< IsmrmrdAcquisitionData > ref_;
+    std::vector< IsmrmrdAcquisitionData > sb_;
     std::vector< IsmrmrdAcquisitionBucketStats > datastats_;
     std::vector< IsmrmrdAcquisitionBucketStats > refstats_;
+    std::vector< IsmrmrdAcquisitionBucketStats > sbstats_;
     std::vector< ISMRMRD::Waveform > waveform_;
   };
   
