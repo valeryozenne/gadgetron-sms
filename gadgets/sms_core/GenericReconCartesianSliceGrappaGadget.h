@@ -161,6 +161,8 @@ namespace Gadgetron {
 
         virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb);
 
+        virtual void remove_unnecessary_kspace_mb2(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& output, size_t acc );
+
 
     };
 }

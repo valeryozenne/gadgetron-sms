@@ -53,6 +53,7 @@ int GenericReconCartesianSliceGrappaGadget::process(Gadgetron::GadgetContainerMe
     process_called_times_++;
 
     IsmrmrdReconData *recon_bit_ = m1->getObjectPtr();
+
     if (recon_bit_->rbit_.size() > num_encoding_spaces_) {
         GWARN_STREAM("Incoming recon_bit has more encoding spaces than the protocol : " << recon_bit_->rbit_.size()
                      << " instead of "
@@ -106,7 +107,6 @@ int GenericReconCartesianSliceGrappaGadget::process(Gadgetron::GadgetContainerMe
                  if (perform_timing.value()) { gt_timer_.stop();      }
             }
         }
-
     }
 
     if (perform_timing.value()) { gt_timer_local_.stop(); }
@@ -231,8 +231,14 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
 
     std::cout << "reduced_E1_ "<< std::endl;
 
-    hoNDArray< std::complex<float> > mb_reduce(RO, reduced_E1_, CHA, 1, STK, N, S);
-    remove_unnecessary_kspace_sb( recon_bit.data_.data_ ,  mb_reduce,  acceFactorSMSE1_[e] );
+    // TODO attention dimension MB =1 car c'est mb par définition il n'y a pas plusieurs coupes
+    hoNDArray< std::complex<float> > mb_reduce;
+    mb_reduce.create(RO, reduced_E1_, CHA, 1, STK, N, S);
+
+    show_size(recon_bit.data_.data_, " recon_bit.data_.data_ " );
+    show_size(mb_reduce, " mb_reduce ");
+
+    remove_unnecessary_kspace_mb2( recon_bit.data_.data_ ,  mb_reduce,  acceFactorSMSE1_[e] );
 
     if (!debug_folder_full_path_.empty())
     {
@@ -240,6 +246,7 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
         save_4D_with_STK_5(mb_reduce, "mb_reduce", "0");
     }
 
+    std::cout << "create  block_MB"<< " voxels_number_per_image_ "<< voxels_number_per_image_ << "  kernel_size_ "<< kernel_size_ << std::endl;
     hoNDArray< std::complex<float> > block_MB;
     block_MB.create(voxels_number_per_image_, kernel_size_, CHA, 1, STK, N, S);
 
@@ -352,7 +359,10 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
 
     GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - incoming data array sb : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N<< " " << S << "]");
 
-    hoNDArray< std::complex<float> > sb_reduce(RO, reduced_E1_, CHA, MB, STK, N, S);
+    std::cout << reduced_E1_<< std::endl;
+
+    hoNDArray< std::complex<float> > sb_reduce;
+    sb_reduce.create(RO, reduced_E1_, CHA, MB, STK, N, S);
 
     remove_unnecessary_kspace_sb( recon_bit.data_.data_ ,  sb_reduce,  acceFactorSMSE1_[e] );
 
@@ -576,6 +586,8 @@ void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_sb(hoNDAr
 
     size_t s,n,a,m,cha,e2,e1;
 
+    std::cout << "end_E1_ " << start_E1_<<  " end_E1_ " <<  end_E1_<< "acc "   << acc << std::endl;
+
     for (s = 0; s < S; s++)
     {
         for (n = 0; n < N; n++)
@@ -607,6 +619,61 @@ void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_sb(hoNDAr
     GADGET_CHECK_THROW(reduced_E1_ == index+1);
 
 }
+
+
+
+
+void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_mb2(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& output, size_t acc )
+{
+
+    size_t RO = input.get_size(0);
+    size_t E1 = input.get_size(1);
+    size_t E2 = input.get_size(2);
+    size_t CHA = input.get_size(3);
+    size_t MB = input.get_size(4);
+    size_t STK = input.get_size(5);
+    size_t N = input.get_size(6);
+    size_t S = input.get_size(7);
+
+    size_t index;
+
+    size_t s,n,a,m,cha,e2,e1;
+
+    std::cout << "end_E1_ " << start_E1_<<  " end_E1_ " <<  end_E1_<< "acc "   << acc << std::endl;
+
+    for (s = 0; s < S; s++)
+    {
+        for (n = 0; n < N; n++)
+        {
+            for (a = 0; a < STK; a++) {
+
+                //TODO ici c'est des data mb donc la dimension est = à 1
+                for (m = 0; m < 1; m++) {
+
+                    for (cha = 0; cha < CHA; cha++) {
+
+                        index=0;
+
+                        for (e1 = start_E1_; e1 < end_E1_; e1+=acc) {
+
+                            std::complex<float> * in = &(input(0, e1, 0, cha, m, a, n, s));
+                            std::complex<float> * out = &(output(0, index, cha, m, a, n, s));
+
+                            memcpy(out , in, sizeof(std::complex<float>)*RO);
+
+                            index++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    std::cout << "reduced_E1_"<< reduced_E1_<< "  index+1 "<< index+1 << std::endl;
+    GADGET_CHECK_THROW(reduced_E1_ == index+1);
+
+}
+
 
 
 

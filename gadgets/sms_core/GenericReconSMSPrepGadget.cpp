@@ -477,12 +477,16 @@ void GenericReconSMSPrepGadget::get_header_and_position_and_gap(hoNDArray< std::
 
     //selection d'un jeux de données :
     arma::ivec index(MB);
+    index.zeros();
+
+    index.print();
 
     z_gap.set_size(1);
 
     for (a = 0; a < 1; a++)
-    {        
-        index=MapSliceSMS.row(a);
+    {
+        MapSliceSMS.row(a).print();
+        index=MapSliceSMS.row(a).t();
 
         for (m = 0; m < MB-1; m++)
         {
