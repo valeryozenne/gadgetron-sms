@@ -79,24 +79,59 @@ namespace Gadgetron {
                 size_t S = data.get_size(5);
                 size_t SLC = data.get_size(6);
 
-                GDEBUG_STREAM("GenericCheckSizeGadget - incoming data array data: [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
+                size_t hE1=headers_.get_size(0);
+                size_t hE2=headers_.get_size(1);
+                size_t hN=headers_.get_size(2);
+                size_t hS=headers_.get_size(3);
+                size_t hSLC=headers_.get_size(4);
 
+                GDEBUG("GenericCheckSizeGadget - |--------------------------------------------------------------------------|\n");
                 if (N>1)
                 {
-                    GDEBUG("GenericCheckSizeGadget : detecting single band and multiband data, it should be the first repetition\n");
+                GDEBUG("GenericCheckSizeGadget - detecting single band and multiband data (if splitSMSGadget is OFF), it should be the first repetition\n");
+                }
 
-                    size_t ii;
+                bool repetition_zero=true;
+                bool single_band_data=false;
+
+                size_t ii;
+                for (ii=0; ii<recon_bit_->rbit_[e].data_.headers_.get_number_of_elements(); ii++)
+                {
+                    if( recon_bit_->rbit_[e].data_.headers_(ii).idx.repetition>0 )
+                    {
+                        GDEBUG_STREAM("GenericCheckSizeGadget - It is not the first repetition, it is the number "<< recon_bit_->rbit_[e].data_.headers_(ii).idx.repetition);
+                        repetition_zero=false;
+                        break;
+                    }
+                }
+
+                if (repetition_zero)
+                {
+                    GDEBUG("GenericCheckSizeGadget - It is the first repetition\n");
                     for (ii=0; ii<recon_bit_->rbit_[e].data_.headers_.get_number_of_elements(); ii++)
                     {
-                        if( recon_bit_->rbit_[e].data_.headers_(ii).idx.repetition>0 )
+                        if( recon_bit_->rbit_[e].data_.headers_(ii).idx.user[0]==1 )
                         {
-                        GERROR_STREAM("After checking, it is not the first repetition, something went wrong ... ");
-                        return GADGET_FAIL;
+                         GDEBUG_STREAM("GenericCheckSizeGadget - Single band data (if splitSMSGadget is ON)");
+                         single_band_data=true;
+                         break;
                         }
                     }
 
-                    GDEBUG("After checking, it is the first repetition\n");
+                    if (single_band_data==false)
+                    {
+                    GDEBUG_STREAM("GenericCheckSizeGadget - Multiband data (if splitSMSGadget is ON) ");
+                    }
                 }
+
+                GDEBUG_STREAM("GenericCheckSizeGadget - incoming data array data: [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
+
+                GDEBUG_STREAM("GenericCheckSizeGadget - incoming data array headers: [E1, E2, N, S, LOC] - [" << hE1 << " " << hE2 << " " << hN << " " << hS << " " << hSLC << "]");
+
+
+
+
+
             }
         }
 

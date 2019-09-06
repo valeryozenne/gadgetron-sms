@@ -177,7 +177,7 @@ int GenericReconSMSv0Base::process_config(ACE_Message_Block* mb)
     lNumberOfChannels_ = h.acquisitionSystemInformation->receiverChannels ? *h.acquisitionSystemInformation->receiverChannels : 1;
     lNumberOfStacks_=lNumberOfSlices_/MB_factor;
 
-    GDEBUG_STREAM(" lNumberOfSlices_  : " << lNumberOfSlices_ << " MB factor: "<< MB_factor << " lNumberOfStacks_: "<< lNumberOfStacks_ );
+    GDEBUG_STREAM("lNumberOfSlices_  : " << lNumberOfSlices_ << " MB factor: "<< MB_factor << " lNumberOfStacks_: "<< lNumberOfStacks_ );
 
 
     //////////////

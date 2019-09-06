@@ -1,5 +1,5 @@
 
-#include "GenericReconCartesianSliceGrappaGadget.h"
+#include "GenericReconCartesianSliceGrappav1Gadget.h"
 #include "mri_core_grappa.h"
 #include "hoNDArray_reductions.h"
 #include "hoNDArray_linalg.h"
@@ -17,13 +17,13 @@
 
 namespace Gadgetron {
 
-GenericReconCartesianSliceGrappaGadget::GenericReconCartesianSliceGrappaGadget() : BaseClass() {
+GenericReconCartesianSliceGrappav1Gadget::GenericReconCartesianSliceGrappav1Gadget() : BaseClass() {
 }
 
-GenericReconCartesianSliceGrappaGadget::~GenericReconCartesianSliceGrappaGadget() {
+GenericReconCartesianSliceGrappav1Gadget::~GenericReconCartesianSliceGrappav1Gadget() {
 }
 
-int GenericReconCartesianSliceGrappaGadget::process_config(ACE_Message_Block *mb) {
+int GenericReconCartesianSliceGrappav1Gadget::process_config(ACE_Message_Block *mb) {
     GADGET_CHECK_RETURN(BaseClass::process_config(mb) == GADGET_OK, GADGET_FAIL);
 
     // -------------------------------------------------
@@ -40,15 +40,13 @@ int GenericReconCartesianSliceGrappaGadget::process_config(ACE_Message_Block *mb
     num_encoding_spaces_ = NE;
     GDEBUG_CONDITION_STREAM(verbose.value(), "Number of encoding spaces: " << NE);
 
-    recon_obj_.resize(NE);
-
-    compteur=0;
+    //recon_obj_.resize(NE);
 
     return GADGET_OK;
 }
 
-int GenericReconCartesianSliceGrappaGadget::process(Gadgetron::GadgetContainerMessage<IsmrmrdReconData> *m1) {
-    if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappaGadget::process"); }
+int GenericReconCartesianSliceGrappav1Gadget::process(Gadgetron::GadgetContainerMessage<IsmrmrdReconData> *m1) {
+    if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappav1Gadget::process"); }
 
     process_called_times_++;
 
@@ -74,38 +72,88 @@ int GenericReconCartesianSliceGrappaGadget::process(Gadgetron::GadgetContainerMe
         if (recon_bit_->rbit_[e].data_.data_.get_number_of_elements() > 0)
         {
 
+            hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
+            hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit_->rbit_[e].data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
 
-            bool is_single_band=false;
-            bool is_first_repetition=detect_first_repetition(recon_bit_->rbit_[e]);
-            if (is_first_repetition==true) {  is_single_band=detect_single_band_data(recon_bit_->rbit_[e]);    }
+            size_t RO = data.get_size(0);
+            size_t E1 = data.get_size(1);
+            size_t E2 = data.get_size(2);
+            size_t CHA = data.get_size(3);
+            size_t MB = data.get_size(4);
+            size_t STK = data.get_size(5);
+            size_t N = data.get_size(6);
+            size_t S = data.get_size(7);
+            size_t new_N=1;
 
-            if (compteur==0)
+            size_t hE1=headers_.get_size(0);
+            size_t hE2=headers_.get_size(1);
+            size_t hN=headers_.get_size(2);
+            size_t hS=headers_.get_size(3);
+            size_t hSLC=headers_.get_size(4);
+
+            // create to new hoNDArray for the sb and mb data
+            // ideally the memory allocation should occurs once for the mb hoNDArray
+
+
+            hoNDArray< std::complex<float> > sb_8D;
+            hoNDArray< ISMRMRD::AcquisitionHeader > headers_sb;
+
+            hoNDArray< std::complex<float> > mb_8D;
+            hoNDArray< ISMRMRD::AcquisitionHeader > headers_mb;
+
+            Gadgetron::IsmrmrdReconData array_sb_data;
+            Gadgetron::IsmrmrdReconData array_mb_data;
+
+            headers_mb.create(hE1, hE2, new_N, hS , hSLC );
+            mb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , new_N, S );
+
+            headers_sb.create(E1, E2, new_N, hS , hSLC );
+            sb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , new_N, S );
+
+            if (N>1)
             {
+
             define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
+
+            extract_sb_and_mb_from_data(recon_bit_->rbit_[e], sb_8D, mb_8D, headers_sb, headers_mb);
+
+            array_sb_data.rbit_.resize(1);
+            array_sb_data.rbit_[0].data_.data_=sb_8D;
+            array_sb_data.rbit_[0].data_.headers_=headers_sb;
+
+            array_mb_data.rbit_.resize(1);
+            array_mb_data.rbit_[0].data_.data_=mb_8D;
+            array_mb_data.rbit_[0].data_.headers_=headers_mb;
+
             this->define_kernel_parameters(recon_bit_->rbit_[e], e);
-            compteur++;
-            std::cout <<" compteur  "<<  compteur << "  is_single_band " <<  is_single_band << std::endl;
-            }
 
-            show_size(recon_bit_->rbit_[e].data_.data_, "GenericReconCartesianSliceGrappaGadget - incoming data array data");
+            save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB_Slice", os.str());
 
-            if (is_single_band==true)  //presence de single band
-            {
-                save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(recon_bit_->rbit_[e].data_.data_, "FID_SB_Slice", os.str());
+            // std::cout << " je suis la structure qui contient les données single band" << std::endl;
+            //if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappav1Gadget::perform_calib"); }
+            //this->perform_slice_grappa_calib(array_sb_data.rbit_[0], e);
+            //if (perform_timing.value()) { gt_timer_.stop(); }
 
-                if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappaGadget::perform_calib"); }
-                this->perform_slice_grappa_calib(recon_bit_->rbit_[e], recon_obj_[e], e);
-                if (perform_timing.value()) { gt_timer_.stop(); }
             }
             else
             {
-                save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(recon_bit_->rbit_[e].data_.data_, "FID_MB_Slice", os.str());
-
-                 if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping"); }
-                 this->perform_slice_grappa_unwrapping(recon_bit_->rbit_[e], recon_obj_[e], e);
-                 if (perform_timing.value()) { gt_timer_.stop();      }
+                //array_mb_data.rbit_[0]=recon_bit_->rbit_[e];
             }
+
+
+
+
+            //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(mb_8D, "FID_MB_Slice", os.str());
+
+            //if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappav1Gadget::perform_slice_grappa_unwrapping"); }
+            //this->perform_slice_grappa_unwrapping(array_mb_data.rbit_[0],  e);
+            //if (perform_timing.value()) { gt_timer_.stop(); }
+
+
+
         }
+
+
 
     }
 
@@ -123,35 +171,15 @@ int GenericReconCartesianSliceGrappaGadget::process(Gadgetron::GadgetContainerMe
 }
 
 
-void GenericReconCartesianSliceGrappaGadget::define_kernel_parameters(IsmrmrdReconBit &recon_bit, size_t e)
-{
-
-    hoNDArray< std::complex<float> >& data = recon_bit.data_.data_;
-
-    size_t RO = data.get_size(0);
-    size_t E1 = data.get_size(1);
-
-    size_t kRO = grappa_kSize_RO.value();
-    size_t kNE1 = grappa_kSize_E1.value();
-
-    kernel_size_=kRO*kNE1;
-    blocks_RO_=RO-kRO+1;
-    blocks_E1_=reduced_E1_-kNE1+1;
-    voxels_number_per_image_=blocks_RO_*blocks_E1_;
-
-    GDEBUG("Kernel_size %d, blocks_RO:  %d,  blocks_E1: %d, voxels_number_per_image_: %d\n", kernel_size_, blocks_RO_,  blocks_E1_ ,voxels_number_per_image_  );
-}
-
-
 
 
 //sur les données single band
-void GenericReconCartesianSliceGrappaGadget::extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb)
+void GenericReconCartesianSliceGrappav1Gadget::extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb)
 {
     //TODO instead of creating a new sb and sb_header i t would be easier to create a new reconbit
 
     hoNDArray< std::complex<float> >& data = recon_bit.data_.data_;
-    //hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit.data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
+    hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit.data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
 
     size_t RO = data.get_size(0);
     size_t E1 = data.get_size(1);
@@ -162,13 +190,13 @@ void GenericReconCartesianSliceGrappaGadget::extract_sb_and_mb_from_data(Ismrmrd
     size_t N = data.get_size(6);
     size_t S = data.get_size(7);
 
-    //size_t hE1=headers_.get_size(0);
-    //size_t hE2=headers_.get_size(1);
-    //size_t hN=headers_.get_size(2);
-    //size_t hS=headers_.get_size(3);
-    //size_t hSLC=headers_.get_size(4);
+    size_t hE1=headers_.get_size(0);
+    size_t hE2=headers_.get_size(1);
+    size_t hN=headers_.get_size(2);
+    size_t hS=headers_.get_size(3);
+    size_t hSLC=headers_.get_size(4);
 
-    //GDEBUG_STREAM("GenericSMSPrepGadget - incoming headers_ array : [E1, E2, N, S, LOC] - [" << hE1 << " " << hE2 << " " << hN << " " << hS << " " << hSLC << "]");
+    GDEBUG_STREAM("GenericSMSPrepGadget - incoming headers_ array : [E1, E2, N, S, LOC] - [" << hE1 << " " << hE2 << " " << hN << " " << hS << " " << hSLC << "]");
 
     /*if (N!=2)
     {
@@ -185,19 +213,19 @@ void GenericReconCartesianSliceGrappaGadget::extract_sb_and_mb_from_data(Ismrmrd
             std::complex<float> * out_sb = &(sb(0, 0, 0, 0, 0, 0, s));
             std::complex<float> * out_mb = &(mb(0, 0, 0, 0, 0, 0, s));
 
-            //ISMRMRD::AcquisitionHeader *in_h=&(headers_(0,0,n,s,slc));
-            //ISMRMRD::AcquisitionHeader *out_h_sb=&(h_sb(0,0,0,s,slc));
-            //ISMRMRD::AcquisitionHeader *out_h_mb=&(h_mb(0,0,0,s,slc));
+            ISMRMRD::AcquisitionHeader *in_h=&(headers_(0,0,0,n,s));
+            ISMRMRD::AcquisitionHeader *out_h_sb=&(h_sb(0,0,0,0,s));
+            ISMRMRD::AcquisitionHeader *out_h_mb=&(h_mb(0,0,0,0,s));
 
             if (n==1)
             {
                 memcpy(out_sb , in, sizeof(std::complex<float>)*RO*E1*E2*CHA*MB*STK);
-                //memcpy(out_h_sb , in_h, sizeof(ISMRMRD::AcquisitionHeader)*E1*E2);
+                memcpy(out_h_sb , in_h, sizeof(ISMRMRD::AcquisitionHeader)*hE1*hE2);
             }
             else
             {
                 memcpy(out_mb , in, sizeof(std::complex<float>)*RO*E1*E2*CHA*MB*STK);
-                //memcpy(out_h_mb , in_h, sizeof(ISMRMRD::AcquisitionHeader)*E1*E2);
+                memcpy(out_h_mb , in_h, sizeof(ISMRMRD::AcquisitionHeader)*hE1*hE2);
             }
         }
     }
@@ -211,10 +239,28 @@ void GenericReconCartesianSliceGrappaGadget::extract_sb_and_mb_from_data(Ismrmrd
 
 }
 
+void GenericReconCartesianSliceGrappav1Gadget::define_kernel_parameters(IsmrmrdReconBit &recon_bit, size_t e)
+{
 
+hoNDArray< std::complex<float> >& data = recon_bit.data_.data_;
 
+size_t RO = data.get_size(0);
+size_t E1 = data.get_size(1);
 
-void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(IsmrmrdReconBit &recon_bit, ReconObjType &recon_obj, size_t e)
+size_t kRO = grappa_kSize_RO.value();
+size_t kNE1 = grappa_kSize_E1.value();
+
+std::cout << reduced_E1_ << std::endl;
+
+kernel_size_=kRO*kNE1;
+blocks_RO_=RO-kRO+1;
+blocks_E1_=reduced_E1_-kNE1+1;
+voxels_number_per_image_=blocks_RO_*blocks_E1_;
+
+GDEBUG("Kernel_size %d, blocks_RO:  %d,  blocks_E1: %d, voxels_number_per_image_: %d\n", kernel_size_, blocks_RO_,  blocks_E1_ ,voxels_number_per_image_  );
+}
+
+void GenericReconCartesianSliceGrappav1Gadget::perform_slice_grappa_unwrapping(IsmrmrdReconBit &recon_bit, size_t e)
 {
     hoNDArray< std::complex<float> >& data = recon_bit.data_.data_;
 
@@ -225,11 +271,9 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
     size_t MB = data.get_size(4);
     size_t STK = data.get_size(5);
     size_t N = data.get_size(6);
-    size_t S = data.get_size(7);
+    size_t S = data.get_size(6);
 
-    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - incoming data array data : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA <<  " " << MB <<  " " << STK << " " << N << " " << S<<  "]");
-
-    std::cout << "reduced_E1_ "<< std::endl;
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappav1Gadget - incoming mb array data : [RO E1 E2 CHA N S STK] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S<< " " << STK << "]");
 
     hoNDArray< std::complex<float> > mb_reduce(RO, reduced_E1_, CHA, 1, STK, N, S);
     remove_unnecessary_kspace_sb( recon_bit.data_.data_ ,  mb_reduce,  acceFactorSMSE1_[e] );
@@ -285,7 +329,7 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
 
                     hoNDArray<std::complex<float> > tempo_kernel(kernel_size_*CHA, CHA );
 
-                    std::complex<float> * in2;
+                     std::complex<float> * in2;
 
                     if (calib_fast.value()==1)
                     {
@@ -337,7 +381,8 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
 
 
 
-void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit, ReconObjType &recon_obj, size_t e) {
+void  GenericReconCartesianSliceGrappav1Gadget::perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit, size_t e) {
+
 
     hoNDArray< std::complex<float> >& sb = recon_bit.data_.data_;
 
@@ -350,7 +395,7 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
     size_t N = sb.get_size(6);
     size_t S = sb.get_size(7);
 
-    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - incoming data array sb : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N<< " " << S << "]");
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappav1Gadget - incoming data array sb : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N<< " " << S << "]");
 
     hoNDArray< std::complex<float> > sb_reduce(RO, reduced_E1_, CHA, MB, STK, N, S);
 
@@ -448,7 +493,7 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
 
                     double thres=grappa_reg_lamda.value();
 
-                    gt_timer_local_.start("GenericReconCartesianSliceGrappaGadget::process  Tikhonov ");
+                    gt_timer_local_.start("GenericReconCartesianSliceGrappav1Gadget::process  Tikhonov ");
 
                     for (unsigned long m = 0; m < MB; m++)
                     {
@@ -495,7 +540,7 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
                     ///
                     size_t p, q;
 
-                    gt_timer_local_.start("GenericReconCartesianSliceGrappaGadget::process  pinv ");
+                    gt_timer_local_.start("GenericReconCartesianSliceGrappav1Gadget::process  pinv ");
 
                     for (p = 0; p < size(measured_data_matrix,0); p++)
                     {
@@ -518,6 +563,9 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
                             CMK(p,q)=CMK_matrix(p,q);
                         }
                     }
+
+
+
 
                     for (unsigned long m = 0; m < MB; m++)
                     {
@@ -560,7 +608,7 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
 }
 
 
-void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_sb(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& output, size_t acc )
+void GenericReconCartesianSliceGrappav1Gadget::remove_unnecessary_kspace_sb(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& output, size_t acc )
 {
 
     size_t RO = input.get_size(0);
@@ -603,14 +651,13 @@ void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_sb(hoNDAr
         }
     }
 
-    std::cout << "reduced_E1_"<< reduced_E1_<< "  index+1 "<< index+1 << std::endl;
     GADGET_CHECK_THROW(reduced_E1_ == index+1);
 
 }
 
 
 
-void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_mb(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& output, size_t acc )
+void GenericReconCartesianSliceGrappav1Gadget::remove_unnecessary_kspace_mb(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& output, size_t acc )
 {
 
     size_t RO = input.get_size(0);
@@ -651,13 +698,11 @@ void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_mb(hoNDAr
         }
     }
 
-
-
     GADGET_CHECK_THROW(reduced_E1_ == index+1);
 
 }
 
-void GenericReconCartesianSliceGrappaGadget::extract_milieu_kernel(hoNDArray< std::complex<float> >& block_SB, hoNDArray< std::complex<float> >& missing_data)
+void GenericReconCartesianSliceGrappav1Gadget::extract_milieu_kernel(hoNDArray< std::complex<float> >& block_SB, hoNDArray< std::complex<float> >& missing_data)
 {
 
     ///------------------------------------------------------------------------
@@ -706,7 +751,7 @@ void GenericReconCartesianSliceGrappaGadget::extract_milieu_kernel(hoNDArray< st
 
 
 
-void GenericReconCartesianSliceGrappaGadget::im2col(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& block_SB)
+void GenericReconCartesianSliceGrappav1Gadget::im2col(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& block_SB)
 {
 
 
@@ -726,7 +771,7 @@ void GenericReconCartesianSliceGrappaGadget::im2col(hoNDArray< std::complex<floa
     GADGET_CHECK_THROW(CHA==lNumberOfChannels_)
             GADGET_CHECK_THROW(STK==lNumberOfStacks_);
 
-    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - im2col : [RO E1 CHA MB STK N S] - [" << RO << " " << E1 << " " << CHA << " " << MB << " " << STK << " " << N<< " " << S << "]");
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappav1Gadget - im2col : [RO E1 CHA MB STK N S] - [" << RO << " " << E1 << " " << CHA << " " << MB << " " << STK << " " << N<< " " << S << "]");
 
     size_t rowIdx, colIdx;
     size_t c,m,a,n,s;
@@ -777,5 +822,5 @@ void GenericReconCartesianSliceGrappaGadget::im2col(hoNDArray< std::complex<floa
 }
 
 
-GADGET_FACTORY_DECLARE(GenericReconCartesianSliceGrappaGadget)
+GADGET_FACTORY_DECLARE(GenericReconCartesianSliceGrappav1Gadget)
 }

@@ -1,4 +1,4 @@
-/** \file   GenericReconSMSPrepGadget.h
+/** \file   GenericReconSMSPrepv1Gadget.h
     \brief  This is the class gadget for both 2DT and 3DT cartesian reconstruction to convert the data into eigen channel, working on the IsmrmrdReconData.
             If incoming data has the ref, ref data will be used to compute KLT coefficients
     \author Hui Xue
@@ -14,15 +14,15 @@
 
 namespace Gadgetron {
 
-    class EXPORTGADGETSSMSCORE GenericReconSMSPrepGadget : public GenericReconSMSBase
+    class EXPORTGADGETSSMSCORE GenericReconSMSPrepv1Gadget : public GenericReconSMSBase
     {
     public:
-        GADGET_DECLARE(GenericReconSMSPrepGadget);
+        GADGET_DECLARE(GenericReconSMSPrepv1Gadget);
 
         typedef GenericReconSMSBase BaseClass;
 
-        GenericReconSMSPrepGadget();
-        ~GenericReconSMSPrepGadget();
+        GenericReconSMSPrepv1Gadget();
+        ~GenericReconSMSPrepv1Gadget();
 
         /// ------------------------------------------------------------------------------------
         /// parameters to control the reconstruction
@@ -51,11 +51,6 @@ namespace Gadgetron {
         // store the KLT coefficients for N, S, SLC at every encoding space
         //std::vector< std::vector< std::vector< std::vector< KLTType > > > > KLT_;
 
-        hoNDArray< std::complex<float> > sb_8D;
-
-        hoNDArray< std::complex<float> > mb_8D;
-
-
         // --------------------------------------------------
         // gadget functions
         // --------------------------------------------------
@@ -79,7 +74,7 @@ namespace Gadgetron {
 
         //common functions
 
-        virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
+        virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & m_sb);
         virtual void fusion_sb_and_mb_in_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb);
         virtual void apply_blip_caipi_shift(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, size_t e);
         virtual void apply_relative_phase_shift(hoNDArray< std::complex<float> >& data);

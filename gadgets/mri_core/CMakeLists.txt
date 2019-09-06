@@ -139,6 +139,7 @@ set( gadgetron_mricore_header_files GadgetMRIHeaders.h
                                     ImageArraySendMixin.hpp
                                     WriteSingleBandFlagsGadget.h
                                     GenericReconSizeGadget.h
+                                    GenericReconSplitSMSGadget.h
                                     )
 
 set( gadgetron_mricore_src_files AcquisitionPassthroughGadget.cpp 
@@ -200,6 +201,7 @@ set( gadgetron_mricore_src_files AcquisitionPassthroughGadget.cpp
                                 ImageAccumulatorGadget.cpp
                                 WriteSingleBandFlagsGadget.cpp
                                 GenericReconSizeGadget.cpp
+                                GenericReconSplitSMSGadget.cpp
         )
 
 set( gadgetron_mricore_config_files

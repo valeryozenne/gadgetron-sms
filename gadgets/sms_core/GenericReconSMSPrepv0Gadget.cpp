@@ -87,9 +87,9 @@ int GenericReconSMSPrepv0Gadget::process(Gadgetron::GadgetContainerMessage< Ismr
 
             save_4D_with_SLC_7(data, "FID_SB4D", os.str());
 
-            reorganize_data(data, indice_sb);
+            permute_slices(data, indice_sb);
 
-            save_4D_with_SLC_7(data, "FID_SB4D_reorganize", os.str());
+            save_4D_with_SLC_7(data, "FID_SB4D_permute_slices", os.str());
 
             hoNDArray< std::complex<float> > data8D;
             data8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
@@ -277,13 +277,25 @@ void GenericReconSMSPrepv0Gadget::get_header_and_position_and_gap(hoNDArray< std
     //selection d'un jeux de données :
     arma::ivec index(MB);
 
-    z_gap.set_size(1);
+    z_gap.set_size(MB);
+    z_gap.zeros();
+
+    //std::cout << size(MapSliceSMS,0) <<  " "<<  size(MapSliceSMS,1)<<  std::endl;
+    //MapSliceSMS.print();
 
     for (a = 0; a < 1; a++)
     {
-        for (m = 0; m < MB; m++)
-        {
-            index=MapSliceSMS.row(a);
+
+        std::cout << size(index,0) <<  " "<<  size(index,1)<< "  "<< size(MapSliceSMS.row(a))  << std::endl;
+        index=MapSliceSMS.row(a).t();
+
+        //index.print();
+        //z_offset_geo.print();
+
+        for (m = 0; m < MB-1; m++)
+        {           
+
+            std::cout << index(m) <<"  " <<  index(m+1)<< std::endl;
 
             if (z_offset_geo(index(m+1))>z_offset_geo(index(m)))
             {
@@ -295,12 +307,13 @@ void GenericReconSMSPrepv0Gadget::get_header_and_position_and_gap(hoNDArray< std
 
         }
     }
+//TODO Erreur de segmentation (core dumped) si c'est decommenté
 
-    // std::cout << z_gap<< std::endl;
+     //std::cout << z_gap<< std::endl;
 }
 
 
-void GenericReconSMSPrepv0Gadget::reorganize_data(hoNDArray< std::complex<float> >& data, arma::uvec indice)
+void GenericReconSMSPrepv0Gadget::permute_slices(hoNDArray< std::complex<float> >& data, arma::uvec indice)
 {
     size_t RO=data.get_size(0);
     size_t E1=data.get_size(1);

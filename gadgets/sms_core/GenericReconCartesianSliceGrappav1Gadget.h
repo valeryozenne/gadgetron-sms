@@ -1,4 +1,4 @@
-/** \file   GenericReconCartesianSliceGrappaGadget.h
+/** \file   GenericReconCartesianSliceGrappav1Gadget.h
     \brief  This is the class gadget for both 2DT and 3DT cartesian grappa and grappaone reconstruction, working on the IsmrmrdReconData.
     \author Hui Xue
 */
@@ -71,16 +71,16 @@ namespace Gadgetron {
 
 namespace Gadgetron {
 
-    class EXPORTGADGETSSMSCORE GenericReconCartesianSliceGrappaGadget : public GenericReconSMSBase
+    class EXPORTGADGETSSMSCORE GenericReconCartesianSliceGrappav1Gadget : public GenericReconSMSBase
     {
     public:
-        GADGET_DECLARE(GenericReconCartesianSliceGrappaGadget);
+        GADGET_DECLARE(GenericReconCartesianSliceGrappav1Gadget);
 
         typedef GenericReconSMSBase BaseClass;
         typedef Gadgetron::GenericReconCartesianGrappaObj< std::complex<float> > ReconObjType;
 
-        GenericReconCartesianSliceGrappaGadget();
-        ~GenericReconCartesianSliceGrappaGadget();
+        GenericReconCartesianSliceGrappav1Gadget();
+        ~GenericReconCartesianSliceGrappav1Gadget();
 
         /// ------------------------------------------------------------------------------------
         /// parameters to control the reconstruction
@@ -115,7 +115,7 @@ namespace Gadgetron {
         // variable for recon
         // --------------------------------------------------
         // record the recon kernel, coil maps etc. for every encoding space
-        std::vector< ReconObjType > recon_obj_;
+        //std::vector< ReconObjType > recon_obj_;
 
         size_t kernel_size_;
         size_t blocks_RO_;
@@ -134,9 +134,6 @@ namespace Gadgetron {
         // recon step functions
         // --------------------------------------------------
 
-
-        unsigned int compteur;
-
           hoNDArray< std::complex<float> > kernel;
           hoNDArray< std::complex<float> > kernelonov;
 
@@ -151,15 +148,15 @@ namespace Gadgetron {
 
         virtual void remove_unnecessary_kspace_mb(hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& sb_reduce, size_t acc);
 
-        virtual void perform_slice_grappa_unwrapping(IsmrmrdReconBit& recon_bit, ReconObjType& recon_obj, size_t encoding);
+        virtual void perform_slice_grappa_unwrapping(IsmrmrdReconBit& recon_bit, size_t encoding);
 
-        virtual void  perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit, ReconObjType &recon_obj, size_t e);
+        virtual void  perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit, size_t e);
 
         virtual void im2col(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& block_SB);
 
         virtual void extract_milieu_kernel(hoNDArray< std::complex<float> >& block_SB, hoNDArray< std::complex<float> >& missing_data);
 
-        virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb);
+        virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
 
 
     };

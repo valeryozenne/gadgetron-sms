@@ -104,6 +104,8 @@ namespace Gadgetron {
                 size_t SLC = data.get_size(6);
 
                 GDEBUG_STREAM("GenericCheckSizeGadget - incoming data array data: [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
+
+
             }
         }
 

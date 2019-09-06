@@ -60,54 +60,57 @@ namespace Gadgetron {
                 GDEBUG_STREAM("GenericReconSMSPostGadget - incoming data array ref : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
             }
 
-            if (recon_bit_->rbit_[e].sb_)
-            {
-               // std::cout << " je suis la structure qui contient les données single band" << std::endl;
-
-                hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].sb_->data_;
-
-                size_t RO = data.get_size(0);
-                size_t E1 = data.get_size(1);
-                size_t E2 = data.get_size(2);
-                size_t CHA = data.get_size(3);
-                size_t MB = data.get_size(4);
-                size_t STK = data.get_size(5);
-                size_t N = data.get_size(6);
-                size_t S = data.get_size(7);
-
-                GDEBUG_STREAM("GenericReconSMSPostGadget - incoming data array sb : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N << " " << S <<"]");
-
-                hoNDArray< std::complex<float> > data7D;
-
-                data7D.create(RO, E1, E2, CHA, N, S, STK*MB);
-
-                undo_stacks_ordering_to_match_gt_organisation(data, data7D);
-
-                m1->getObjectPtr()->rbit_[e].sb_->data_ = data7D;
-
-            }
-
             if (recon_bit_->rbit_[e].data_.data_.get_number_of_elements() > 0)
             {
-               // std::cout << " je suis la structure qui contient les données multi band" << std::endl;
 
-                hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
+                bool is_single_band=false;
+                bool is_first_repetition=detect_first_repetition(recon_bit_->rbit_[e]);
+                if (is_first_repetition==true) {  is_single_band=detect_single_band_data(recon_bit_->rbit_[e]);    }
 
-                size_t RO = data.get_size(0);
-                size_t E1 = data.get_size(1);
-                size_t E2 = data.get_size(2);
-                size_t CHA = data.get_size(3);
-                size_t MB = data.get_size(4);
-                size_t STK = data.get_size(5);
-                size_t N = data.get_size(6);
-                size_t S = data.get_size(7);
+                show_size(recon_bit_->rbit_[e].data_.data_, "GenericReconSMSPostGadget - incoming data array data");
 
-                GDEBUG_STREAM("GenericReconSMSPostGadget - incoming data array data: [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N << " " << S <<"]");
+                hoNDArray< std::complex<float> >& data_8D = recon_bit_->rbit_[e].data_.data_;
+
+                size_t RO = data_8D.get_size(0);
+                size_t E1 = data_8D.get_size(1);
+                size_t E2 = data_8D.get_size(2);
+                size_t CHA = data_8D.get_size(3);
+                size_t MB = data_8D.get_size(4);
+                size_t STK = data_8D.get_size(5);
+                size_t N = data_8D.get_size(6);
+                size_t S = data_8D.get_size(7);
 
 
+                if (is_single_band==true)  //presence de single band
+                {
 
+                    hoNDArray< std::complex<float> > data_7D;
+
+                    data_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
+
+                    undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D);
+
+                    m1->getObjectPtr()->rbit_[e].sb_->data_ = data_7D;
+
+                }
+                else
+                {
+
+                    hoNDArray< std::complex<float> > data_7D;
+
+                    data_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
+
+                    undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D);
+
+                    m1->getObjectPtr()->rbit_[e].sb_->data_ = data_7D;
+
+                }
 
             }
+
+
+
+
         }
 
         if (perform_timing.value()) { gt_timer_.stop(); }

@@ -135,13 +135,17 @@ namespace Gadgetron {
 
         virtual void reorganize_nav(hoNDArray< std::complex<float> >& data, arma::uvec indice);
 
-        virtual void prepare_epi_data();
+        virtual void prepare_epi_data(size_t e);
 
         virtual void apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc , bool optimal);
 
         virtual void apply_ghost_correction_with_STK7(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc , bool optimal);
 
         virtual void define_usefull_parameters(IsmrmrdReconBit &recon_bit, size_t e);
+        virtual void define_usefull_parameters_simple_version(IsmrmrdReconBit &recon_bit, size_t e);
+
+        virtual bool detect_first_repetition(IsmrmrdReconBit &recon_bit);
+        virtual bool detect_single_band_data(IsmrmrdReconBit &recon_bit);
 
         virtual int get_reduced_E1_size(size_t start_E1 , size_t end_E1, size_t acc );
 

@@ -58,7 +58,7 @@ namespace Gadgetron {
         virtual int process_config(ACE_Message_Block* mb);
         virtual int process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1);
         virtual void remove_extra_dimension_and_permute_stack_dimension(hoNDArray< std::complex<float> >& data);
-        virtual void reorganize_data(hoNDArray< std::complex<float> >& data, arma::uvec indice);
+        virtual void permute_slices(hoNDArray< std::complex<float> >& data, arma::uvec indice);
 
         virtual void create_stacks_of_slices(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& fid_stack_SB);
         virtual void apply_relative_phase_shift(hoNDArray< std::complex<float> >& data);

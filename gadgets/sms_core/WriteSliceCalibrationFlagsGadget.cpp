@@ -154,14 +154,14 @@ int WriteSliceCalibrationFlagsGadget::process(GadgetContainerMessage<ISMRMRD::Ac
                     // si c'est déjà vu c'est MB                    
                     m1->getObjectPtr()->setFlag(ISMRMRD::ISMRMRD_ACQ_USER2);
                     m1->getObjectPtr()->clearFlag(ISMRMRD::ISMRMRD_ACQ_USER1);
-                    m1->getObjectPtr()->idx.user[0]=1;
+                    //m1->getObjectPtr()->idx.user[0]=1;
                 }
                 else
                 {
                     // si c'est pas déjà vu c'est SB
                     m1->getObjectPtr()->setFlag(ISMRMRD::ISMRMRD_ACQ_USER1);
                     m1->getObjectPtr()->clearFlag(ISMRMRD::ISMRMRD_ACQ_USER2);
-                    m1->getObjectPtr()->idx.user[0]=0;
+                    //m1->getObjectPtr()->idx.user[0]=0;
                 }
             }
             else
@@ -174,14 +174,14 @@ int WriteSliceCalibrationFlagsGadget::process(GadgetContainerMessage<ISMRMRD::Ac
                     // si c'est déjà vu c'est MB                    
                     m1->getObjectPtr()->setFlag(ISMRMRD::ISMRMRD_ACQ_USER2);
                     m1->getObjectPtr()->clearFlag(ISMRMRD::ISMRMRD_ACQ_USER1);
-                    m1->getObjectPtr()->idx.user[0]=1;
+                    //m1->getObjectPtr()->idx.user[0]=1;
                 }
                 else
                 {
                     // si c'est pas déjà vu c'est SB
                     m1->getObjectPtr()->setFlag(ISMRMRD::ISMRMRD_ACQ_USER1);
                     m1->getObjectPtr()->clearFlag(ISMRMRD::ISMRMRD_ACQ_USER2);
-                    m1->getObjectPtr()->idx.user[0]=0;
+                    //m1->getObjectPtr()->idx.user[0]=0;
                 }
             }
         }

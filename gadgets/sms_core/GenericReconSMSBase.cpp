@@ -350,8 +350,10 @@ void GenericReconSMSBase::save_4D_with_STK_5(hoNDArray< std::complex<float> >& i
     {
         GERROR_STREAM(" save_4D_5D_data failed ... ");
     }
-
-
+    else
+    {
+        GDEBUG_STREAM(" saving 4D with STK_5 data soon ... ");
+    }
 
     hoNDArray< std::complex<float> > output;
     output.create(RO, E1, CHA , MB);
@@ -558,7 +560,6 @@ arma::imat GenericReconSMSBase::get_map_slice_single_band(int MB_factor, int lNu
     return output;
 }
 
-
 void GenericReconSMSBase::show_size(hoNDArray< std::complex<float> >& input, std::string name)
 {
     size_t RO = input.get_size(0);
@@ -572,8 +573,6 @@ void GenericReconSMSBase::show_size(hoNDArray< std::complex<float> >& input, std
 
     GDEBUG_STREAM("GenericReconSMSBase - "<<  name << ": [X1 X2 X3 X4 X5 X6 X7 X8 ] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << X5 <<  " " << X6 << " " << X7 << " " << X8  << "]");
 }
-
-
 
 void GenericReconSMSBase::load_epi_data()
 {
@@ -622,8 +621,8 @@ void GenericReconSMSBase::load_epi_data()
         std::complex<float> * out_pos_no_exp = &(epi_nav_pos_no_exp_(0, s));
         memcpy(out_pos_no_exp, &corrpos_no_exp(0) , sizeof(std::complex<float>)*dimensions_[0]);
 
-        /*
-        if (s==2)
+
+        /*if (s==2)
         {
             for (size_t ro = 0; ro < dimensions_[0]; ro++)
             {
@@ -715,8 +714,13 @@ void GenericReconSMSBase::create_stacks_of_nav(hoNDArray< std::complex<float> >&
 
 
 
-void GenericReconSMSBase::prepare_epi_data()
+void GenericReconSMSBase::prepare_epi_data(size_t e)
 {
+    std::stringstream os;
+    os << "_encoding_" << e;
+    std::string suffix = os.str();
+
+
     size_t RO=epi_nav_neg_.get_size(0);
 
     reorganize_nav(epi_nav_neg_, indice_sb);
@@ -743,7 +747,35 @@ void GenericReconSMSBase::prepare_epi_data()
     compute_mean_epi_nav(epi_nav_neg_no_exp_STK_, epi_nav_neg_no_exp_STK_mean_);
     compute_mean_epi_nav(epi_nav_pos_no_exp_STK_, epi_nav_pos_no_exp_STK_mean_);
 
- /*   for (size_t a = 0; a < lNumberOfStacks_; a++)
+    show_size(epi_nav_neg_no_exp_STK_,"epi_nav_neg_no_exp_STK_");
+    show_size(epi_nav_neg_no_exp_STK_mean_,"epi_nav_neg_no_exp_STK_mean_");
+
+
+    /*for (size_t s = 0; s < lNumberOfSlices_  ; s++)
+    {
+        if (s==2)
+        {
+            for (size_t ro = 0; ro < dimensions_[0]; ro++)
+            {
+                std::cout << " ro "<< epi_nav_neg_STK_(ro,0,s) << " "<< epi_nav_neg_no_exp_STK_(ro, 0, s) << " "<< epi_nav_neg_no_exp_STK_mean_(ro, 0, s)  << std::endl;
+            }
+        }
+    }*/
+
+    gt_exporter_.export_array_complex(epi_nav_neg_no_exp_STK_, debug_folder_full_path_ + "NAV_neg_no_exp_STK" + os.str());
+    gt_exporter_.export_array_complex(epi_nav_pos_no_exp_STK_, debug_folder_full_path_ + "NAV_pos_no_exp_STK" + os.str());
+
+    //save_4D_data(epi_nav_neg_no_exp_STK_, "NAV_neg_no_exp_STK", os.str());
+    //save_4D_data(epi_nav_pos_no_exp_STK_, "NAV_pos_no_exp_STK", os.str());
+
+    gt_exporter_.export_array_complex(epi_nav_neg_no_exp_STK_mean_, debug_folder_full_path_ + "NAV_neg_no_exp_STK_mean" + os.str());
+    gt_exporter_.export_array_complex(epi_nav_pos_no_exp_STK_mean_, debug_folder_full_path_ + "NAV_pos_no_exp_STK_mean" + os.str());
+
+    //save_4D_data(epi_nav_neg_no_exp_STK_mean_, "NAV_neg_no_exp_STK_mean", os.str());
+    //save_4D_data(epi_nav_pos_no_exp_STK_mean_, "NAV_pos_no_exp_STK_mean", os.str());
+
+
+    /*   for (size_t a = 0; a < lNumberOfStacks_; a++)
     {
         for (size_t m = 0; m < MB_factor; m++)
         {
@@ -846,6 +878,131 @@ void GenericReconSMSBase::define_usefull_parameters(IsmrmrdReconBit &recon_bit, 
 }
 
 
+
+
+bool GenericReconSMSBase::detect_first_repetition(IsmrmrdReconBit &recon_bit)
+{
+    bool is_first_repetition=true;
+
+    for (size_t ii=0; ii<recon_bit.data_.headers_.get_number_of_elements(); ii++)
+    {
+        if( recon_bit.data_.headers_(ii).idx.repetition>0 )
+        {
+            GDEBUG_STREAM("GenericReconSMSBase - this is not the first repetition)");
+            is_first_repetition=false;
+            break;
+        }
+    }
+
+    if (is_first_repetition) {GDEBUG_STREAM("GenericReconSMSBase - this is the first repetition)"); }
+
+    return is_first_repetition;
+
+}
+
+bool GenericReconSMSBase::detect_single_band_data(IsmrmrdReconBit &recon_bit)
+{
+    bool is_single_band=false;
+
+    for (size_t ii=0; ii<recon_bit.data_.headers_.get_number_of_elements(); ii++)
+    {
+        if( recon_bit.data_.headers_(ii).idx.user[0]==1 )
+        {
+            GDEBUG_STREAM("GenericReconSMSBase - Single band data (assuming splitSMSGadget is ON)");
+            is_single_band=true;
+            break;
+        }
+    }
+
+    if (is_single_band==false) {GDEBUG_STREAM("GenericReconSMSBase - Multiband band data (assuming splitSMSGadget is ON)");}
+
+    return is_single_band;
+
+}
+
+void GenericReconSMSBase::define_usefull_parameters_simple_version(IsmrmrdReconBit &recon_bit, size_t e)
+{
+
+    size_t start_E1_SB(0), end_E1_SB(0);
+
+    std::cout << "number of dimension "<< recon_bit.data_.data_.get_number_of_dimensions() << std::endl;
+
+    auto t = Gadgetron::detect_sampled_region_E1(recon_bit.data_.data_);
+    start_E1_SB = std::get<0>(t);
+    end_E1_SB = std::get<1>(t);
+
+    /*size_t start_E1_MB(0), end_E1_MB(0);
+    t = Gadgetron::detect_sampled_region_E1(recon_bit.data_.data_);
+    start_E1_MB = std::get<0>(t);
+    end_E1_MB = std::get<1>(t);*/
+
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_SB - end_E1_SB  : " << start_E1_SB << " - " << end_E1_SB);
+    //GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_MB - end_E1_MB  : " << start_E1_MB << " - " << end_E1_MB);
+
+    SamplingLimit sampling_limits_SB[3]; //, sampling_limits_MB[3];
+    for (int i = 0; i < 3; i++)
+        sampling_limits_SB[i] = recon_bit.data_.sampling_.sampling_limits_[i];
+
+    //for (int i = 0; i < 3; i++)
+     //   sampling_limits_MB[i] = recon_bit.data_.sampling_.sampling_limits_[i];
+
+    /*for (int i = 0; i < 3; i++)
+    {
+        std::cout << "  sampling_limits_SB[i].min_ "<< sampling_limits_SB[i].min_ << "  sampling_limits_MB[i].min_ "<< sampling_limits_MB[i].min_ << std::endl;
+        std::cout << "  sampling_limits_SB[i].center_ "<< sampling_limits_SB[i].center_ << "  sampling_limits_MB[i].center_ "<< sampling_limits_MB[i].center_ << std::endl;
+        std::cout << "  sampling_limits_SB[i].max_ "<< sampling_limits_SB[i].max_ << "  sampling_limits_MB[i].max_ "<< sampling_limits_MB[i].max_ << std::endl;
+    }*/
+
+    /*for (int i = 0; i < 3; i++)
+    {
+        GADGET_CHECK_THROW(sampling_limits_SB[i].min_ <= sampling_limits_MB[i].min_);
+        GADGET_CHECK_THROW(sampling_limits_SB[i].center_ <= sampling_limits_MB[i].center_);
+        GADGET_CHECK_THROW(sampling_limits_SB[i].max_ <= sampling_limits_MB[i].max_);
+    }*/
+
+    std::cout << start_E1_SB << "  "<< end_E1_SB << "  "<<  acceFactorSMSE1_[e] << std::endl;
+    //std::cout << start_E1_MB << "  "<< end_E1_MB << "  "<<  acceFactorSMSE1_[e] << std::endl;
+
+
+    size_t reduced_E1_SB_=get_reduced_E1_size(start_E1_SB,end_E1_SB, acceFactorSMSE1_[e] );
+    //size_t reduced_E1_MB_=get_reduced_E1_size(start_E1_MB,end_E1_MB, acceFactorSMSE1_[e] );
+
+    /*if (reduced_E1_SB_!= reduced_E1_MB_)
+    {
+        // on prend les dimensions les plus petites
+        if (reduced_E1_SB_<reduced_E1_MB_)
+        {
+            start_E1_=start_E1_SB;
+            end_E1_=end_E1_SB;
+            reduced_E1_=reduced_E1_SB_;
+        }
+        else if (reduced_E1_SB_>reduced_E1_MB_)
+        {
+            start_E1_=start_E1_MB;
+            end_E1_=end_E1_MB;
+            reduced_E1_=reduced_E1_MB_;
+        }
+    }
+    else
+    {
+        if (start_E1_SB!=start_E1_MB  || end_E1_SB!=end_E1_MB  )
+        {
+            GERROR("start_E1_SB!=start_E1_MB  || end_E1_SB!=end_E1_MB\n");
+        }
+
+        start_E1_=start_E1_SB;
+        end_E1_=end_E1_SB;
+        reduced_E1_=reduced_E1_SB_;
+    }*/
+
+    start_E1_=start_E1_SB;
+    end_E1_=end_E1_SB;
+    reduced_E1_=reduced_E1_SB_;
+
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - start_E1_ - end_E1_  : " << start_E1_ << " - " << end_E1_);
+
+}
+
 int GenericReconSMSBase::get_reduced_E1_size(size_t start_E1 , size_t end_E1 , size_t acc )
 {
     int output;
@@ -886,7 +1043,9 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
 
     hoNDFFT<float>::instance()->ifft(&data,0);
 
-    // on suppose que les corrections EPI sont les mêmes pour tous les N et S
+    // on suppose que les corrections EPI sont les mêmes pour tous les S
+
+    //std::cout << "start_E1_ "<<  start_E1_ <<  "end_E1_ "<<  end_E1_ <<   "acc "<<  acc << std::endl;
 
     for (m = 0; m < MB; m++) {
 
@@ -895,7 +1054,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
             //for (size_t e1 = start_E1_; e1 < end_E1_; e1+=acc)
             for (size_t e1 = start_E1_; e1 < end_E1_; e1+=acc)
             {
-                ISMRMRD::AcquisitionHeader& curr_header = headers_(e1, 0, 0, 0, 0);
+                ISMRMRD::AcquisitionHeader& curr_header = headers_(e1, 0, 0, 0, 0);  //5D, fixed order [E1, E2, N, S, LOC]
                 //std::cout << "  ISMRMRD_ACQ_IS_REVERSE  " << curr_header.isFlagSet(ISMRMRD::ISMRMRD_ACQ_IS_REVERSE)<< std::endl;
 
                 if (optimal)
@@ -905,6 +1064,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
                         for (ro = 0; ro < RO; ro++)
                         {
                             shift(ro)=epi_nav_neg_no_exp_STK_(ro,m,a);
+
                         }
                     } else {
                         for (ro = 0; ro < RO; ro++)
@@ -933,6 +1093,8 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
 
                 for (ro = 0; ro < RO; ro++)
                 {
+                    //std::cout << shift(ro) <<  "  " << exp(shift(ro)) << std::endl;
+
                     for (e2 = 0; e2 < E2; e2++)
                     {
                         for (cha = 0; cha < CHA; cha++)
@@ -941,7 +1103,6 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
                         }
                     }
                 }
-
             }
 
             for (n = 0; n < N; n++) {
@@ -950,7 +1111,10 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
 
                     std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
                     std::complex<float> * out = &(tempo(0, 0, 0, 0));
+
                     memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+
+                    //std::cout<< tempo(0, 0, 0, 0) << " " <<  phase_shift(0, 0, 0, 0) << std::endl;
 
                     Gadgetron::multiply(tempo, phase_shift, tempo);
 

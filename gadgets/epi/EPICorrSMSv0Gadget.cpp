@@ -780,7 +780,7 @@ void EPICorrSMSv0Gadget::fonction_qui_sauvegarde_sur_le_disk_les_corrections_par
     GDEBUG("STEP 2 : EPI correction : slice %d", slice);
 
     std::ostringstream slice_index;
-    slice_index << "_slice_" << slice;
+    slice_index << "_" << slice;
     str_s = slice_index.str();
 
     //hoNDArray< std::complex<float> > readout(*m2->getObjectPtr());
@@ -791,13 +791,6 @@ void EPICorrSMSv0Gadget::fonction_qui_sauvegarde_sur_le_disk_les_corrections_par
     Gadgetron::SaveVectorOntheDisk(corrneg_no_exp_save_.col(slice), "/tmp/", "gadgetron/", "corrneg_no_exp",   str_s,  ".bin");
     Gadgetron::SaveVectorOntheDisk(corrpos_no_exp_save_.col(slice), "/tmp/", "gadgetron/", "corrpos_no_exp",   str_s,  ".bin");
 
-
-
-    hoNDArray< std::complex<float> > corrneg_output_format_analyze;
-    corrneg_output_format_analyze.create(readout);
-
-    memcpy(&corrneg_output_format_analyze, &corrneg_, sizeof(std::complex<float>)*readout);
-    gt_exporter_.export_array_complex(corrneg_output_format_analyze, debug_folder_full_path_ + "corrneg_no_exp" + slice_index.str());
 
 }
 
