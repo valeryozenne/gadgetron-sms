@@ -37,7 +37,7 @@
 
 namespace Gadgetron
 {
-
+/*
 arma::cx_fvec LoadCplxVectorFromtheDisk(std::string home,std::string path,  std::string nom,  std::string str_s,  std::string str_e)
 {
     std::string load_data =  home + "/" + path +nom + str_s + str_e;
@@ -175,6 +175,6 @@ void ShowErrorMessageSaveWithLocation(std::string msg, bool status)
     }
 }
 
-
+*/
 
 }
