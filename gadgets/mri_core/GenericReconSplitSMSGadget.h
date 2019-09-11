@@ -38,8 +38,13 @@ namespace Gadgetron {
         // default interface function
         virtual int process_config(ACE_Message_Block* mb);
         virtual int process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1);
-
-
         virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
+
+        hoNDArray< ISMRMRD::AcquisitionHeader > headers_sb;
+        hoNDArray< ISMRMRD::AcquisitionHeader > headers_mb;
+
+        hoNDArray< std::complex<float> > sb;
+        hoNDArray< std::complex<float> > mb;
+
     };
 }

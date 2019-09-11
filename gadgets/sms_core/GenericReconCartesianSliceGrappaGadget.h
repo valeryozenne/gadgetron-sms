@@ -95,7 +95,7 @@ namespace Gadgetron {
         /// Grappa parameters
         GADGET_PROPERTY(grappa_kSize_RO, int, "Grappa kernel size RO", 5);
         GADGET_PROPERTY(grappa_kSize_E1, int, "Grappa kernel size E1", 5);
-        GADGET_PROPERTY(calib_fast, int, "calibration with Tikhonov", 1);
+        GADGET_PROPERTY(calib_fast, int, "calibration with Tikhonov", 0);
 
         GADGET_PROPERTY(grappa_reg_lamda, double, "Grappa regularization threshold", 0.0005);
         //GADGET_PROPERTY(grappa_calib_over_determine_ratio, double, "Grappa calibration overdermination ratio", 45);
@@ -141,6 +141,7 @@ namespace Gadgetron {
           hoNDArray< std::complex<float> > kernelonov;
 
           hoNDArray< std::complex<float> > unfolded_image;
+          hoNDArray< std::complex<float> > unfolded_image_permute;
 
         arma::cx_fmat CMK_matrix;
         arma::cx_fmat measured_data_matrix;
@@ -163,6 +164,7 @@ namespace Gadgetron {
 
         virtual void remove_unnecessary_kspace_mb2(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& output, size_t acc );
 
+        virtual void recopy_kspace( hoNDArray< std::complex<float> >& output, size_t acc );       
 
     };
 }

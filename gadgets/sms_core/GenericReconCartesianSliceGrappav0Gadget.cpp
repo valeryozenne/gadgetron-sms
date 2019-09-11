@@ -505,7 +505,7 @@ void GenericReconCartesianSliceGrappav0Gadget::remove_unnecessary_kspace_sb(hoND
 
                         index=0;
 
-                        for (e1 = start_E1_; e1 < end_E1_; e1+=acc) {
+                        for (e1 = start_E1_; e1 <= end_E1_; e1+=acc) {
 
                             std::complex<float> * in = &(input(0, e1, 0, cha, m, a, n, s));
                             std::complex<float> * out = &(output(0, index, cha, m, a, n, s));
@@ -553,7 +553,7 @@ void GenericReconCartesianSliceGrappav0Gadget::remove_unnecessary_kspace_mb(hoND
 
                     index=0;
 
-                    for (e1 = start_E1_; e1 < end_E1_; e1+=acc) {
+                    for (e1 = start_E1_; e1 <= end_E1_; e1+=acc) {
 
                         std::complex<float> * in = &(input(0, e1, 0, cha,  n, s, a));
                         std::complex<float> * out = &(output(0, index, cha, m, a, n, s));

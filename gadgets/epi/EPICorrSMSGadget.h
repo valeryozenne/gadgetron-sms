@@ -6,6 +6,7 @@
 #include "hoArmadillo.h"
 #include "gadgetron_epi_export.h"
 #include "mri_core_slice_grappa.h"
+#include "mri_core_utility_interventional.h"
 
 #include <ismrmrd/ismrmrd.h>
 #include "ismrmrd/xml.h"
@@ -172,6 +173,8 @@ protected:
 
      hoNDArray< std::complex<float> > corrneg_output_format_analyze;
      hoNDArray< std::complex<float> > corrpos_output_format_analyze;
+
+     //unsigned int compteur_acs;
 
 };
 }

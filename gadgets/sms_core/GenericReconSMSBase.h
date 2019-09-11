@@ -8,6 +8,7 @@
 
 #include "GenericReconBase.h"
 #include "mri_core_slice_grappa.h"
+#include "mri_core_utility_interventional.h"
 #include "hoNDArray_utils.h"
 #include "hoNDArray_elemwise.h"
 #include "hoNDKLT.h"
@@ -52,7 +53,7 @@ namespace Gadgetron {
         bool is_cmrr_sequence ;
 
         unsigned int MB_factor;
-        unsigned int Blipped_CAIPI;
+        int Blipped_CAIPI;
 
         unsigned int lNumberOfStacks_;
         unsigned int lNumberOfSlices_;
@@ -81,6 +82,24 @@ namespace Gadgetron {
 
 
         float slice_thickness;
+
+        arma::cx_fmat corrneg_all_;
+        arma::cx_fmat corrpos_all_;
+
+        arma::cx_fmat corrneg_all_no_exp_;
+        arma::cx_fmat corrpos_all_no_exp_;
+
+        arma::cx_fmat corrneg_all_STK_mean_;
+        arma::cx_fmat corrpos_all_STK_mean_;
+
+        arma::cx_fcube corrneg_all_STK_;
+        arma::cx_fcube corrpos_all_STK_;
+
+        arma::cx_fcube corrneg_all_no_exp_STK_;
+        arma::cx_fcube corrpos_all_no_exp_STK_;
+
+        arma::cx_fmat corrneg_all_no_exp_STK_mean_;
+        arma::cx_fmat corrpos_all_no_exp_STK_mean_;
 
         hoNDArray<std::complex<float>> epi_nav_neg_;
         hoNDArray<std::complex<float>> epi_nav_pos_;
@@ -111,6 +130,15 @@ namespace Gadgetron {
         virtual arma::ivec map_interleaved_acquisitions(int number_of_slices, bool no_reordering );
         virtual arma::imat get_map_slice_single_band(int MB_factor, int lNumberOfStacks, arma::ivec order_of_acquisition_mb, bool no_reordering);
 
+        arma::vec z_offset_geo;
+        arma::vec z_gap;
+
+        virtual void reorganize_arma_nav(arma::cx_fmat data, arma::uvec indice);
+
+        virtual void compute_mean_epi_arma_nav(arma::cx_fcube &input,  arma::cx_fmat& output_no_exp,  arma::cx_fmat& output);
+
+        virtual void create_stacks_of_arma_nav(arma::cx_fmat &data, arma::cx_fcube &new_stack);
+
         virtual void save_4D_data(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
         virtual void save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
@@ -137,7 +165,9 @@ namespace Gadgetron {
 
         virtual void prepare_epi_data(size_t e);
 
-        virtual void apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc , bool optimal);
+        virtual void apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo , bool optimal);
+
+        virtual void apply_ghost_correction_with_arma_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , std::string msg);
 
         virtual void apply_ghost_correction_with_STK7(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc , bool optimal);
 
@@ -148,6 +178,12 @@ namespace Gadgetron {
         virtual bool detect_single_band_data(IsmrmrdReconBit &recon_bit);
 
         virtual int get_reduced_E1_size(size_t start_E1 , size_t end_E1, size_t acc );
+
+        virtual void apply_relative_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
+
+        virtual void get_header_and_position_and_gap(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > headers_);
+
+        virtual void apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data);
 
     };
 }

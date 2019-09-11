@@ -324,11 +324,11 @@ void GenericReconSMSPrepv0Gadget::permute_slices(hoNDArray< std::complex<float> 
     size_t SLC=data.get_size(6);
 
     hoNDArray< std::complex<float> > new_data;
-    new_data.create(RO,E1, E2, CHA, N, S, SLC);
+    new_data.create(RO, E1, E2, CHA, N, S, SLC);
 
     size_t n, s;
 
-    for (int i = 0; i < SLC; i++) {
+    for (size_t i = 0; i < SLC; i++) {
 
         for (s = 0; s < S; s++)
         {
@@ -340,7 +340,7 @@ void GenericReconSMSPrepv0Gadget::permute_slices(hoNDArray< std::complex<float> 
                 size_t usedN = n;
                 if (usedN >= N) usedN = N - 1;
 
-                std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice[i]));
+                std::complex<float> * in = &(data(0, 0, 0, 0, n, s, (int)indice[i]));
                 std::complex<float> * out = &(new_data(0, 0, 0, 0, n, s, i));
 
                 memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);

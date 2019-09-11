@@ -277,7 +277,7 @@ void GenericReconSMSPrepv1Gadget::apply_averaged_epi_ghost_correction(hoNDArray<
 
     //hoNDArray< std::complex<float> > sb_8D_optimal=sb_8D;
 
-    apply_ghost_correction_with_STK6(sb_8D, headers_sb ,  acceFactorSMSE1_[e] , false);
+    apply_ghost_correction_with_STK6(sb_8D, headers_sb ,  acceFactorSMSE1_[e] , false, false);
 
     //apply_ghost_correction_with_STK6(sb_8D_optimal, headers_sb ,  acceFactorSMSE1_[e] , true);
 
@@ -327,7 +327,7 @@ void GenericReconSMSPrepv1Gadget::pre_process_mb_data(hoNDArray< std::complex<fl
     save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(mb_8D, "FID_MB_avant_epi_nav", os.str());
     }
 
-    apply_ghost_correction_with_STK6(mb_8D, headers_mb ,  acceFactorSMSE1_[e] , false);
+    apply_ghost_correction_with_STK6(mb_8D, headers_mb ,  acceFactorSMSE1_[e] , false, false);
     //apply_ghost_correction_with_STK7(data, recon_bit_->rbit_[e].data_.headers_ ,  acceFactorSMSE1_[e] , false);
 
     if (!debug_folder_full_path_.empty())

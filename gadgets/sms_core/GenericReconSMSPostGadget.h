@@ -39,6 +39,9 @@ namespace Gadgetron {
         // calibration mode
         //std::vector<Gadgetron::ismrmrdCALIBMODE> calib_mode_;
 
+
+        hoNDArray< ISMRMRD::AcquisitionHeader > headers_buffered;
+
         // --------------------------------------------------
         // variable for recon
         // --------------------------------------------------
@@ -54,5 +57,16 @@ namespace Gadgetron {
         virtual int process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1);
 
         virtual void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output);
+
+        virtual void undo_blip_caipi_shift(hoNDArray< std::complex<float> >& sb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_sb, size_t e);
+
+        virtual void post_process_sb_data(hoNDArray< std::complex<float> >& data_8D, hoNDArray< std::complex<float> >& data_7D, hoNDArray< ISMRMRD::AcquisitionHeader > & headers, size_t e);
+
+        virtual void post_process_mb_data(hoNDArray< std::complex<float> >& data_8D, hoNDArray< std::complex<float> >& data_7D, hoNDArray< ISMRMRD::AcquisitionHeader > & headers, size_t e);
+
+        virtual void post_process_ref_data(hoNDArray< std::complex<float> >& data_8D, hoNDArray< std::complex<float> >& data_7D, size_t e);
+
+        virtual void set_idx(hoNDArray< ISMRMRD::AcquisitionHeader > headers_, unsigned int rep, unsigned int set);
+
     };
 }

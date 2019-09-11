@@ -6,6 +6,7 @@
 #include "hoArmadillo.h"
 #include "gadgetron_epi_export.h"
 #include "mri_core_slice_grappa.h"
+#include "mri_core_utility_interventional.h"
 
 #include <ismrmrd/ismrmrd.h>
 #include "ismrmrd/xml.h"

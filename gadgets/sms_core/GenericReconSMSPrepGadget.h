@@ -45,11 +45,12 @@ namespace Gadgetron {
 
         unsigned int center_k_space_xml;
 
-        arma::vec z_offset_geo;
-        arma::vec z_gap;
+
 
         // store the KLT coefficients for N, S, SLC at every encoding space
         //std::vector< std::vector< std::vector< std::vector< KLTType > > > > KLT_;
+
+        hoNDArray< std::complex<float> > ref_8D;
 
         hoNDArray< std::complex<float> > sb_8D;
 
@@ -66,6 +67,8 @@ namespace Gadgetron {
         //virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb);
         virtual void pre_process_sb_data(hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& sb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, size_t encoding);
         virtual void pre_process_mb_data(hoNDArray< std::complex<float> >& mb, hoNDArray< std::complex<float> >& mb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb, size_t encoding);
+        virtual void pre_process_ref_data(hoNDArray< std::complex<float> >& ref, hoNDArray< std::complex<float> >& ref_8D, size_t e);
+
 
         //sb functions
         virtual void reorganize_sb_data_to_8D(hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& sb_8D, size_t encoding);
@@ -81,13 +84,11 @@ namespace Gadgetron {
 
         virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
         virtual void fusion_sb_and_mb_in_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb);
-        virtual void apply_blip_caipi_shift(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, size_t e);
-        virtual void apply_relative_phase_shift(hoNDArray< std::complex<float> >& data);
-        virtual void apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data);
 
+        virtual void apply_blip_caipi_shift(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, size_t e);
         virtual void apply_averaged_epi_ghost_correction(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_sb, size_t e);
 
-        virtual void get_header_and_position_and_gap(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > headers_);
+
 
           };
 }

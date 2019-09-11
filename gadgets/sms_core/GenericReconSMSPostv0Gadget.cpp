@@ -104,9 +104,6 @@ namespace Gadgetron {
 
                 GDEBUG_STREAM("GenericReconSMSPostv0Gadget - incoming data array data: [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N << " " << S <<"]");
 
-
-
-
             }
         }
 

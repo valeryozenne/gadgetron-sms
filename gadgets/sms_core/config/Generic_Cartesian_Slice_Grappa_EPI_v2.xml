@@ -106,7 +106,6 @@
     </gadget>
  -->
 
-
     <gadget>
     <name>SMSPrepGadget</name>
     <dll>gadgetron_smscore</dll>
@@ -115,7 +114,6 @@
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
     </gadget>
-
 
 <!--
 <gadget>
@@ -129,8 +127,6 @@
 </gadget>
 -->
 
-
-
     <gadget>
     <name>SliceGrappaGadget</name>
     <dll>gadgetron_smscore</dll>
@@ -141,8 +137,7 @@
     </gadget>
 
 
-<!--
-    <gadget>
+  <gadget>
     <name>SMSPostGadget</name>
     <dll>gadgetron_smscore</dll>
     <classname>GenericReconSMSPostGadget</classname>
@@ -150,8 +145,6 @@
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
     </gadget>
-
--->
 
 
 
@@ -307,16 +300,25 @@
 
 <!-- after recon processing -->
 <gadget>
-    <name>ComplexToFloatAttrib</name>
-    <dll>gadgetron_mricore</dll>
-    <classname>ComplexToFloatGadget</classname>
+      <name>ExtractThermoI</name>
+      <dll>gadgetron_mricore</dll>
+      <classname>ExtractThermoIGadget</classname>
+      <property>
+          <name>doOffline</name>
+          <value>1</value>
+      </property>
+      <property>
+          <name>extract_mask</name>
+          <value>9</value>
+      </property>
 </gadget>
 
-<gadget>
-    <name>FloatToShortAttrib</name>
-    <dll>gadgetron_mricore</dll>
-    <classname>FloatToUShortGadget</classname>
-</gadget>
+  <gadget>
+      <name>FloatToShortAttrib</name>
+      <dll>gadgetron_mricore</dll>
+      <classname>FloatToUShortGadget</classname>
+  </gadget>
+
 
 <gadget>
     <name>ImageFinish</name>

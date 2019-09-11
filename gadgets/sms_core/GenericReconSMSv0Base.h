@@ -8,6 +8,7 @@
 
 #include "GenericReconBase.h"
 #include "mri_core_slice_grappa.h"
+#include "mri_core_utility_interventional.h"
 #include "hoNDArray_utils.h"
 #include "hoNDArray_elemwise.h"
 #include "hoNDKLT.h"

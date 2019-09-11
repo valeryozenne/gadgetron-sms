@@ -65,8 +65,6 @@ int GenericReconCartesianSliceGrappaGadget::process(Gadgetron::GadgetContainerMe
         std::stringstream os;
         os << "_encoding_" << e;
 
-        os << "_encoding_" << e;
-
         GDEBUG_CONDITION_STREAM(verbose.value(),
                                 "Calling " << process_called_times_ << " , encoding space : " << e);
         GDEBUG_CONDITION_STREAM(verbose.value(),
@@ -74,7 +72,6 @@ int GenericReconCartesianSliceGrappaGadget::process(Gadgetron::GadgetContainerMe
 
         if (recon_bit_->rbit_[e].data_.data_.get_number_of_elements() > 0)
         {
-
 
             bool is_single_band=false;
             bool is_first_repetition=detect_first_repetition(recon_bit_->rbit_[e]);
@@ -92,19 +89,33 @@ int GenericReconCartesianSliceGrappaGadget::process(Gadgetron::GadgetContainerMe
 
             if (is_single_band==true)  //presence de single band
             {
-                save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(recon_bit_->rbit_[e].data_.data_, "FID_SB_Slice", os.str());
+                save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(recon_bit_->rbit_[e].data_.data_, "FID_SB_Avant_Calib_sms", os.str());
 
                 if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappaGadget::perform_calib"); }
                 this->perform_slice_grappa_calib(recon_bit_->rbit_[e], recon_obj_[e], e);
                 if (perform_timing.value()) { gt_timer_.stop(); }
+
+
+
+
+
             }
             else
             {
-                save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(recon_bit_->rbit_[e].data_.data_, "FID_MB_Slice", os.str());
+                save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(recon_bit_->rbit_[e].data_.data_, "FID_MB_Avant_Unwrap_sms", os.str());
 
-                 if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping"); }
-                 this->perform_slice_grappa_unwrapping(recon_bit_->rbit_[e], recon_obj_[e], e);
-                 if (perform_timing.value()) { gt_timer_.stop();      }
+                if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping"); }
+                this->perform_slice_grappa_unwrapping(recon_bit_->rbit_[e], recon_obj_[e], e);
+                if (perform_timing.value()) { gt_timer_.stop();}
+
+                ///////////////
+
+                hoNDArray< std::complex<float> > data_=m1->getObjectPtr()->rbit_[e].data_.data_;
+
+                recopy_kspace( m1->getObjectPtr()->rbit_[e].data_.data_, acceFactorSMSE1_[e] );
+
+                save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(m1->getObjectPtr()->rbit_[e].data_.data_, "FID_MB_Slice_Fin", os.str());
+
             }
         }
     }
@@ -229,29 +240,26 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
 
     GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - incoming data array data : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA <<  " " << MB <<  " " << STK << " " << N << " " << S<<  "]");
 
-    std::cout << "reduced_E1_ "<< std::endl;
+    //std::cout << "reduced_E1_ "<< std::endl;
 
     // TODO attention dimension MB =1 car c'est mb par définition il n'y a pas plusieurs coupes
     hoNDArray< std::complex<float> > mb_reduce;
     mb_reduce.create(RO, reduced_E1_, CHA, 1, STK, N, S);
 
-    show_size(recon_bit.data_.data_, " recon_bit.data_.data_ " );
-    show_size(mb_reduce, " mb_reduce ");
-
     remove_unnecessary_kspace_mb2( recon_bit.data_.data_ ,  mb_reduce,  acceFactorSMSE1_[e] );
 
     if (!debug_folder_full_path_.empty())
     {
-        show_size(mb_reduce,"mb_reduce");
+        //show_size(mb_reduce,"mb_reduce");
         save_4D_with_STK_5(mb_reduce, "mb_reduce", "0");
     }
 
-    std::cout << "create  block_MB"<< " voxels_number_per_image_ "<< voxels_number_per_image_ << "  kernel_size_ "<< kernel_size_ << std::endl;
+    //std::cout << "create  block_MB"<< " voxels_number_per_image_ "<< voxels_number_per_image_ << "  kernel_size_ "<< kernel_size_ << std::endl;
     hoNDArray< std::complex<float> > block_MB;
     block_MB.create(voxels_number_per_image_, kernel_size_, CHA, 1, STK, N, S);
 
     im2col(mb_reduce,block_MB);
-    show_size(block_MB,"block_MB");
+    //show_size(block_MB,"block_MB");
     save_4D_with_STK_5(block_MB,"block_MB", "0");
 
     std::vector<size_t> newdims;
@@ -265,13 +273,17 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
     block_MB.reshape(&newdims);
 
     show_size(block_MB,"block_MB reshape");
-    save_4D_with_STK_5(block_MB,"block_MB_reshape", "0");
+    save_4D_with_STK_5(block_MB,"", "0");
 
-    unfolded_image.create(voxels_number_per_image_,  1, CHA, MB_factor, STK,  N, S);
+    //TODO ceci devrait etre alloué une seule fois et non a chaque passage
+    unfolded_image.create(voxels_number_per_image_, CHA, MB_factor, STK,  N, S);
+    unfolded_image_permute.create(blocks_RO_,blocks_E1_,CHA, MB_factor, STK,  N, S);
 
     show_size(kernel,"kernel");
 
     // attention les dimensions ne sont pas les mêmes
+
+    std::cout <<voxels_number_per_image_<< "  "<< kernel_size_<< " "  << STK <<" "<< MB << "  " << CHA  <<std::endl;
 
     size_t s, n, a, m;
 
@@ -283,7 +295,7 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
 
                 hoNDArray<std::complex<float> > tempo_MB(voxels_number_per_image_, kernel_size_*CHA);
 
-                std::complex<float> * in = &(block_MB(0, 0, 0, 0, a, n, s));
+                std::complex<float> * in = &(block_MB(0, 0, 0, 0, a, n, s));  //[voxels_number_per_image_, kernel_size_, CHA, 1, STK, N, S ]
                 std::complex<float> * out = &(tempo_MB(0, 0));
 
                 memcpy(out , in, sizeof(std::complex<float>)*voxels_number_per_image_*kernel_size_*CHA );
@@ -311,19 +323,42 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
                     Gadgetron::gemm(lili, tempo_MB, false, tempo_kernel, false);
 
                     std::complex<float> * image_in = &(lili(0, 0));
-                    std::complex<float> * image_out = &(unfolded_image(0, 0, 0, m,  a, n, s));
+                    std::complex<float> * image_out = &(unfolded_image(0, 0, m, a, n, s));
 
                     memcpy(image_out , image_in, sizeof(std::complex<float>)*voxels_number_per_image_*CHA);
-
                 }
-
             }
         }
     }
 
-    show_size(unfolded_image,"unfolded_image");
 
+    /////////////////
+/*
+    for (size_t nidx1 = 0; nidx1 < blocks_per_column; nidx1++) //for nidx1=1:blocks_per_column
+    {
+        for (size_t nidx2 = 0; nidx2 < blocks_per_row; nidx2++) // for nidx2=1:blocks_per_row
+        {
+            for (size_t cha = 0; cha < CHA; cha++)   //for nidy2=1:nc2   number of channels
+            {
+                //recon(nidx1,nidx2,1,nidy2,nidy3,nidy4)=permute(block_MB(nidx1,nidx2,:),[1 3 2]) * kernel(:,nidy2,nidy3,nidy4) ;
+
+                lala=reshape(block_MB.tube(nidx1,nidx2),1,kernel_size*lNumberOfChannels_,1);
+                lili=lala.slice(0);
+
+                for (unsigned long m = 0; m < MB_factor_; m++)
+                {
+                    recon_crop(m,0).slice(nidx1).col(c).row(nidx2)=lili*kernel_all_slices.slice(kernel_slice_position(m)).col(c);
+                }
+            }
+        }
+    }
+*/
+    ///////////////
+
+
+    show_size(unfolded_image,"unfolded_image");
     save_4D_with_STK_5(unfolded_image, "unfolded_image", "0");
+    save_4D_data(unfolded_image, "unfolded_image", "0");
 
     std::vector<size_t> newdims2;
     newdims2.push_back(blocks_E1_);
@@ -336,8 +371,23 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
     unfolded_image.reshape(&newdims2);
 
     show_size(unfolded_image,"unfolded_image_reshape");
-
     save_4D_with_STK_5(unfolded_image, "unfolded_image_reshape", "0");
+
+
+    std::vector<size_t> newdims3;
+    newdims3.push_back(1);
+    newdims3.push_back(0);
+    newdims3.push_back(2);
+    newdims3.push_back(3);
+    newdims3.push_back(4); //N
+    newdims3.push_back(5); //S
+    newdims3.push_back(6); //STK
+
+    unfolded_image_permute=permute(unfolded_image,newdims3);
+
+    show_size(unfolded_image_permute,"unfolded_image_permute");
+
+
 
 }
 
@@ -385,9 +435,9 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
 
     /////////
 
-    im2col(sb_reduce,block_SB);
-    //show_size(block_SB, " block_SB ");
+    im2col(sb_reduce, block_SB);
 
+    //show_size(block_SB, " block_SB ");
     save_4D_8D_kspace(block_SB, "block_SB", "0");
 
     if (blocking==true)
@@ -399,6 +449,9 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
         //GDEBUG("blocking == false");
         extract_milieu_kernel(block_SB,  missing_data);
     }
+
+    //show_size(missing_data, " missing_data ");
+    save_4D_8D_kspace(missing_data, "missing_data", "0");
 
     CMK_matrix.set_size(CHA*kernel_size_, voxels_number_per_image_);
     measured_data_matrix.set_size(voxels_number_per_image_, CHA*kernel_size_);
@@ -415,15 +468,17 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
                 hoNDArray<std::complex<float> > measured_data;
 
                 //show_size(tempo," tempo ");
-                std::complex<float> * in = &(block_SB(0, 0, 0,  a, n, s));
+                std::complex<float> * in = &(block_SB(0, 0, 0 ,0 , a, n, s)); // [7316 25 12 2 4 1 1 1]
+
                 std::complex<float> * out = &(tempo(0, 0, 0 ));
 
                 memcpy(out, in, sizeof(std::complex<float>)*voxels_number_per_image_*kernel_size_*CHA*MB );
 
+                //show_size(tempo, "block_SB_reduce");
+
                 // sum over the MB dimension to average the kspace data (simulation of sms)
                 Gadgetron::sum_over_dimension(tempo, measured_data, 3);
                 //show_size(measured_data," measured_data ");
-
 
                 if (!debug_folder_full_path_.empty())
                 {
@@ -431,7 +486,6 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
                     stk << "_stack_" << a;
                     gt_exporter_.export_array_complex(measured_data, debug_folder_full_path_ + "measured_data" + stk.str());
                 }
-
 
                 std::vector<size_t> newdims;
                 newdims.push_back(measured_data.get_size(0));
@@ -490,14 +544,14 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
                         SolveLinearSystem_Tikhonov(A, B, x, thres);
 
                         std::complex<float> * x_in = &(x(0, 0));
-                        std::complex<float> * x_out = &(kernelonov(0, 0, m,  a, n, s));
+                        std::complex<float> * x_out = &(kernelonov(0, 0, m, a, n, s));
 
                         memcpy(x_out , x_in, sizeof(std::complex<float>)*colA*colB);
 
                     }
 
                     gt_timer_local_.stop();
-                    save_4D_data(kernelonov, "kernelonov", "0");
+
                 }
                 else
                 {
@@ -546,26 +600,24 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
                         //gemm( lala, CMK,miss);
 
                         std::complex<float> * kernel_in = &(lala(0, 0));
-                        std::complex<float> * kernel_out = &(kernel(0, 0, m,  a, n, s));
+                        std::complex<float> * kernel_out = &(kernel(0, 0, m, a, n, s));
 
                         memcpy(kernel_out , kernel_in, sizeof(std::complex<float>)*CHA*kernel_size_*CHA);
 
                     }
-
-
                     gt_timer_local_.stop();
                 }
-
-
-
                 //show_size(missing_data," missing_data ");
-                //show_size(kernel," kernel ");
+                //show_size(measured_data," measure_data ");
             }
         }
+        //show_size(kernel, " kernel out ");
+        save_4D_data(kernel, "kernel", "0");
+        //show_size(kernel, " kernelonov out ");
+        save_4D_data(kernelonov, "kernelonov", "0");
+
     }
 
-    show_size(kernel, " kernel out ");
-    save_4D_data(kernel, "kernel", "0");
     // -----------------------------------
 }
 
@@ -586,7 +638,7 @@ void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_sb(hoNDAr
 
     size_t s,n,a,m,cha,e2,e1;
 
-    std::cout << "end_E1_ " << start_E1_<<  " end_E1_ " <<  end_E1_<< "acc "   << acc << std::endl;
+    //std::cout << "end_E1_ " << start_E1_<<  " end_E1_ " <<  end_E1_<< "acc "   << acc << std::endl;
 
     for (s = 0; s < S; s++)
     {
@@ -600,13 +652,13 @@ void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_sb(hoNDAr
 
                         index=0;
 
-                        for (e1 = start_E1_; e1 < end_E1_; e1+=acc) {
+                        for (e1 = start_E1_; e1 <= end_E1_; e1+=acc) {
 
                             std::complex<float> * in = &(input(0, e1, 0, cha, m, a, n, s));
                             std::complex<float> * out = &(output(0, index, cha, m, a, n, s));
 
                             memcpy(out , in, sizeof(std::complex<float>)*RO);
-
+                             //if (m==0 && cha==0 && a==0) { std::cout << " e1 " << e1 <<  " index "<< index <<" e1 +2 " << e1 +2 <<  std::endl;}
                             index++;
                         }
                     }
@@ -615,11 +667,79 @@ void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_sb(hoNDAr
         }
     }
 
-    std::cout << "reduced_E1_"<< reduced_E1_<< "  index+1 "<< index+1 << std::endl;
-    GADGET_CHECK_THROW(reduced_E1_ == index+1);
+    //std::cout << "reduced_E1_"<< reduced_E1_<< "  index+1 "<< index+1 << std::endl;
+    GADGET_CHECK_THROW(reduced_E1_ == index);
 
 }
 
+
+
+void GenericReconCartesianSliceGrappaGadget::recopy_kspace( hoNDArray< std::complex<float> >& output, size_t acc )
+{
+  //  hoNDArray< std::complex<float> > output;
+   // output.create(data_.get_size(0),data_.get_size(1),data_.get_size(2),data_.get_size(3),data_.get_size(4),data_.get_size(5),data_.get_size(6),data_.get_size(7) );
+
+
+   // std::vector<size_t> newdims;
+   // newdims.push_back(blocks_E1_);
+   // newdims.push_back(blocks_RO_);
+
+    size_t RO = unfolded_image.get_size(1);
+    size_t E1 = unfolded_image.get_size(0);
+    size_t CHA = unfolded_image.get_size(2);
+    size_t MB = unfolded_image.get_size(3);
+    size_t STK = unfolded_image.get_size(4);
+    size_t N = unfolded_image.get_size(5);
+    size_t S = unfolded_image.get_size(6);
+
+    show_size(unfolded_image," input ");
+    show_size(output," output ");
+
+    size_t index_x, index_y ;
+
+    index_x=2;
+
+    size_t s,n,a,m,cha,e1,ro;
+
+    //std::cout << "start_E1_ " << start_E1_+2*acc<<  " end_E1_ " <<  end_E1_-2*acc<< " acc "   << acc << " E1 "   << E1<< std::endl;
+
+    for (s = 0; s < S; s++) {
+
+        for (n = 0; n < N; n++) {
+
+            for (a = 0; a < STK; a++) {
+
+                for (m = 0; m < MB; m++) {
+
+                    for (cha = 0; cha < CHA; cha++) {
+
+                        index_y=start_E1_+2*acc;  // on se déplace de 2 lignes * accélération selon y
+                        //TODO  il faut ajuster le nombre 2 en fonction de la taille du kernel
+
+                        for (e1 = 0; e1 < E1; e1++) {
+
+                            std::complex<float> * in2 = & (unfolded_image_permute(0, e1, cha, m, a, n, s));
+                            std::complex<float> * out2 = &(output(index_x, index_y, 0, cha, m, a, n, s));
+
+                            memcpy(out2 , in2, sizeof(std::complex<float>)*RO);
+
+                            //if (m==0 && cha==0 && a==0) { std::cout << " e1 " << e1 <<  " index_y "<< index_y << " RO "<< RO<< std::endl;}
+
+                            index_y+=acc;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+//std::cout << "reduced_E1_-4  "<< reduced_E1_-2*acc<< "  index_x "<< index_x  << "  index_y "<< index_y  << std::endl;
+
+//recopy_kspace( m1->getObjectPtr()->rbit_[e].data_.data_ ,  acceFactorSMSE1_[e] );}
+
+    //GADGET_CHECK_THROW(reduced_E1_ == index+1);
+
+}
 
 
 
@@ -654,7 +774,7 @@ void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_mb2(hoNDA
 
                         index=0;
 
-                        for (e1 = start_E1_; e1 < end_E1_; e1+=acc) {
+                        for (e1 = start_E1_; e1 <= end_E1_; e1+=acc) {
 
                             std::complex<float> * in = &(input(0, e1, 0, cha, m, a, n, s));
                             std::complex<float> * out = &(output(0, index, cha, m, a, n, s));
@@ -669,8 +789,8 @@ void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_mb2(hoNDA
         }
     }
 
-    std::cout << "reduced_E1_"<< reduced_E1_<< "  index+1 "<< index+1 << std::endl;
-    GADGET_CHECK_THROW(reduced_E1_ == index+1);
+    //std::cout << "reduced_E1_"<< reduced_E1_<< "  index+1 "<< index+1 << std::endl;
+    GADGET_CHECK_THROW(reduced_E1_ == index);
 
 }
 
@@ -748,6 +868,9 @@ void GenericReconCartesianSliceGrappaGadget::extract_milieu_kernel(hoNDArray< st
 
     GDEBUG("Le milieu du kernel est %d  \n",milieu );
 
+    show_size(block_SB,"input");
+    show_size(missing_data,"output");
+
     // TODO #pragma omp parallel for default() private() shared()
     for (s = 0; s < S; s++)    {
 
@@ -761,7 +884,11 @@ void GenericReconCartesianSliceGrappaGadget::extract_milieu_kernel(hoNDArray< st
                     {
                         for ( p = 0; p < voxels_number_per_image_; p++)
                         {
-                            missing_data(p,c,m,a,n,s)=block_SB(p, m, c, m, a, n,s);
+                            missing_data(p,c,m,a,n,s)=block_SB(p, milieu, c, m, a, n, s);
+
+                             //[7316 25 12 2 4 1 1 1]
+                             //[7316 12 2 4 1 1 1 1]
+
 
                         }
                     }
@@ -825,7 +952,7 @@ void GenericReconCartesianSliceGrappaGadget::im2col(hoNDArray< std::complex<floa
                                     {
                                         colIdx = xx + yy*grappa_kSize_E1.value();
 
-                                        block_SB(rowIdx, colIdx, c, m, a, n,s)=input(j+yy , i+xx, c, m, a, n, s);
+                                        block_SB(rowIdx, colIdx, c, m, a, n,s)=input(j+yy , i+xx, c, m, a, n, s);  //[128 63 12 2 4 1 1 1]
 
                                         //if (c==0 && a==0 && m==0 && xx==3 && yy==3)
                                         //{
@@ -842,6 +969,8 @@ void GenericReconCartesianSliceGrappaGadget::im2col(hoNDArray< std::complex<floa
         }
     }
 }
+
+
 
 
 GADGET_FACTORY_DECLARE(GenericReconCartesianSliceGrappaGadget)

@@ -143,6 +143,7 @@ int EPICorrSMSGadget::process_config(ACE_Message_Block *mb) {
     corrneg_output_format_analyze.create(readout);
     corrpos_output_format_analyze.create(readout);
 
+    //compteur_acs=0;
 
     GDEBUG_STREAM("EPICorrSMSGadget configured");
     return 0;
@@ -213,9 +214,12 @@ int EPICorrSMSGadget::process(
                 if (hdr.idx.user[0]==1)
                 {
                 //do nothing, the epi correction will be applied using an averaged navigator in the PrepGadget
+                //apply_epi_correction(hdr, adata);
                 }
                 else
                 {
+                   // std::cout << "coucou je passe ici compteur_acs "<< compteur_acs<< std::endl;
+                   // compteur_acs++;
                 apply_epi_correction(hdr, adata);
                 }
 
@@ -252,14 +256,16 @@ void EPICorrSMSGadget::apply_epi_correction(ISMRMRD::AcquisitionHeader &hdr, arm
     if (hdr.isFlagSet(ISMRMRD::ISMRMRD_ACQ_IS_REVERSE)) {
         // Negative readout
         for (int p = 0; p < adata.n_cols; p++) {
-            adata.col(p) %= (pow(corrB0_, epiEchoNumber_ + RefNav_to_Echo0_time_ES_) % corrneg_);
+         //   adata.col(p) %= (pow(corrB0_, epiEchoNumber_ + RefNav_to_Echo0_time_ES_) % corrneg_);
+           adata.col(p) %=  corrneg_;
         }
         // Now that we have corrected we set the readout direction to positive
         hdr.clearFlag(ISMRMRD::ISMRMRD_ACQ_IS_REVERSE);
     } else {
         // Positive readout
         for (int p = 0; p < adata.n_cols; p++) {
-            adata.col(p) %= (pow(corrB0_, epiEchoNumber_ + RefNav_to_Echo0_time_ES_) % corrpos_);
+          //  adata.col(p) %= (pow(corrB0_, epiEchoNumber_ + RefNav_to_Echo0_time_ES_) % corrpos_);
+            adata.col(p) %=  corrpos_;
         }
     }
 }
@@ -794,19 +800,17 @@ void EPICorrSMSGadget::fonction_qui_sauvegarde_sur_le_disk_les_corrections_par_c
 
     //hoNDArray< std::complex<float> > readout(*m2->getObjectPtr());
 
-    Gadgetron::SaveVectorOntheDisk(corrneg_, "/tmp/", "gadgetron/", "corrneg",   str_s,  ".bin");
-    Gadgetron::SaveVectorOntheDisk(corrpos_, "/tmp/", "gadgetron/", "corrpos",   str_s,  ".bin");
+    Gadgetron::SaveVectorOntheDisk(corrneg_, "/tmp/", "gadgetron/", "corrneg_sms",   str_s,  ".bin");
+    Gadgetron::SaveVectorOntheDisk(corrpos_, "/tmp/", "gadgetron/", "corrpos_sms",   str_s,  ".bin");
 
-    Gadgetron::SaveVectorOntheDisk(corrneg_no_exp_save_.col(slice), "/tmp/", "gadgetron/", "corrneg_no_exp",   str_s,  ".bin");
-    Gadgetron::SaveVectorOntheDisk(corrpos_no_exp_save_.col(slice), "/tmp/", "gadgetron/", "corrpos_no_exp",   str_s,  ".bin");
+    Gadgetron::SaveVectorOntheDisk(corrneg_no_exp_save_.col(slice), "/tmp/", "gadgetron/", "corrneg_sms_no_exp",   str_s,  ".bin");
+    Gadgetron::SaveVectorOntheDisk(corrpos_no_exp_save_.col(slice), "/tmp/", "gadgetron/", "corrpos_sms_no_exp",   str_s,  ".bin");
 
+    //memcpy(&corrneg_output_format_analyze(0), &corrneg_(0) , sizeof(std::complex<float>)*readout);
+    //memcpy(&corrpos_output_format_analyze(0), &corrpos_(0) , sizeof(std::complex<float>)*readout);
 
-
-    memcpy(&corrneg_output_format_analyze(0), &corrneg_(0) , sizeof(std::complex<float>)*readout);
-    memcpy(&corrpos_output_format_analyze(0), &corrpos_(0) , sizeof(std::complex<float>)*readout);
-
-    gt_exporter_.export_array_complex(corrneg_output_format_analyze, partial_name_stored_epi_dependency_ + "_corrneg" + slice_index.str());
-    gt_exporter_.export_array_complex(corrpos_output_format_analyze, partial_name_stored_epi_dependency_ + "_corrpos" + slice_index.str());
+    //gt_exporter_.export_array_complex(corrneg_output_format_analyze, partial_name_stored_epi_dependency_ + "_corrneg" + slice_index.str());
+    //gt_exporter_.export_array_complex(corrpos_output_format_analyze, partial_name_stored_epi_dependency_ + "_corrpos" + slice_index.str());
 
 }
 
