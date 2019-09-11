@@ -279,7 +279,7 @@ void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<flo
     size_t N=data.get_size(6);
     size_t S=data.get_size(7);
 
-    show_size(data, "avant blip caipi");
+    //show_size(data, "avant blip caipi");
 
     hoNDArray< std::complex<float> > tempo;
     tempo.create(RO, E1, E2, CHA);
@@ -368,6 +368,113 @@ void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<flo
     }
 }
 
+
+
+
+void GenericReconSMSBase::apply_relative_phase_shift_test(hoNDArray< std::complex<float> >& data, bool is_positive )
+{
+    // à définir dans SMS Base car c'est aussi utilisé dans SMSPostGadget
+    // vecteur_in_E1_direction=exp(1i*([1:1:size(reconSB,2)]- 1*center_k_space_sample   )*2*pi/PE_shift*(nband-1)) ;
+    //  test=repmat( vecteur_in_E1_direction ,[ size(reconSB,1) 1 size(reconSB,3) size(reconSB,4) size(reconSB,5) size(reconSB,6)]  );
+    //  reconSB(:,:,:,:,:,1,nt,nband)=reconSB(:,:,:,:,:,:,nt,nband).*test;
+
+    size_t RO=data.get_size(0);
+    size_t E1=data.get_size(1);
+    size_t E2=data.get_size(2);
+    size_t CHA=data.get_size(3);
+    size_t MB=data.get_size(4);
+    size_t STK=data.get_size(5);
+    size_t N=data.get_size(6);
+    size_t S=data.get_size(7);
+
+    //show_size(data, "avant blip caipi");
+
+    hoNDArray< std::complex<float> > tempo;
+    tempo.create(RO, E1, E2, CHA);
+
+    hoNDArray< std::complex<float> > phase_shift;
+    phase_shift.create(RO, E1, E2, CHA);
+
+    center_k_space_E1=round(E1/2);
+
+    //GDEBUG_STREAM("  center_k_space_xml  "<<   center_k_space_xml  << " center_k_space_E1    "<<  center_k_space_E1<< " E1 "  << E1 );
+
+    arma::fvec index_imag = arma::linspace<arma::fvec>( 0, E1-1, E1 )  - center_k_space_E1 +2;
+
+    //std::cout << index_imag << std::endl;
+
+    arma::cx_fvec phase;
+    arma::cx_fvec shift_to_apply;
+
+    phase.set_size(E1);
+    phase.zeros();
+    phase.set_imag(index_imag);
+
+    size_t m,a,n,s,cha,e2,e1,ro;
+    float caipi_factor;
+
+    int facteur;
+
+    if (is_positive==true)
+    {facteur=1;}
+    else
+    {facteur=-1;}
+
+
+    for (m = 0; m < MB_factor; m++) {
+
+        caipi_factor=2*arma::datum::pi/(facteur*Blipped_CAIPI)*(m);
+
+        if (is_positive==true)
+        {
+            GDEBUG_STREAM(" apply Blipped_CAIPI  "<<   facteur*Blipped_CAIPI  << " caipi_factor    "<<  caipi_factor  );
+        }
+        else
+        {
+            GDEBUG_STREAM(" undo Blipped_CAIPI  "<<   facteur*Blipped_CAIPI  << " caipi_factor    "<<  caipi_factor  );
+        }
+
+        shift_to_apply=exp(phase*caipi_factor);
+
+        for (e1 = 0; e1 < E1; e1++)
+        {
+            for (ro = 0; ro < RO; ro++)
+            {
+                for (e2 = 0; e2 < E2; e2++)
+                {
+                    for (cha = 0; cha < CHA; cha++)
+                    {
+                        phase_shift(ro,e1,e2,cha)=shift_to_apply(e1);
+                    }
+                }
+            }
+        }
+
+        for (a = 0; a < lNumberOfStacks_; a++) {
+
+            for (s = 0; s < S; s++)
+            {
+                size_t usedS = s;
+                if (usedS >= S) usedS = S - 1;
+
+                for (n = 0; n < N; n++)
+                {
+                    size_t usedN = n;
+                    if (usedN >= N) usedN = N - 1;
+
+                    std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
+                    std::complex<float> * out = &(tempo(0, 0, 0, 0));
+                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+
+                    Gadgetron::multiply(tempo, phase_shift, tempo);
+
+                    memcpy(in , out, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+
+                }
+            }
+        }
+    }
+}
 
 
 
@@ -1638,7 +1745,10 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK7(hoNDArray< std::compl
     size_t S = data.get_size(5);
     size_t STK = data.get_size(6);
 
-    GDEBUG_STREAM("GenericSMSPrepGadget - mb stk7 data array  : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << STK  << "]");
+    GADGET_CHECK_THROW(CHA==lNumberOfChannels_)
+    GADGET_CHECK_THROW(STK==lNumberOfStacks_);
+
+    //GDEBUG_STREAM("GenericSMSPrepGadget - mb stk7 data array  : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << STK  << "]");
 
     size_t a, e1, ro, e2, cha, n, s;
 
@@ -1710,7 +1820,6 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK7(hoNDArray< std::compl
         }
     }
 
-
     hoNDFFT<float>::instance()->fft(&data,0);
 }
 
@@ -1719,10 +1828,8 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK7(hoNDArray< std::compl
 
 
 
-void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data)
-{
-
-    // fid_stack_SB_corrected(:, :, :, c, :, :, a, m)=fid_stack.SB_shift(:, :, :, c, :, :, a, m) * exp(1i*pi*z_offset_geo(index)/z_gap(1));
+void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive)
+{    
 
     size_t RO=data.get_size(0);
     size_t E1=data.get_size(1);
@@ -1733,10 +1840,20 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
     size_t N=data.get_size(6);
     size_t S=data.get_size(7);
 
+    GADGET_CHECK_THROW(CHA==lNumberOfChannels_)
+    GADGET_CHECK_THROW(STK==lNumberOfStacks_);
+
     size_t m, a, n, s;
-    size_t index;
+    size_t index;    
 
     std::complex<double> ii(0,1);
+
+    int facteur;
+
+    if (is_positive==true)
+    {facteur=-1;}
+    else
+    {facteur=1;}
 
     for (a = 0; a < STK; a++) {
 
@@ -1744,8 +1861,8 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
 
             index = MapSliceSMS(a,m);
 
-            std::complex<double> lala=  exp(arma::datum::pi*ii*z_offset_geo(index)/z_gap(0));
-            std::complex<float>  lili=  static_cast< std::complex<float> >(lala) ;
+            std::complex<double> lala=  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
+            std::complex<float>  lili=  static_cast< std::complex<float> >(lala) ;           
 
             for (s = 0; s < S; s++)
             {
@@ -1753,17 +1870,15 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
                 {
                     std::complex<float> *in = &(data(0, 0, 0, 0, m, a, n, s));
 
-                    for (size_t ii = 0; ii < RO * E1 * E2 * CHA; ii++) {
+                    for (size_t j = 0; j < RO * E1 * E2 * CHA; j++) {
 
-                        data[ii] = data[ii]*lili  ;
+                        in[j] = in[j]*lili;
                     }
                 }
             }
         }
     }
-
 }
-
 
 GADGET_FACTORY_DECLARE(GenericReconSMSBase)
 }

@@ -240,9 +240,7 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
 
     GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - incoming data array data : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA <<  " " << MB <<  " " << STK << " " << N << " " << S<<  "]");
 
-    //std::cout << "reduced_E1_ "<< std::endl;
-
-    // TODO attention dimension MB =1 car c'est mb par définition il n'y a pas plusieurs coupes
+    // TODO attention dimension MB =1 car c'est mb par définition il n'y a pas plusieurs coupes dans cette direction
     hoNDArray< std::complex<float> > mb_reduce;
     mb_reduce.create(RO, reduced_E1_, CHA, 1, STK, N, S);
 
@@ -418,7 +416,7 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
 
     if (!debug_folder_full_path_.empty())
     {
-        show_size(sb_reduce,"sb_reduce");
+        //show_size(sb_reduce,"sb_reduce");
         save_4D_with_STK_5(sb_reduce, "sb_reduce", "0");
     }
 
@@ -569,9 +567,7 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
                         }
                     }
 
-                    CMK_matrix = pinv(measured_data_matrix.t()*measured_data_matrix)*measured_data_matrix.t();
-
-                    //std::cout << size(CMK_matrix,0 )<< "  "<< size(CMK_matrix,1) <<std::endl;
+                    CMK_matrix = pinv(measured_data_matrix.t()*measured_data_matrix)*measured_data_matrix.t();                 
 
                     hoNDArray<std::complex<float> > CMK(measured_data.get_size(1),measured_data.get_size(0));
 
@@ -606,14 +602,11 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
 
                     }
                     gt_timer_local_.stop();
-                }
-                //show_size(missing_data," missing_data ");
-                //show_size(measured_data," measure_data ");
+                }               
             }
         }
-        //show_size(kernel, " kernel out ");
-        save_4D_data(kernel, "kernel", "0");
-        //show_size(kernel, " kernelonov out ");
+
+        save_4D_data(kernel, "kernel", "0");      
         save_4D_data(kernelonov, "kernelonov", "0");
 
     }
@@ -676,13 +669,6 @@ void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_sb(hoNDAr
 
 void GenericReconCartesianSliceGrappaGadget::recopy_kspace( hoNDArray< std::complex<float> >& output, size_t acc )
 {
-  //  hoNDArray< std::complex<float> > output;
-   // output.create(data_.get_size(0),data_.get_size(1),data_.get_size(2),data_.get_size(3),data_.get_size(4),data_.get_size(5),data_.get_size(6),data_.get_size(7) );
-
-
-   // std::vector<size_t> newdims;
-   // newdims.push_back(blocks_E1_);
-   // newdims.push_back(blocks_RO_);
 
     size_t RO = unfolded_image.get_size(1);
     size_t E1 = unfolded_image.get_size(0);
@@ -759,7 +745,7 @@ void GenericReconCartesianSliceGrappaGadget::remove_unnecessary_kspace_mb2(hoNDA
 
     size_t s,n,a,m,cha,e2,e1;
 
-    std::cout << "end_E1_ " << start_E1_<<  " end_E1_ " <<  end_E1_<< "acc "   << acc << std::endl;
+    //std::cout << "end_E1_ " << start_E1_<<  " end_E1_ " <<  end_E1_<< "acc "   << acc << std::endl;
 
     for (s = 0; s < S; s++)
     {
@@ -866,10 +852,7 @@ void GenericReconCartesianSliceGrappaGadget::extract_milieu_kernel(hoNDArray< st
 
     size_t milieu=round(float(kernel_size_)/2)-1;
 
-    GDEBUG("Le milieu du kernel est %d  \n",milieu );
-
-    show_size(block_SB,"input");
-    show_size(missing_data,"output");
+    //GDEBUG("Le milieu du kernel est %d  \n",milieu );
 
     // TODO #pragma omp parallel for default() private() shared()
     for (s = 0; s < S; s++)    {
@@ -918,9 +901,9 @@ void GenericReconCartesianSliceGrappaGadget::im2col(hoNDArray< std::complex<floa
     size_t S = input.get_size(7);
 
     GADGET_CHECK_THROW(CHA==lNumberOfChannels_)
-            GADGET_CHECK_THROW(STK==lNumberOfStacks_);
+    GADGET_CHECK_THROW(STK==lNumberOfStacks_);
 
-    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - im2col : [RO E1 CHA MB STK N S] - [" << RO << " " << E1 << " " << CHA << " " << MB << " " << STK << " " << N<< " " << S << "]");
+    //GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - im2col : [RO E1 CHA MB STK N S] - [" << RO << " " << E1 << " " << CHA << " " << MB << " " << STK << " " << N<< " " << S << "]");
 
     size_t rowIdx, colIdx;
     size_t c,m,a,n,s;

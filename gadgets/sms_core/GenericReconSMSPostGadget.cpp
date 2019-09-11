@@ -168,7 +168,16 @@ void GenericReconSMSPostGadget::post_process_sb_data(hoNDArray< std::complex<flo
 
     // apply slice_optimal phase-shift
 
-     undo_blip_caipi_shift(data_8D, headers, e);
+    std::stringstream os;
+    os << "_encoding_" << e;
+    std::string suffix = os.str();
+
+     undo_blip_caipi_shift(data_8D, headers, e, true);
+
+     if (!debug_folder_full_path_.empty())
+     {
+     save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_SB4D_fin_caipi", os.str());
+     }
 
      load_epi_data();
 
@@ -183,7 +192,17 @@ void GenericReconSMSPostGadget::post_process_sb_data(hoNDArray< std::complex<flo
 
 void GenericReconSMSPostGadget::post_process_mb_data(hoNDArray< std::complex<float> >& data_8D, hoNDArray< std::complex<float> >& data_7D, hoNDArray< ISMRMRD::AcquisitionHeader > & headers, size_t e)
 {
-    undo_blip_caipi_shift(data_8D, headers, e);
+
+    std::stringstream os;
+    os << "_encoding_" << e;
+    std::string suffix = os.str();
+
+    undo_blip_caipi_shift(data_8D, headers, e, false);
+
+    if (!debug_folder_full_path_.empty())
+    {
+    save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_MB4D_fin_caipi", os.str());
+    }
 
     apply_ghost_correction_with_arma_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, "POST MB");
 
@@ -303,7 +322,7 @@ void GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation(ho
 
 
 
-void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & headers, size_t e)
+void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & headers, size_t e, bool undo_absolute)
 {
     std::stringstream os;
     os << "_encoding_" << e;
@@ -311,19 +330,27 @@ void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<fl
 
     if (is_wip_sequence==1)
     {
-        // si WIP on applique le blip caipi
-        apply_relative_phase_shift(data, false);
+        // et on applique aussi l'offset de phase
+        // recupération de l'offset de position dans la direction de coupe
+        if (undo_absolute==true)
+        {
+        // true means single band data
+        get_header_and_position_and_gap(data, headers);
+        apply_absolute_phase_shift(data, true);
+
+        apply_relative_phase_shift(data, true);
+        }
+        else
+        {
+        // false means multiband data
+        apply_relative_phase_shift_test(data, true);
+        }
+
 
         //if (!debug_folder_full_path_.empty())
         //{
         //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data, "FID_SB4D_relative_shift", os.str());
         //}
-
-        // et on applique aussi l'offset de phase
-        // recupération de l'offset de position dans la direction de coupe
-        //get_header_and_position_and_gap(sb_8D, headers_sb);
-
-        //apply_absolute_phase_shift(sb_8D);
 
         //if (!debug_folder_full_path_.empty())
         //{

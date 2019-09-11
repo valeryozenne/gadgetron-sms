@@ -148,7 +148,7 @@ void GenericReconCartesianSliceGrappav0Gadget::perform_slice_grappa_unwrapping(I
 
     if (!debug_folder_full_path_.empty())
     {
-        show_size(mb_reduce,"mb_reduce");
+        //show_size(mb_reduce,"mb_reduce");
         save_4D_with_STK_5(mb_reduce, "mb_reduce", "0");
     }
 
@@ -156,7 +156,7 @@ void GenericReconCartesianSliceGrappav0Gadget::perform_slice_grappa_unwrapping(I
     block_MB.create(voxels_number_per_image_, kernel_size_, CHA, 1, STK, N, S);
 
     im2col(mb_reduce,block_MB);
-    show_size(block_MB,"block_MB");
+    //show_size(block_MB,"block_MB");
     save_4D_with_STK_5(block_MB,"block_MB", "0");
 
     std::vector<size_t> newdims;
@@ -169,7 +169,7 @@ void GenericReconCartesianSliceGrappav0Gadget::perform_slice_grappa_unwrapping(I
     newdims.push_back(S); //S
     block_MB.reshape(&newdims);
 
-    show_size(block_MB,"block_MB reshape");
+    //show_size(block_MB,"block_MB reshape");
     save_4D_with_STK_5(block_MB,"block_MB_reshape", "0");
 
     unfolded_image.create(voxels_number_per_image_,  1, CHA, MB_factor, STK,  N, S);

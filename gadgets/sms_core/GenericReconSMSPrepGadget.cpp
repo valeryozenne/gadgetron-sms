@@ -204,23 +204,29 @@ void GenericReconSMSPrepGadget::apply_blip_caipi_shift(hoNDArray< std::complex<f
 
     if (is_wip_sequence==1)
     {
+
+        if (!debug_folder_full_path_.empty())
+        {
+            save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB4D_prep_avant_relative_shift", os.str());
+        }
+
         // si WIP on applique le blip caipi
         apply_relative_phase_shift(sb_8D, false);
 
         if (!debug_folder_full_path_.empty())
         {
-            save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB4D_prep_relative_shift", os.str());
+            save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB4D_prep_apres_relative_shift", os.str());
         }
 
         // et on applique aussi l'offset de phase
         // recupération de l'offset de position dans la direction de coupe
         get_header_and_position_and_gap(sb_8D, headers_sb);
 
-        apply_absolute_phase_shift(sb_8D);
+        apply_absolute_phase_shift(sb_8D,false);
 
         if (!debug_folder_full_path_.empty())
         {
-            save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB4D_prep_absolute_shift", os.str());
+            save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB4D_prep_apres_absolute_shift", os.str());
         }
 
     }
@@ -262,7 +268,6 @@ void GenericReconSMSPrepGadget::apply_averaged_epi_ghost_correction(hoNDArray< s
     {
         save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB_avant2_epi_nav", os.str());
     }
-
 
     apply_ghost_correction_with_arma_STK6(sb_8D, headers_sb ,  acceFactorSMSE1_[e], false , false, "PREP SB");
 
@@ -306,7 +311,7 @@ void GenericReconSMSPrepGadget::pre_process_mb_data(hoNDArray< std::complex<floa
     // save_4D_data(data, "FID_MB4D_reorganize", os.str());
     // reorganize_data(data, arma::conv_to<arma::uvec>::from(order_of_acquisition_mb));
 
-    show_size(mb_8D,"FID_MB4D_remove" );
+    //show_size(mb_8D,"FID_MB4D_remove" );
 
     //apply the average slice navigator
     if (!debug_folder_full_path_.empty())

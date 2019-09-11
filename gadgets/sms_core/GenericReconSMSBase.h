@@ -180,10 +180,12 @@ namespace Gadgetron {
         virtual int get_reduced_E1_size(size_t start_E1 , size_t end_E1, size_t acc );
 
         virtual void apply_relative_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
+        virtual void apply_relative_phase_shift_test(hoNDArray< std::complex<float> >& data, bool is_positive );
+        virtual void apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
 
         virtual void get_header_and_position_and_gap(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > headers_);
 
-        virtual void apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data);
+
 
     };
 }
