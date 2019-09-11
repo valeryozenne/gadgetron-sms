@@ -127,7 +127,6 @@ int RemoveBlipGadget::process(GadgetContainerMessage<ISMRMRD::AcquisitionHeader>
 
     shift_ = get_blipped_factor(order_of_acquisition_sb(slice));
 
-
     if (shift_!=0)
     {
 

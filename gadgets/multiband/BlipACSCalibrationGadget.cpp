@@ -84,6 +84,9 @@ int BlipACSCalibrationGadget::process_config(ACE_Message_Block *mb)
     /// FR
     /// UK
     ///
+    ///
+
+    std::cout << encoding << std::endl;
     arma::fvec index_imag = arma::linspace<arma::fvec>( 1, encoding, encoding )  - center_k_space_sample ;
 
 
@@ -124,7 +127,6 @@ int BlipACSCalibrationGadget::process(GadgetContainerMessage<ISMRMRD::Acquisitio
         str_s = indice_slice.str();
 
         shift_ = get_blipped_factor(order_of_acquisition_sb(slice));
-
 
         if (shift_!=0)
         {

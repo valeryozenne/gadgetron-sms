@@ -24,7 +24,8 @@
 
     <!-- Noise prewhitening -->
  <gadget><name>NoiseAdjust</name><dll>gadgetron_mricore</dll><classname>NoiseAdjustGadget</classname></gadget>
- <!--
+
+<!--
    <gadget>
       <name>PCA</name>
       <dll>gadgetron_mricore</dll>
@@ -118,8 +119,6 @@
         <dll>gadgetron_multiband</dll>
         <classname>CheckMultibandDefoldingGadget</classname>
     </gadget>
-
-
 
     <gadget>
         <name>EmptyFlags</name>
@@ -309,17 +308,19 @@
     </gadget>
 
 
-
-
     <gadget>
-    <name>Extract</name>
-    <dll>gadgetron_mricore</dll>
-    <classname>ExtractGadget</classname>
-    <property>
-            <name>extract_mask</name>
-            <value>9</value>
-        </property>
-  </gadget>
+      <name>ExtractThermoI</name>
+      <dll>gadgetron_mricore</dll>
+      <classname>ExtractThermoIGadget</classname>
+      <property>
+          <name>doOffline</name>
+          <value>1</value>
+      </property>
+      <property>
+          <name>extract_mask</name>
+          <value>9</value>
+      </property>
+    </gadget>
 
 
     <gadget>

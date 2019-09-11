@@ -279,7 +279,7 @@ int PseudoGenericMultibandRecoGadget::process(GadgetContainerMessage<ISMRMRD::Ac
 
                 std::stringstream stk;
                 stk << "_stack_" << a;
-                gt_exporter_.export_array_complex(copy, "/tmp/gadgetron/SliceGrappa/slice_calibration_reduce0" + stk.str());
+                gt_exporter_.export_array_complex(copy, "/tmp/gadgetron/SliceGrappa/FID_SB_Avant_Calib_multi_encoding_0" + stk.str());
 
                 calculate_kernel(slice_calibration_reduce);
 
@@ -295,6 +295,14 @@ int PseudoGenericMultibandRecoGadget::process(GadgetContainerMessage<ISMRMRD::Ac
 
                     kernel_all_slices.slice(MapSliceSMS(m,a))=kernel.slice(m);
                 }
+
+                hoNDArray< std::complex<float> > copy_kernel;
+                copy_kernel.create(kernel_size*lNumberOfChannels_,lNumberOfChannels_,MB_factor_);
+                memcpy(&copy(0,0,0), &kernel(0,0,0) , sizeof(std::complex<float>)*kernel_size*lNumberOfChannels_*lNumberOfChannels_*MB_factor_);
+
+                std::stringstream stk2;
+                stk2 << "_stack_" << a;
+                gt_exporter_.export_array_complex(copy_kernel, "/tmp/gadgetron/SliceGrappa/kernel_multiband_encoding_0" + stk2.str());
 
                 GDEBUG("Kernel calculation is ending \n");
             }
@@ -366,6 +374,16 @@ int PseudoGenericMultibandRecoGadget::process(GadgetContainerMessage<ISMRMRD::Ac
                 //std::cout << " a  "  <<  a << " order_of_acquisition_mb(a)  "  << order_of_acquisition_mb(a)  << std::endl;
 
                 //std::cout << size(folded_image.slices(order_of_acquisition_mb(a), order_of_acquisition_mb(a)) ) << std::endl;
+
+                arma::cx_fmat tempo=folded_image.slices(order_of_acquisition_mb(a), order_of_acquisition_mb(a));
+
+                hoNDArray< std::complex<float> > copy;
+                copy.create(readout*lNumberOfChannels_, encoding);
+                memcpy(&copy(0,0), &tempo(0,0) ,sizeof(std::complex<float>)*readout*lNumberOfChannels_*encoding);
+
+                std::stringstream stk;
+                stk << "_stack_" << a;
+                gt_exporter_.export_array_complex(copy, "/tmp/gadgetron/SliceGrappa/FID_MB_Avant_Unwrap_multi_encoding_0" + stk.str());
 
                 calculate_unfolded_image(folded_image.slices(order_of_acquisition_mb(a), order_of_acquisition_mb(a)), MapSliceSMS.col(a));
 
@@ -825,7 +843,7 @@ arma::cx_fcube PseudoGenericMultibandRecoGadget::remove_data_if_inplane_grappa(a
             // std::cout << s << std::endl;
             // ici on peut ajouter une tableau qui dit si on continue ou pas
 
-            for (unsigned int j = 1; j < size(input,1); j+=acceFactorE1_)
+            for (unsigned int j = 1; j < size(input,1); j+=acceFactorE1_) //TODO modif val
             {
                 indice = ((j+1)/acceFactorE1_)-1;
                 output.slice(s).col(indice)=input.slice(s).col(j);
@@ -1001,7 +1019,7 @@ void PseudoGenericMultibandRecoGadget::find_encoding_dimension_for_SMS_calculati
 {
     if(acceFactorE1_>1)
     {
-        e1_size_for_sms_calculation=round(encoding/acceFactorE1_);
+        e1_size_for_sms_calculation=round(encoding/acceFactorE1_); //TODO modif val annulé
     }
     else
     {
