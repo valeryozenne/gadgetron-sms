@@ -42,6 +42,7 @@ namespace Gadgetron {
             if (this->mb_compression_.delete_data_on_destruct()) this->mb_compression_.clear();
 
 
+
         }
 
         // ------------------------------------
@@ -87,6 +88,7 @@ namespace Gadgetron {
         hoNDArray<T > ref_compression_;
         hoNDArray<T > sb_compression_;
         hoNDArray<T > mb_compression_;
+
     };
 }
 
@@ -116,7 +118,7 @@ namespace Gadgetron {
         /// Grappa parameters
         GADGET_PROPERTY(grappa_kSize_RO, int, "Grappa kernel size RO", 5);
         GADGET_PROPERTY(grappa_kSize_E1, int, "Grappa kernel size E1", 5);
-        GADGET_PROPERTY(calib_fast, int, "calibration with Tikhonov", 0);
+        GADGET_PROPERTY(calib_fast, bool, "calibration with Tikhonov", false);
 
         GADGET_PROPERTY(grappa_reg_lamda, double, "Grappa regularization threshold", 0.0005);
         //GADGET_PROPERTY(grappa_calib_over_determine_ratio, double, "Grappa calibration overdermination ratio", 45);
@@ -161,6 +163,7 @@ namespace Gadgetron {
 
         unsigned int compteur;
 
+        //TODO necessay for the pinv operation
         arma::cx_fmat CMK_matrix;
         arma::cx_fmat measured_data_matrix;
 

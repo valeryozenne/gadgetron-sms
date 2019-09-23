@@ -125,8 +125,6 @@ int GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMessage< Ismrm
 
                 GDEBUG_STREAM("GenericSMSSplitGadget - incoming mb headers_ array : [E1, E2, N, S, LOC] - [" << hE1 << " " << hE2 << " " << hN << " " << hS << " " << hSLC << "]");
 
-
-
                 if (this->next()->putq(m1) < 0)
                 {
                     GERROR_STREAM("Put IsmrmrdReconData to Q failed ... ");

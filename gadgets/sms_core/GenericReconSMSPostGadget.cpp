@@ -252,7 +252,7 @@ void GenericReconSMSPostGadget::set_idx(hoNDArray< ISMRMRD::AcquisitionHeader > 
 void GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output)
 {
 
-    //TODO it should be remplace by one single copy
+    //TODO it should be remplaced by one single copy
 
     size_t RO=data.get_size(0);
     size_t E1=data.get_size(1);
