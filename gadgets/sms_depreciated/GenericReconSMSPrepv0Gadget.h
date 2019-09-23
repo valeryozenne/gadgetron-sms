@@ -14,7 +14,7 @@
 
 namespace Gadgetron {
 
-    class EXPORTGADGETSSMSCORE GenericReconSMSPrepv0Gadget : public GenericReconSMSv0Base
+    class EXPORTGADGETSSMSDEPRECIATED GenericReconSMSPrepv0Gadget : public GenericReconSMSv0Base
     {
     public:
         GADGET_DECLARE(GenericReconSMSPrepv0Gadget);

@@ -257,8 +257,12 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
     block_MB.create(voxels_number_per_image_, kernel_size_, CHA, 1, STK, N, S);
 
     im2col(mb_reduce,block_MB);
+
+    if (!debug_folder_full_path_.empty())
+    {
     //show_size(block_MB,"block_MB");
     save_4D_with_STK_5(block_MB,"block_MB", "0");
+    }
 
     std::vector<size_t> newdims;
     newdims.push_back(blocks_RO_*blocks_E1_);
@@ -270,18 +274,15 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
     newdims.push_back(S); //S
     block_MB.reshape(&newdims);
 
+    if (!debug_folder_full_path_.empty())
+    {
     show_size(block_MB,"block_MB reshape");
     save_4D_with_STK_5(block_MB,"", "0");
+    }
 
     //TODO ceci devrait etre alloué une seule fois et non a chaque passage
     unfolded_image.create(voxels_number_per_image_, CHA, MB_factor, STK,  N, S);
-    unfolded_image_permute.create(blocks_RO_,blocks_E1_,CHA, MB_factor, STK,  N, S);
-
-    show_size(kernel,"kernel");
-
-    // attention les dimensions ne sont pas les mêmes
-
-    std::cout <<voxels_number_per_image_<< "  "<< kernel_size_<< " "  << STK <<" "<< MB << "  " << CHA  <<std::endl;
+    unfolded_image_permute.create(blocks_RO_,blocks_E1_,CHA, MB_factor, STK,  N, S);   
 
     size_t s, n, a, m;
 
@@ -353,10 +354,12 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
 */
     ///////////////
 
-
+    if (!debug_folder_full_path_.empty())
+    {
     show_size(unfolded_image,"unfolded_image");
     save_4D_with_STK_5(unfolded_image, "unfolded_image", "0");
     save_4D_data(unfolded_image, "unfolded_image", "0");
+    }
 
     std::vector<size_t> newdims2;
     newdims2.push_back(blocks_E1_);
@@ -368,9 +371,11 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
     newdims2.push_back(S); //STK
     unfolded_image.reshape(&newdims2);
 
+    if (!debug_folder_full_path_.empty())
+    {
     show_size(unfolded_image,"unfolded_image_reshape");
     save_4D_with_STK_5(unfolded_image, "unfolded_image_reshape", "0");
-
+    }
 
     std::vector<size_t> newdims3;
     newdims3.push_back(1);
@@ -383,12 +388,13 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
 
     unfolded_image_permute=permute(unfolded_image,newdims3);
 
+    if (!debug_folder_full_path_.empty())
+    {
     show_size(unfolded_image_permute,"unfolded_image_permute");
-
+    }
 
 
 }
-
 
 
 
@@ -435,8 +441,10 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
 
     im2col(sb_reduce, block_SB);
 
-    //show_size(block_SB, " block_SB ");
+    if (!debug_folder_full_path_.empty())
+    {
     save_4D_8D_kspace(block_SB, "block_SB", "0");
+    }
 
     if (blocking==true)
     {
@@ -448,8 +456,10 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
         extract_milieu_kernel(block_SB,  missing_data);
     }
 
-    //show_size(missing_data, " missing_data ");
+    if (!debug_folder_full_path_.empty())
+    {
     save_4D_8D_kspace(missing_data, "missing_data", "0");
+    }
 
     CMK_matrix.set_size(CHA*kernel_size_, voxels_number_per_image_);
     measured_data_matrix.set_size(voxels_number_per_image_, CHA*kernel_size_);
@@ -467,16 +477,12 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
 
                 //show_size(tempo," tempo ");
                 std::complex<float> * in = &(block_SB(0, 0, 0 ,0 , a, n, s)); // [7316 25 12 2 4 1 1 1]
-
                 std::complex<float> * out = &(tempo(0, 0, 0 ));
 
                 memcpy(out, in, sizeof(std::complex<float>)*voxels_number_per_image_*kernel_size_*CHA*MB );
 
-                //show_size(tempo, "block_SB_reduce");
-
                 // sum over the MB dimension to average the kspace data (simulation of sms)
                 Gadgetron::sum_over_dimension(tempo, measured_data, 3);
-                //show_size(measured_data," measured_data ");
 
                 if (!debug_folder_full_path_.empty())
                 {
@@ -491,7 +497,6 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
 
                 measured_data.reshape(&newdims);
 
-                //show_size(measured_data," measured_data ");
 
                 if (!debug_folder_full_path_.empty())
                 {
@@ -606,8 +611,11 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
             }
         }
 
+        if (!debug_folder_full_path_.empty())
+        {
         save_4D_data(kernel, "kernel", "0");      
         save_4D_data(kernelonov, "kernelonov", "0");
+        }
 
     }
 

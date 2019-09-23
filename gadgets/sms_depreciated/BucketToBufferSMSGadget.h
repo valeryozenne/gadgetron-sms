@@ -3,7 +3,7 @@
 
 #include "Gadget.h"
 #include "hoNDArray.h"
-#include "gadgetron_smscore_export.h"
+#include "gadgetron_sms_depreciated_export.h"
 
 #include <ismrmrd/ismrmrd.h>
 #include <ismrmrd/xml.h>
@@ -24,7 +24,7 @@ namespace Gadgetron{
     // Since the order of data can be changed from its acquried time order, there is no easy way to resort waveform data
     // Therefore, the waveform data was copied and passed with every buffer
 
-  class EXPORTGADGETSSMSCORE BucketToBufferSMSGadget :
+  class EXPORTGADGETSSMSDEPRECIATED BucketToBufferSMSGadget :
   public Gadget1<IsmrmrdAcquisitionBucket>
     {
     public:

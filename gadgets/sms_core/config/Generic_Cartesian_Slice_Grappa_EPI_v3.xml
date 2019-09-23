@@ -115,6 +115,27 @@
     <property><name>verbose</name><value>true</value></property>
     </gadget>
 
+
+<!-- Coil compression -->
+  <gadget>
+    <name>CoilCompression</name>
+    <dll>gadgetron_smscore</dll>
+    <classname>GenericReconEigenChannelSMSGadget</classname>
+
+    <property><name>debug_folder</name><value></value></property>
+    <property><name>perform_timing</name><value>true</value></property>
+    <property><name>verbose</name><value>false</value></property>
+
+    <property><name>average_all_ref_N</name><value>true</value></property>
+    <property><name>average_all_ref_S</name><value>false</value></property>
+
+
+    <property><name>upstream_coil_compression</name><value>true</value></property>
+    <property><name>upstream_coil_compression_thres</name><value>0.002</value></property>
+    <property><name>upstream_coil_compression_num_modesKept</name><value>0</value></property>
+</gadget>
+
+
 <!--
 <gadget>
     <name>CheckSize</name>
@@ -128,12 +149,17 @@
 -->
 
     <gadget>
-    <name>SliceGrappaGadget</name>
+    <name>SliceGrappav3Gadget</name>
     <dll>gadgetron_smscore</dll>
-    <classname>GenericReconCartesianSliceGrappaGadget</classname>
+    <classname>GenericReconCartesianSliceGrappav3Gadget</classname>
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
+
+    <property><name>downstream_coil_compression</name><value>true</value></property>
+    <property><name>downstream_coil_compression_thres</name><value>0.002</value></property>
+    <property><name>downstream_coil_compression_num_modesKept</name><value>0</value></property>
+
     </gadget>
 
 
@@ -180,7 +206,6 @@
     <property><name>average_all_ref_N</name><value>true</value></property>
     <property><name>average_all_ref_S</name><value>true</value></property>
 
-
     <property><name>upstream_coil_compression</name><value>true</value></property>
     <property><name>upstream_coil_compression_thres</name><value>-1</value></property>
     <property><name>upstream_coil_compression_num_modesKept</name><value>0</value></property>
@@ -199,7 +224,7 @@
     <property><name>coil_map_algorithm</name><value>Inati</value></property>
 
     <!-- Down stream coil compression -->
-    <property><name>downstream_coil_compression</name><value>true</value></property>
+    <property><name>downstream_coil_compression</name><value>false</value></property>
     <property><name>downstream_coil_compression_thres</name><value>0.002</value></property>
     <property><name>downstream_coil_compression_num_modesKept</name><value>0</value></property>
 

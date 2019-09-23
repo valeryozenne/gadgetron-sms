@@ -281,16 +281,14 @@ void GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation(ho
 
             for (s = 0; s < S; s++)
             {
-
                 for (n = 0; n < N; n++)
                 {
-
                     std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
                     std::complex<float> * out = &(tempo(0, 0, 0, 0, n, s, index));
                     memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);                    
 
                     //create stack
-                    index = MapSliceSMS(a,m);
+                    //index = MapSliceSMS(a,m);
                     //std::complex<float> * in = &(data(0, 0, 0, 0, n, s, index));
                     //std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
                 }
@@ -315,9 +313,6 @@ void GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation(ho
                 }
             }
     }
-
-
-
 }
 
 

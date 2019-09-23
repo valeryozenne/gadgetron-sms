@@ -1691,7 +1691,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK7(hoNDArray< std::compl
     size_t S = data.get_size(5);
     size_t STK = data.get_size(6);
 
-    //GADGET_CHECK_THROW(CHA==lNumberOfChannels_)
+    GADGET_CHECK_THROW(CHA==lNumberOfChannels_)
     GADGET_CHECK_THROW(STK==lNumberOfStacks_);
 
     //GDEBUG_STREAM("GenericSMSPrepGadget - mb stk7 data array  : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << STK  << "]");
@@ -1786,7 +1786,7 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
     size_t N=data.get_size(6);
     size_t S=data.get_size(7);
 
-    //GADGET_CHECK_THROW(CHA==lNumberOfChannels_)
+    GADGET_CHECK_THROW(CHA==lNumberOfChannels_)
     GADGET_CHECK_THROW(STK==lNumberOfStacks_);
 
     size_t m, a, n, s;

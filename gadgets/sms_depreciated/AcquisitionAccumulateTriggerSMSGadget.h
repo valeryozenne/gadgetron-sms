@@ -3,7 +3,7 @@
 
 #include "Gadget.h"
 #include "hoNDArray.h"
-#include "gadgetron_smscore_export.h"
+#include "gadgetron_sms_depreciated_export.h"
 
 #include <ismrmrd/ismrmrd.h>
 #include <complex>
@@ -13,7 +13,7 @@
 namespace Gadgetron{
 
 
-  class EXPORTGADGETSSMSCORE AcquisitionAccumulateTriggerSMSGadget :
+  class EXPORTGADGETSSMSDEPRECIATED AcquisitionAccumulateTriggerSMSGadget :
   public Gadgetron::Gadget1Of2<ISMRMRD::AcquisitionHeader, ISMRMRD::ISMRMRD_WaveformHeader >
     {
     public:

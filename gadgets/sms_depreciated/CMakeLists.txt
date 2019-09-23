@@ -1,5 +1,5 @@
 if (WIN32)
-    add_definitions(-D__BUILD_GADGETRON_SMSCORE__)
+    add_definitions(-D__BUILD_GADGETRON_SMSDEPRECIATED__)
 endif ()
 
 find_package(ZFP)
@@ -76,55 +76,58 @@ elseif (ARMADILLO_FOUND)
     message("Armadillo not found, i.e. not compiling Blas/Lapack optimized MRI Gadgets")
 endif ()
 
-set( gadgetron_smscore_header_files  	
-        WriteSliceCalibrationFlagsGadget.h
-        GenericReconCheckSizeGadget.h        
+set( gadgetron_sms_depreciated_header_files 
+        BucketToBufferSMSGadget.h
+        AcquisitionAccumulateTriggerSMSGadget.h
         GenericReconBase.h
         GenericReconGadget.h
         GadgetIsmrmrdReadWrite.h
         NHLBICompression.h
         ImageArraySendMixin.h        
         ImageArraySendMixin.hpp
-        GenericReconSMSBase.h
-        GenericReconSMSPrepGadget.h
-        GenericReconSMSPostGadget.h
-        GenericReconCartesianSliceGrappaGadget.h
-        GenericReconCartesianSliceGrappav3Gadget.h
-        GenericReconEigenChannelSMSGadget.h
+        GenericReconSMSBase.h        
+        GenericReconSMSv0Base.h
+        GenericReconSMSPrepv0Gadget.h
+        GenericReconSMSPrepv1Gadget.h
+        GenericReconSMSPostv0Gadget.h
+        GenericReconCartesianSliceGrappav0Gadget.h
+        GenericReconCartesianSliceGrappav1Gadget.h
 )
 
-set( gadgetron_smscore_src_files 	
-        WriteSliceCalibrationFlagsGadget.cpp
-        GenericReconCheckSizeGadget.cpp        
+set( gadgetron_sms_depreciated_src_files                
+        BucketToBufferSMSGadget.cpp
+        AcquisitionAccumulateTriggerSMSGadget.cpp
         GenericReconBase.cpp
         GenericReconGadget.cpp
         GadgetIsmrmrdReadWrite.cpp
-        GenericReconSMSBase.cpp
-        GenericReconSMSPrepGadget.cpp
-        GenericReconSMSPostGadget.cpp
-        GenericReconCartesianSliceGrappaGadget.cpp  
-        GenericReconCartesianSliceGrappav3Gadget.cpp
-        GenericReconEigenChannelSMSGadget.cpp
+        GenericReconSMSBase.cpp        
+        GenericReconSMSv0Base.cpp
+        GenericReconSMSPrepv0Gadget.cpp
+        GenericReconSMSPrepv1Gadget.cpp
+        GenericReconSMSPostv0Gadget.cpp
+        GenericReconCartesianSliceGrappav0Gadget.cpp
+        GenericReconCartesianSliceGrappav1Gadget.cpp
+
         )
 
-set( gadgetron_smscore_config_files 
-    config/Generic_Cartesian_Slice_Grappa_EPI_v2.xml
-    config/Generic_Cartesian_Slice_Grappa_EPI_v3.xml
+set( gadgetron_sms_depreciated_config_files    
+    config/Generic_Cartesian_Slice_Grappa_EPI.xml
+    config/Generic_Cartesian_Slice_Grappa_EPI_v1.xml    
 )
 
-add_library(gadgetron_smscore SHARED 
-    gadgetron_smscore_export.h 
-    ${gadgetron_smscore_header_files} 
-    ${gadgetron_smscore_src_files}
-    ${gadgetron_smscore_config_files}
+add_library(gadgetron_sms_depreciated SHARED 
+    gadgetron_sms_depreciated_export.h 
+    ${gadgetron_sms_depreciated_header_files} 
+    ${gadgetron_sms_depreciated_src_files}
+    ${gadgetron_sms_depreciated_config_files}
     ${OPTIMIZED_GADGETS}
     ${OPTIMIZED_GADGET_HEADERS}
         )
 # Above: Whitespace misaligned, and one file on each line please.
 
-set_target_properties(gadgetron_smscore PROPERTIES VERSION ${GADGETRON_VERSION_STRING} SOVERSION ${GADGETRON_SOVERSION})
+set_target_properties(gadgetron_sms_depreciated PROPERTIES VERSION ${GADGETRON_VERSION_STRING} SOVERSION ${GADGETRON_SOVERSION})
 
-target_link_libraries(gadgetron_smscore 
+target_link_libraries(gadgetron_sms_depreciated 
     gadgetron_gadgetbase
     gadgetron_toolbox_log
     gadgetron_toolbox_cpucore
@@ -139,7 +142,7 @@ target_link_libraries(gadgetron_smscore
     ${Boost_LIBRARIES}
 )
 if(ARMADILLO_FOUND)
-   target_link_libraries(gadgetron_smscore
+   target_link_libraries(gadgetron_sms_depreciated
     gadgetron_toolbox_cpuoperator
     gadgetron_toolbox_cpuklt
     gadgetron_toolbox_mri_core
@@ -147,17 +150,17 @@ if(ARMADILLO_FOUND)
 endif()
 
 if (ZFP_FOUND)
-   target_link_libraries(gadgetron_smscore ${ZFP_LIBRARIES})
+   target_link_libraries(gadgetron_sms_depreciated ${ZFP_LIBRARIES})
 endif ()
 
 install(FILES 
-    gadgetron_smscore_export.h
-    ${gadgetron_smscore_header_files}
+    gadgetron_sms_depreciated_export.h
+    ${gadgetron_sms_depreciated_header_files}
     ${OPTIMIZED_GADGET_HEADERS}
     DESTINATION ${GADGETRON_INSTALL_INCLUDE_PATH} COMPONENT main)
 
 if (ARMADILLO_FOUND)
-    install(FILES ${gadgetron_smscore_config_files} DESTINATION ${GADGETRON_INSTALL_CONFIG_PATH} COMPONENT main)
+    install(FILES ${gadgetron_sms_depreciated_config_files} DESTINATION ${GADGETRON_INSTALL_CONFIG_PATH} COMPONENT main)
 endif ()
 
-install(TARGETS gadgetron_smscore DESTINATION lib COMPONENT main)
+install(TARGETS gadgetron_sms_depreciated DESTINATION lib COMPONENT main)

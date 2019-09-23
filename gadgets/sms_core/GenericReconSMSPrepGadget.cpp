@@ -90,7 +90,7 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
                 size_t S = data.get_size(5);
                 size_t SLC = data.get_size(6);
 
-                //TODO must be done somewhere else
+                //TODO should be done somewhere else
                 sb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
                 mb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
             }
@@ -102,7 +102,7 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
             // create to new hoNDArray [8D] for the sb and mb data
 
             if (is_single_band==true)
-            {
+            {                
                 define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
                 pre_process_sb_data(data, sb_8D, headers_, e);
                 recon_bit_->rbit_[e].data_.data_ = sb_8D;
@@ -111,11 +111,10 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
             else
             {
                 // only mb data
-                //then apply standard proccesing on mb
-
+                //then apply standard proccesing on mb                
                 define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
                 pre_process_mb_data(data, mb_8D, headers_ , e);
-                recon_bit_->rbit_[e].data_.data_ = mb_8D;
+                recon_bit_->rbit_[e].data_.data_ = mb_8D;                
 
             }
         }
@@ -180,14 +179,15 @@ void GenericReconSMSPrepGadget::reorganize_sb_data_to_8D(hoNDArray< std::complex
         save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(sb, "FID_SB4D", os.str());
     }
 
-    permute_slices_index(sb, indice_sb);
+    //permute_slices_index(sb, indice_sb);
 
-    if (!debug_folder_full_path_.empty())
-    {
-        save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(sb, "FID_SB4D_permute_slices", os.str());
-    }
+    //if (!debug_folder_full_path_.empty())
+    //{
+    //    save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(sb, "FID_SB4D_permute_slices", os.str());
+    //}
+    //create_stacks_of_slices(sb, sb_8D);
 
-    create_stacks_of_slices(sb, sb_8D);
+    create_stacks_of_slices_directly(sb, sb_8D, indice_sb);
 
     if (!debug_folder_full_path_.empty())
     {
@@ -304,15 +304,6 @@ void GenericReconSMSPrepGadget::pre_process_mb_data(hoNDArray< std::complex<floa
         save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(mb_8D, "FID_MB4D_remove", os.str());
     }
 
-    size_t STK = mb_8D.get_size(5);
-
-    // code usefull only for matlab comparison
-    // reorganize_data(data, indice_mb);
-    // save_4D_data(data, "FID_MB4D_reorganize", os.str());
-    // reorganize_data(data, arma::conv_to<arma::uvec>::from(order_of_acquisition_mb));
-
-    //show_size(mb_8D,"FID_MB4D_remove" );
-
     //apply the average slice navigator
     if (!debug_folder_full_path_.empty())
     {
@@ -328,7 +319,7 @@ void GenericReconSMSPrepGadget::pre_process_mb_data(hoNDArray< std::complex<floa
 
 }
 
-
+/*
 void GenericReconSMSPrepGadget::fusion_sb_and_mb_in_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb)
 {
     size_t RO=sb.get_size(0);
@@ -366,9 +357,9 @@ void GenericReconSMSPrepGadget::fusion_sb_and_mb_in_data(IsmrmrdReconBit &recon_
     }
 
     recon_bit.data_.data_ = data;
-}
+}*/
 
-
+/*
 //sur les données single band
 void GenericReconSMSPrepGadget::extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb)
 {
@@ -434,7 +425,7 @@ void GenericReconSMSPrepGadget::extract_sb_and_mb_from_data(IsmrmrdReconBit &rec
     // in order to have new_recon_bit.data_.data=sb;
     // and new_recon_bit.data_.headers_=h_sb;
 
-}
+}*/
 
 
 
@@ -579,6 +570,47 @@ void GenericReconSMSPrepGadget::reorganize_mb_data_to_8D(hoNDArray< std::complex
 
 }
 
+
+
+//sur les données single band
+void GenericReconSMSPrepGadget::create_stacks_of_slices_directly(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack, arma::uvec indice)
+{
+
+    size_t RO=data.get_size(0);
+    size_t E1=data.get_size(1);
+    size_t E2=data.get_size(2);
+    size_t CHA=data.get_size(3);
+    size_t N=data.get_size(4);
+    size_t S=data.get_size(5);
+
+    size_t MB=new_stack.get_size(4);
+    size_t STK=new_stack.get_size(5);
+
+    size_t n, s, a, m;
+    size_t index;
+
+    // copy of the data in the 8D array
+
+    for (a = 0; a < STK; a++) {
+
+        for (m = 0; m < MB; m++) {
+
+            index = MapSliceSMS(a,m);
+
+            for (s = 0; s < S; s++)
+            {
+                for (n = 0; n < N; n++)
+                {
+                    std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice(index)));
+                    //std::complex<float> * in = &(data(0, 0, 0, 0, n, s, index));
+                    std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
+
+                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+                }
+            }
+        }
+    }
+}
 
 
 //sur les données single band

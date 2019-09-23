@@ -13,7 +13,7 @@ namespace Gadgetron {
 
     /// define the recon status
     template <typename T>
-    class EXPORTGADGETSSMSCORE GenericReconCartesianGrappaObj
+    class EXPORTGADGETSSMSDEPRECIATED GenericReconCartesianGrappaObj
     {
     public:
 
@@ -71,7 +71,7 @@ namespace Gadgetron {
 
 namespace Gadgetron {
 
-    class EXPORTGADGETSSMSCORE GenericReconCartesianSliceGrappav0Gadget : public GenericReconSMSv0Base
+    class EXPORTGADGETSSMSDEPRECIATED GenericReconCartesianSliceGrappav0Gadget : public GenericReconSMSv0Base
     {
     public:
         GADGET_DECLARE(GenericReconCartesianSliceGrappav0Gadget);

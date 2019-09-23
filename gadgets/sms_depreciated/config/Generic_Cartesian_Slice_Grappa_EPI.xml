@@ -26,11 +26,11 @@
     <!-- Noise prewhitening -->
     <gadget><name>NoiseAdjust</name><dll>gadgetron_mricore</dll><classname>NoiseAdjustGadget</classname></gadget>
 
-    <gadget>
-    <name>WriteSingleBandFlags</name>
-     <dll>gadgetron_mricore</dll>
-    <classname>WriteSingleBandFlagsGadget</classname>
-    </gadget>
+<gadget>
+ <name>WriteSliceCalibrationFlags</name>
+     <dll>gadgetron_sms_depreciated</dll>
+    <classname>WriteSliceCalibrationFlagsGadget</classname>
+</gadget>
 
     <!-- EPI correction -->
     <gadget>
@@ -40,9 +40,9 @@
     </gadget>
 
     <gadget>
-        <name>EPICorrSMS</name>
+        <name>EPICorrSMSv0</name>
         <dll>gadgetron_epi</dll>
-        <classname>EPICorrSMSGadget</classname>
+        <classname>EPICorrSMSv0Gadget</classname>
     </gadget>
 
     <gadget>
@@ -60,26 +60,27 @@
     <!-- Data accumulation and trigger gadget -->
     <gadget>
         <name>AccTrig</name>
-        <dll>gadgetron_mricore</dll>
-        <classname>AcquisitionAccumulateTriggerGadget</classname>
+        <dll>gadgetron_sms_depreciated</dll>
+        <classname>AcquisitionAccumulateTriggerSMSGadget</classname>
         <property><name>trigger_dimension</name><value>repetition</value></property>
-        <property><name>sorting_dimension</name><value></value></property>
+        <property><name>sorting_dimension</name><value>average</value></property>
     </gadget>
 
     <gadget>
         <name>BucketToBuffer</name>
-        <dll>gadgetron_mricore</dll>
-        <classname>BucketToBufferGadget</classname>
-        <property><name>N_dimension</name><value>user_0</value></property>
-        <property><name>S_dimension</name><value>contrast</value></property>
+        <dll>gadgetron_sms_depreciated</dll>
+        <classname>BucketToBufferSMSGadget</classname>
+        <property><name>N_dimension</name><value>repetition</value></property>
+        <property><name>S_dimension</name><value>average</value></property>
         <property><name>split_slices</name><value>false</value></property>
         <property><name>ignore_segment</name><value>true</value></property>
     </gadget>
 
+
     <gadget>
-    <name>SMSPrepv1Gadget</name>
-    <dll>gadgetron_smscore</dll>
-    <classname>GenericReconSMSPrepv1Gadget</classname>
+    <name>SMSPrepv0Gadget</name>
+    <dll>gadgetron_sms_depreciated</dll>
+    <classname>GenericReconSMSPrepv0Gadget</classname>
     <!-- parameters for debug and timing -->
     <property><name>debug_folder</name><value>/Prep/</value></property>
     <property><name>perform_timing</name><value>true</value></property>
@@ -87,38 +88,24 @@
     </gadget>
 
     <gadget>
-        <name>CheckSize</name>
-        <dll>gadgetron_mricore</dll>
-        <classname>GenericReconSizeGadget</classname>
-        <property><name>debug_folder</name><value></value></property>
-        <property><name>perform_timing</name><value>true</value></property>
-        <property><name>verbose</name><value>true</value></property>
-    </gadget>
-
-
-
-
-    <gadget>
-    <name>SliceGrappav1Gadget</name>
-    <dll>gadgetron_smscore</dll>
-    <classname>GenericReconCartesianSliceGrappav1Gadget</classname>
+    <name>SliceGrappav0Gadget</name>
+    <dll>gadgetron_sms_depreciated</dll>
+    <classname>GenericReconCartesianSliceGrappav0Gadget</classname>
     <property><name>debug_folder</name><value>/SliceGrappa/</value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
     </gadget>
 
-
-<!--
     <gadget>
-    <name>SMSPostGadget</name>
-    <dll>gadgetron_smscore</dll>
-    <classname>GenericReconSMSPostGadget</classname>
+    <name>SMSPostv0Gadget</name>
+    <dll>gadgetron_sms_depreciated</dll>
+    <classname>GenericReconSMSPostv0Gadget</classname>
+    <!-- parameters for debug and timing -->
     <property><name>debug_folder</name><value>/Post/</value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
     </gadget>
 
--->
 
     <!-- Prep ref -->
     <gadget>
