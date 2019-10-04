@@ -157,6 +157,8 @@
     <property><name>verbose</name><value>true</value></property>
 
     <property><name>calib_fast</name><value>true</value></property>
+    <property><name>grappa_kSize_RO</name><value>5</value></property>
+    <property><name>grappa_kSize_E1</name><value>5</value></property>
 
     <property><name>downstream_coil_compression</name><value>true</value></property>
     <property><name>downstream_coil_compression_thres</name><value>0.002</value></property>
