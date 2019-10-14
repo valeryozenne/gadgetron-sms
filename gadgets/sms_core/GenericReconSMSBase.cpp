@@ -285,7 +285,7 @@ void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<flo
     tempo.create(RO, E1, E2, CHA);
 
     hoNDArray< std::complex<float> > phase_shift;
-    phase_shift.create(RO, E1, E2, CHA);
+    phase_shift.create(RO, E1, E2, CHA, MB);
 
     center_k_space_E1=round(E1/2);
 
@@ -312,7 +312,6 @@ void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<flo
     else
     {facteur=-1;}
 
-
     for (m = 0; m < MB_factor; m++) {
 
         caipi_factor=2*arma::datum::pi/(facteur*Blipped_CAIPI)*(m);
@@ -328,20 +327,32 @@ void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<flo
 
         shift_to_apply=exp(phase*caipi_factor);
 
-        for (e1 = 0; e1 < E1; e1++)
+        // TODO in gadegtron 4.0 , try this:
+        //for (e1 = 0; e1 < E1; e1++)
+        //{
+        //        phase_shift(slice,e1,slice,slice,slice)=shift_to_apply(e1);  // repmat variation only along e1 and mb once added TODO
+        //}
+
+        // TODO add mb dimension in phase_shift and then do the multiplication done
+        // check how to use gprof
+        for (cha = 0; cha < CHA; cha++)
         {
-            for (ro = 0; ro < RO; ro++)
+            for (e2 = 0; e2 < E2; e2++)
             {
-                for (e2 = 0; e2 < E2; e2++)
+                for (e1 = 0; e1 < E1; e1++)
                 {
-                    for (cha = 0; cha < CHA; cha++)
+                    for (ro = 0; ro < RO; ro++)
                     {
-                        phase_shift(ro,e1,e2,cha)=shift_to_apply(e1);
+                        phase_shift(ro,e1,e2,cha,m)=shift_to_apply(e1);  // repmat variation only along e1 and mb once added TODO
                     }
                 }
             }
         }
+    }
 
+     data *= phase_shift;  //thansk to david
+
+/*
         for (a = 0; a < lNumberOfStacks_; a++) {
 
             for (s = 0; s < S; s++)
@@ -365,7 +376,8 @@ void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<flo
                 }
             }
         }
-    }
+    }*/
+
 }
 
 
