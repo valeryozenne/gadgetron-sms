@@ -136,7 +136,12 @@ set( gadgetron_mricore_header_files GadgetMRIHeaders.h
                                     NHLBICompression.h
                                     ImageAccumulatorGadget.h
                                     ImageArraySendMixin.h
-                                    ImageArraySendMixin.hpp )
+                                    ImageArraySendMixin.hpp
+                                    WriteSingleBandFlagsGadget.h
+                                    GenericReconSizeGadget.h
+                                    GenericReconSplitSMSGadget.h
+                                    ExtractThermoIGadget.h
+                                    )
 
 set( gadgetron_mricore_src_files AcquisitionPassthroughGadget.cpp 
                                 AcquisitionFinishGadget.cpp 
@@ -195,6 +200,11 @@ set( gadgetron_mricore_src_files AcquisitionPassthroughGadget.cpp
                                 RateLimitGadget.cpp
                                 NoiseSummaryGadget.cpp
                                 ImageAccumulatorGadget.cpp
+                                WriteSingleBandFlagsGadget.cpp
+                                GenericReconSizeGadget.cpp
+                                GenericReconSplitSMSGadget.cpp
+                                ExtractThermoIGadget.cpp
+
         )
 
 set( gadgetron_mricore_config_files
@@ -210,7 +220,7 @@ set( gadgetron_mricore_config_files
     config/Generic_Cartesian_Grappa.xml
     config/Generic_Cartesian_Grappa_SNR.xml
     config/Generic_Cartesian_Grappa_T2W.xml
-        config/Generic_Cartesian_Grappa_RealTimeCine.xml
+    config/Generic_Cartesian_Grappa_RealTimeCine.xml
     config/Generic_Cartesian_Grappa_RealTimeCine_Cloud.xml
     config/Generic_Cartesian_Grappa_EPI.xml
     config/Generic_Cartesian_Grappa_EPI_AVE.xml

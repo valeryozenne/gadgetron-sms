@@ -24,6 +24,8 @@ include_directories(
   )
 
 add_subdirectory(mri_core)
+add_subdirectory(sms_core)
+add_subdirectory(sms_depreciated)
 
 add_subdirectory(interventional_mri)
 if (ARMADILLO_FOUND)
@@ -40,6 +42,8 @@ endif()
 
 if (ARMADILLO_FOUND)
   add_subdirectory(epi)
+  add_subdirectory(epi_liryc)
+  add_subdirectory(multiband)
   add_subdirectory(fatwater)
 elseif (ARMADILLO_FOUND)
   message("Armadillo not found, NOT compiling EPI or Fat/water Gadgets")

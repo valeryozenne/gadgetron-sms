@@ -41,6 +41,9 @@ namespace Gadgetron {
         else if (N_dimension.value().compare("slice") == 0) {
             N_ = SLICE;
         }
+        else if (N_dimension.value().compare("user_0") == 0) {
+            N_ = USER_0;
+        }
         else {
             GDEBUG("WARNING: Unknown N dimension (%s), N set to NONE", N_dimension.value().c_str());
             N_ = NONE;
@@ -72,6 +75,9 @@ namespace Gadgetron {
         else if (S_dimension.value().compare("slice") == 0) {
             S_ = SLICE;
         }
+        else if (S_dimension.value().compare("user_0") == 0) {
+            S_ = USER_0;
+        }
         else {
             GDEBUG("WARNING: Unknown sort dimension (%s), sorting set to NONE\n", S_dimension.value().c_str());
             S_ = NONE;
@@ -101,22 +107,22 @@ namespace Gadgetron {
         //GDEBUG("BucketToBufferGadget::process\n");
 
         //Some information about the bucket
-        //GDEBUG_STREAM("The Reference part: " << m1->getObjectPtr()->refstats_.size() << std::endl);
-        //GDEBUG_STREAM("   nslices: " << m1->getObjectPtr()->refstats_[0].slice.size() << std::endl);
-        //for (int e=0; e<m1->getObjectPtr()->refstats_.size() ; e++) {
-        //    for (std::set<uint16_t>::iterator it = m1->getObjectPtr()->refstats_[e].kspace_encode_step_1.begin();
-        //         it != m1->getObjectPtr()->refstats_[e].kspace_encode_step_1.end(); ++it) {
-        //        GDEBUG_STREAM("   K1: " <<  *it << std::endl);
-        //    }
-        //}
-        //GDEBUG_STREAM("The data part: " << m1->getObjectPtr()->datastats_.size() << std::endl);
-        //GDEBUG_STREAM("   nslices: " << m1->getObjectPtr()->datastats_[0].slice.size() << std::endl);
-        //for (int e=0; e<m1->getObjectPtr()->datastats_.size() ; e++) {
-        //    for (std::set<uint16_t>::iterator it = m1->getObjectPtr()->datastats_[e].kspace_encode_step_1.begin();
-        //         it != m1->getObjectPtr()->datastats_[e].kspace_encode_step_1.end(); ++it) {
-        //        GDEBUG_STREAM("   K1: " <<  *it << std::endl);
-        //    }
-        //}
+        /*GDEBUG_STREAM("The Reference part: " << m1->getObjectPtr()->refstats_.size() << std::endl);
+        GDEBUG_STREAM("   nslices: " << m1->getObjectPtr()->refstats_[0].slice.size() << std::endl);
+        for (int e=0; e<m1->getObjectPtr()->refstats_.size() ; e++) {
+            for (std::set<uint16_t>::iterator it = m1->getObjectPtr()->refstats_[e].kspace_encode_step_1.begin();
+                it != m1->getObjectPtr()->refstats_[e].kspace_encode_step_1.end(); ++it) {
+               GDEBUG_STREAM("   K1: " <<  *it << std::endl);
+            }
+        }
+        GDEBUG_STREAM("The data part: " << m1->getObjectPtr()->datastats_.size() << std::endl);
+        GDEBUG_STREAM("   nslices: " << m1->getObjectPtr()->datastats_[0].slice.size() << std::endl);
+        for (int e=0; e<m1->getObjectPtr()->datastats_.size() ; e++) {
+            for (std::set<uint16_t>::iterator it = m1->getObjectPtr()->datastats_[e].kspace_encode_step_1.begin();
+                 it != m1->getObjectPtr()->datastats_[e].kspace_encode_step_1.end(); ++it) {
+                GDEBUG_STREAM("   K1: " <<  *it << std::endl);
+            }
+        }*/
 
         //Iterate over the reference data of the bucket
         IsmrmrdDataBuffered* pCurrDataBuffer = NULL;
@@ -138,6 +144,7 @@ namespace Gadgetron {
             //GDEBUG_STREAM("k1: " << acqhdr.idx.kspace_encode_step_1 << std::endl);
             //GDEBUG_STREAM("k2: " << acqhdr.idx.kspace_encode_step_2 << std::endl);
             //GDEBUG_STREAM("seg: " << acqhdr.idx.segment << std::endl);
+            //GDEBUG_STREAM("user: " << acqhdr.idx.user[0] << std::endl);
             //GDEBUG_STREAM("key: " << key << std::endl);
 
             //Get some references to simplify the notation
@@ -190,6 +197,7 @@ namespace Gadgetron {
             //GDEBUG_STREAM("k1: " << acqhdr.idx.kspace_encode_step_1 << std::endl);
             //GDEBUG_STREAM("k2: " << acqhdr.idx.kspace_encode_step_2 << std::endl);
             //GDEBUG_STREAM("seg: " << acqhdr.idx.segment << std::endl);
+            //GDEBUG_STREAM("user: " << acqhdr.idx.user[0] << std::endl);
             //GDEBUG_STREAM("key: " << key << std::endl);
 
             //Get some references to simplify the notation
@@ -314,6 +322,9 @@ namespace Gadgetron {
         else if (N_ == SEGMENT) {
             index = idx.segment;
         }
+        else if (N_ == USER_0) {
+            index = idx.user[0];
+        }
         else {
             index = 0;
         }
@@ -343,6 +354,9 @@ namespace Gadgetron {
         else if (S_ == SEGMENT) {
             index = idx.segment;
         }
+        else if (S_ == USER_0) {
+            index = idx.user[0];
+        }
         else {
             index = 0;
         }
@@ -352,10 +366,10 @@ namespace Gadgetron {
 
     size_t BucketToBufferGadget::getKey(ISMRMRD::ISMRMRD_EncodingCounters idx)
     {
-        //[SLC, PHS, CON, REP, SET, SEG, AVE]
+        //[SLC, PHS, CON, REP, SET, SEG, AVE, USER_0]
         //collapse across two of them (N and S)
 
-        size_t slice, phase, contrast, repetition, set, segment, average;
+        size_t slice, phase, contrast, repetition, set, segment, average, user_0;
 
         if (split_slices_) {
             slice = idx.slice;
@@ -406,14 +420,23 @@ namespace Gadgetron {
             average = idx.average;
         }
 
+        if ((S_ == USER_0) || (N_ == USER_0)) {
+            user_0 = 0;
+        }
+        else {
+            user_0 = idx.user[0];
+        }
+
+
         size_t key = 0;
         key += slice * 0x1;
         key += phase * 0x100;
         key += contrast * 0x10000;
         key += repetition * 0x1000000;
-        key += set * 0x100000000;
+        key += set     * 0x100000000;
         key += segment * 0x10000000000;
         key += average * 0x1000000000000;
+        key += user_0  * 0x100000000000000;
 
         return key;
     }
@@ -584,6 +607,9 @@ namespace Gadgetron {
             case SLICE:
                 NN = *stats.slice.rbegin() - *stats.slice.begin() + 1;
                 break;
+            case USER_0:
+                NN = *stats.user_0.rbegin() - *stats.user_0.begin() + 1;
+                break;
             default:
                 NN = 1;
             }
@@ -610,6 +636,9 @@ namespace Gadgetron {
                 break;
             case SLICE:
                 NS = *stats.slice.rbegin() - *stats.slice.begin() + 1;
+                break;
+            case USER_0:
+                NS = *stats.user_0.rbegin() - *stats.user_0.begin() + 1;
                 break;
             default:
                 NS = 1;

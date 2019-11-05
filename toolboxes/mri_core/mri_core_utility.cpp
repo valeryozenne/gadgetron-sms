@@ -93,12 +93,11 @@ namespace Gadgetron
         size_t N = data.get_size(4);
         size_t S = data.get_size(5);
         size_t SLC = data.get_size(6);
+        size_t STK = data.get_size(7);
 
         size_t start_E1, end_E1;
         start_E1 = E1;
         end_E1 = 0;
-
-
 
         for (size_t slc = 0; slc < SLC; slc++)
         {
