@@ -350,9 +350,9 @@ void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<flo
         }
     }
 
-     data *= phase_shift;  //thansk to david
+    data *= phase_shift;  //thansk to david
 
-/*
+    /*
         for (a = 0; a < lNumberOfStacks_; a++) {
 
             for (s = 0; s < S; s++)
@@ -502,7 +502,7 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
     size_t start_E1(0), end_E1(0);
     auto t = Gadgetron::detect_sampled_region_E1(data);
     start_E1 = std::get<0>(t);
-    end_E1 = std::get<1>(t);  
+    end_E1 = std::get<1>(t);
 
     hoNDArray<float > shift_from_isocenter;
     shift_from_isocenter.create(3);
@@ -906,9 +906,13 @@ void GenericReconSMSBase::load_epi_data()
 
     epi_nav_neg_.create(dimensions_[0], lNumberOfSlices_);
     epi_nav_pos_.create(dimensions_[0], lNumberOfSlices_);
+    //epi_nav_neg_.clear();
+    //epi_nav_pos_.clear();
 
     epi_nav_neg_no_exp_.create(dimensions_[0], lNumberOfSlices_);
     epi_nav_pos_no_exp_.create(dimensions_[0], lNumberOfSlices_);
+    //epi_nav_neg_no_exp_.clear();
+    //epi_nav_pos_no_exp_.clear();
 
     corrneg_all_.set_size( dimensions_[0] , lNumberOfSlices_);
     corrpos_all_.set_size( dimensions_[0] , lNumberOfSlices_);
@@ -937,7 +941,7 @@ void GenericReconSMSBase::load_epi_data()
         corrpos_all_.col(s)=corrpos;
 
         corrneg_all_no_exp_.col(s)=corrneg_no_exp;
-        corrpos_all_no_exp_.col(s)=corrpos_no_exp;      
+        corrpos_all_no_exp_.col(s)=corrpos_no_exp;
 
         GADGET_CHECK_THROW( size(corrneg,0) == dimensions_[0] );
 
@@ -952,20 +956,76 @@ void GenericReconSMSBase::load_epi_data()
 
         std::complex<float> * out_pos_no_exp = &(epi_nav_pos_no_exp_(0, s));
         memcpy(out_pos_no_exp, &corrpos_no_exp(0) , sizeof(std::complex<float>)*dimensions_[0]);
-
-        /*if (s==2)
-        {
-            for (size_t ro = 0; ro < dimensions_[0]; ro++)
-            {
-                std::cout << " ro "<< epi_nav_neg_(ro,s) << " "<< epi_nav_neg_no_exp_(ro, s)  << std::endl;
-            }
-        }*/
     }
+
+    CheckComplexNumberEqualInMatrix(epi_nav_neg_,corrneg_all_ );
+    CheckComplexNumberEqualInMatrix(epi_nav_neg_no_exp_,corrneg_all_no_exp_ );
+
+    CheckComplexNumberEqualInMatrix(epi_nav_pos_,corrpos_all_ );
+    CheckComplexNumberEqualInMatrix(epi_nav_pos_no_exp_,corrpos_all_no_exp_ );
+
 }
 
+int GenericReconSMSBase::CheckComplexNumberEqualInVector(hoNDArray< std::complex<float> >& input , arma::cx_fvec  input_arma)
+{
 
+    GADGET_CHECK_THROW( size(input_arma,0) == input.get_size(0) );
 
-void GenericReconSMSBase::compute_mean_epi_nav(hoNDArray< std::complex<float> >& input,  hoNDArray< std::complex<float> >& output)
+    for (size_t ro = 0; ro < input.get_size(0); ro++)
+    {
+        if (input_arma(ro)!=input(ro))
+        {GERROR_STREAM("CheckComplexNumberEqualInMatrix "<< input_arma(ro) << " "<<  input(ro) );
+            return GADGET_FAIL;
+        }
+    }
+
+    //GADGET_CHECK_THROW( size(input2,1) == input1.get_size(1) );
+    return 0;
+}
+
+int GenericReconSMSBase::CheckComplexNumberEqualInMatrix(hoNDArray< std::complex<float> >& input , arma::cx_fmat  input_arma)
+{
+
+    GADGET_CHECK_THROW( size(input_arma,0) == input.get_size(0) );
+    GADGET_CHECK_THROW( size(input_arma,1) == input.get_size(1) );
+
+    for (size_t s = 0; s < input.get_size(1)  ; s++)
+    {
+        for (size_t ro = 0; ro < input.get_size(0); ro++)
+        {
+            if (input_arma(ro,s)!=input(ro,s))
+            {GERROR_STREAM("CheckComplexNumberEqualInMatrix "<< input_arma(ro,s) << " "<<  input(ro,s) <<  " ro: "<<  ro << " s: "<< s );
+                return GADGET_FAIL;
+            }
+        }
+    }
+    return 0;
+}
+
+int GenericReconSMSBase::CheckComplexNumberEqualInCube(hoNDArray< std::complex<float> >& input , arma::cx_fcube  input_arma)
+{
+
+    GADGET_CHECK_THROW( size(input_arma,0) == input.get_size(0) );
+    GADGET_CHECK_THROW( size(input_arma,1) == input.get_size(1) );
+    GADGET_CHECK_THROW( size(input_arma,2) == input.get_size(2) );
+
+    for (size_t a = 0; a < input.get_size(2)  ; a++)
+    {
+
+        for (size_t s = 0; s < input.get_size(1)  ; s++)
+        {
+            for (size_t ro = 0; ro < input.get_size(0); ro++)
+            {
+                if (input_arma(ro,s,a)!=input(ro,s,a))
+                {GERROR_STREAM("CheckComplexNumberEqualInMatrix "<< input_arma(ro,s,a) << " "<<  input(ro,s,a) );
+                    return GADGET_FAIL;}
+            }
+        }
+    }
+    return 0;
+}
+
+void GenericReconSMSBase::compute_mean_epi_nav(hoNDArray< std::complex<float> >& input,  hoNDArray< std::complex<float> >& output_no_exp ,  hoNDArray< std::complex<float> >& output )
 {
 
     size_t RO=input.get_size(0);
@@ -986,10 +1046,20 @@ void GenericReconSMSBase::compute_mean_epi_nav(hoNDArray< std::complex<float> >&
         Gadgetron::scal( (1.0/MB), nav_sum_2nd);
 
         std::complex<float> * in2 = &(nav_sum_2nd(0));
-        std::complex<float> * out2 = &(output(0, a ));
+        std::complex<float> * out2 = &(output_no_exp(0, a ));
 
         memcpy(out2, in2, sizeof(std::complex<float>)*RO);
     }
+
+    for (size_t a = 0; a < output.get_size(1); a++)
+    {
+        for (size_t ro = 0; ro < output.get_size(0); ro++)
+        {
+            output(ro,a)=std::exp(output_no_exp(ro,a));
+        }
+    }
+
+
 }
 
 
@@ -1004,20 +1074,19 @@ void GenericReconSMSBase::compute_mean_epi_arma_nav(arma::cx_fcube &input,  arma
 
     for (size_t a = 0; a < STK; a++)
     {
-
         arma::cx_fmat nav=input.slice(a);
 
         arma::cx_fvec nav_sum_2nd=mean(nav,1);
 
         output_no_exp.col(a)=nav_sum_2nd;
 
-        output.col(a)=arma::exp(nav_sum_2nd);    
+        output.col(a)=arma::exp(nav_sum_2nd);
     }
 }
 
 
 
-void GenericReconSMSBase::reorganize_arma_nav(arma::cx_fmat data, arma::uvec indice)
+void GenericReconSMSBase::reorganize_arma_nav(arma::cx_fmat &data, arma::uvec indice)
 {
     size_t RO=size(data,0);
     size_t SLC=size(data,1);
@@ -1025,12 +1094,10 @@ void GenericReconSMSBase::reorganize_arma_nav(arma::cx_fmat data, arma::uvec ind
     arma::cx_fmat new_data;
     new_data.set_size(RO, SLC);
 
-    size_t n, s;
-
     for (int slc = 0; slc < SLC; slc++)
     {
-        new_data.col(s)=data.col(indice(slc));
-    }    
+        new_data.col(slc)=data.col(indice(slc));
+    }
 
     data = new_data;
 
@@ -1045,13 +1112,10 @@ void GenericReconSMSBase::reorganize_nav(hoNDArray< std::complex<float> >& data,
     hoNDArray< std::complex<float> > new_data;
     new_data.create(RO, SLC);
 
-    size_t n, s;
-
     for (int slc = 0; slc < SLC; slc++) {
 
         std::complex<float> * in = &(data(0, indice(slc)));
         std::complex<float> * out = &(new_data(0, slc));
-
         memcpy(out , in, sizeof(std::complex<float>)*RO);
     }
 
@@ -1118,7 +1182,7 @@ void GenericReconSMSBase::create_stacks_of_arma_nav(arma::cx_fmat &data, arma::c
 }
 
 
-void GenericReconSMSBase::prepare_epi_data(size_t e)
+void GenericReconSMSBase::prepare_epi_data(size_t e, size_t E1, size_t E2, size_t CHA )
 {
     std::stringstream os;
     os << "_encoding_" << e;
@@ -1146,6 +1210,9 @@ void GenericReconSMSBase::prepare_epi_data(size_t e)
 
     epi_nav_neg_no_exp_STK_mean_.create(RO, lNumberOfStacks_ );
     epi_nav_pos_no_exp_STK_mean_.create(RO, lNumberOfStacks_ );
+
+    epi_nav_neg_STK_mean_.create(RO, lNumberOfStacks_ );
+    epi_nav_pos_STK_mean_.create(RO, lNumberOfStacks_ );
 
     corrneg_all_STK_.set_size(RO, MB_factor, lNumberOfStacks_ );
     corrpos_all_STK_.set_size(RO, MB_factor, lNumberOfStacks_ );
@@ -1179,68 +1246,23 @@ void GenericReconSMSBase::prepare_epi_data(size_t e)
     create_stacks_of_arma_nav(corrneg_all_no_exp_, corrneg_all_no_exp_STK_);
     create_stacks_of_arma_nav(corrpos_all_no_exp_, corrpos_all_no_exp_STK_);
 
-    /*for (size_t a = 0; a < lNumberOfStacks_  ; a++)
-    {
-        for (size_t m = 0; m < MB_factor  ; m++)
-        {
-            std::cout << m  << " " << a << std::endl;
-            std::cout <<  corrneg_all_STK_.slice(a).col(m)  << std::endl;
-            std::cout <<  corrpos_all_STK_.slice(a).col(m)  << std::endl;
-        }
-    }*/
-
-    compute_mean_epi_nav(epi_nav_neg_no_exp_STK_, epi_nav_neg_no_exp_STK_mean_);
-    compute_mean_epi_nav(epi_nav_pos_no_exp_STK_, epi_nav_pos_no_exp_STK_mean_);
+    compute_mean_epi_nav(epi_nav_neg_no_exp_STK_, epi_nav_neg_no_exp_STK_mean_,  epi_nav_neg_STK_mean_);
+    compute_mean_epi_nav(epi_nav_pos_no_exp_STK_, epi_nav_pos_no_exp_STK_mean_,  epi_nav_pos_STK_mean_);
 
     compute_mean_epi_arma_nav(corrneg_all_no_exp_STK_, corrneg_all_no_exp_STK_mean_, corrneg_all_STK_mean_);
     compute_mean_epi_arma_nav(corrpos_all_no_exp_STK_, corrpos_all_no_exp_STK_mean_, corrpos_all_STK_mean_);
 
-    /*for (size_t a = 0; a < lNumberOfStacks_  ; a++)
-    {
-        for (size_t ro = 0; ro < RO; ro++)
-        {
-        std::cout << " ro "<< corrneg_all_no_exp_STK_(ro, 0 , a) << "  "<< corrneg_all_no_exp_STK_mean_(ro, a) << "  " << corrneg_all_STK_(ro, 0 , a) << "  "<< corrneg_all_STK_mean_(ro, a) << "  " << std::endl;
-        }
-    }*/
+    CheckComplexNumberEqualInMatrix(epi_nav_neg_STK_mean_,corrneg_all_STK_mean_ );
+    CheckComplexNumberEqualInMatrix(epi_nav_neg_no_exp_STK_mean_,corrneg_all_no_exp_STK_mean_ );
 
-    //gt_exporter_.export_array_complex(epi_nav_neg_no_exp_STK_, debug_folder_full_path_ + "NAV_neg_no_exp_STK" + os.str());
-    //gt_exporter_.export_array_complex(epi_nav_pos_no_exp_STK_, debug_folder_full_path_ + "NAV_pos_no_exp_STK" + os.str());
+    CheckComplexNumberEqualInMatrix(epi_nav_pos_STK_mean_,corrpos_all_STK_mean_ );
+    CheckComplexNumberEqualInMatrix(epi_nav_pos_no_exp_STK_mean_,corrpos_all_no_exp_STK_mean_ );
 
-    //save_4D_data(epi_nav_neg_no_exp_STK_, "NAV_neg_no_exp_STK", os.str());
-    //save_4D_data(epi_nav_pos_no_exp_STK_, "NAV_pos_no_exp_STK", os.str());
-
-    //gt_exporter_.export_array_complex(epi_nav_neg_no_exp_STK_mean_, debug_folder_full_path_ + "NAV_neg_no_exp_STK_mean" + os.str());
-    //gt_exporter_.export_array_complex(epi_nav_pos_no_exp_STK_mean_, debug_folder_full_path_ + "NAV_pos_no_exp_STK_mean" + os.str());
-
-    //save_4D_data(epi_nav_neg_no_exp_STK_mean_, "NAV_neg_no_exp_STK_mean", os.str());
-    //save_4D_data(epi_nav_pos_no_exp_STK_mean_, "NAV_pos_no_exp_STK_mean", os.str());
-
-    /*   for (size_t a = 0; a < lNumberOfStacks_; a++)
-    {
-        for (size_t m = 0; m < MB_factor; m++)
-        {
-            std::cout << " a" << a <<  " m " << m <<"  " <<epi_nav_neg_no_exp_STK_(0,m,a) << std::endl;
-        }
-
-        std::cout  << " a" << a <<  epi_nav_neg_no_exp_STK_mean_(0,a) << std::endl;
-    }
-
-
-    size_t a = 0;
-    size_t m = 0;
-
-    for (size_t ro = 0; ro < dimensions_[0]; ro++)
-    {
-        std::cout << " ro "<< epi_nav_neg_no_exp_STK_mean_(ro,a) << "   "<< epi_nav_pos_no_exp_STK_mean_(ro,a)  << std::endl;
-    }
-
-    std::cout << " -----------------"<<  std::endl;
-
-    for (size_t ro = 0; ro < dimensions_[0]; ro++)
-    {
-        std::cout << " ro "<< epi_nav_neg_no_exp_STK_(ro,m,a) << "   "<< epi_nav_pos_no_exp_STK_(ro,m,a)  << std::endl;
-    }
-*/
+    correction_pos_hoND.create(RO);
+    correction_neg_hoND.create(RO);
+    phase_shift.create(RO, E1, E2, CHA);
+    tempo_hoND.create(RO, E1, E2, CHA);
+    tempo_1D_hoND.create(RO);
 
 }
 
@@ -1457,7 +1479,8 @@ int GenericReconSMSBase::get_reduced_E1_size(size_t start_E1 , size_t end_E1 , s
 }
 
 
-void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal )
+
+void GenericReconSMSBase::apply_ghost_correction_with_STK6_old(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal )
 {
     size_t RO = data.get_size(0);
     size_t E1 = data.get_size(1);
@@ -1577,7 +1600,6 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
 
 
 
-
 void GenericReconSMSBase::apply_ghost_correction_with_arma_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , std::string msg)
 {
     size_t RO = data.get_size(0);
@@ -1615,22 +1637,22 @@ void GenericReconSMSBase::apply_ghost_correction_with_arma_STK6(hoNDArray< std::
     arma::cx_fvec correction_neg;
     correction_neg.set_size(RO);
 
-     for (a = 0; a < STK; a++) {
+    for (a = 0; a < STK; a++) {
 
-          for (m = 0; m < MB; m++) {
+        for (m = 0; m < MB; m++) {
 
             compteur_pos=0;
             compteur_neg=0;
 
             if (optimal==true)
             {
-            correction_pos=corrpos_all_STK_.slice(a).col(m) ;
-            correction_neg=corrneg_all_STK_.slice(a).col(m) ;
+                correction_pos=corrpos_all_STK_.slice(a).col(m) ;
+                correction_neg=corrneg_all_STK_.slice(a).col(m) ;
             }
             else
             {
-            correction_pos=corrpos_all_STK_mean_.col(a) ;
-            correction_neg=corrneg_all_STK_mean_.col(a) ;
+                correction_pos=corrpos_all_STK_mean_.col(a) ;
+                correction_neg=corrneg_all_STK_mean_.col(a) ;
             }
 
             if (undo==true)
@@ -1691,6 +1713,287 @@ void GenericReconSMSBase::apply_ghost_correction_with_arma_STK6(hoNDArray< std::
     hoNDFFT<float>::instance()->fft(&data,0);
 }
 
+
+
+
+
+
+void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , std::string msg)
+{
+    size_t RO = data.get_size(0);
+    size_t E1 = data.get_size(1);
+    size_t E2 = data.get_size(2);
+    size_t CHA = data.get_size(3);
+    size_t MB = data.get_size(4);
+    size_t STK = data.get_size(5);
+    size_t N = data.get_size(6);
+    size_t S = data.get_size(7);
+
+    //GDEBUG_STREAM("GenericReconSMSBase - EPI stk6 data array  : [RO E1 E2 CHA N S SLC] - [" << msg << " " << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N << " " << S << "]");
+
+    size_t ro;
+
+    hoNDFFT<float>::instance()->ifft(&data,0);
+
+    /*****************************************/
+    // TODO cela suppose que les lignes sont les mêmes pour chaque dimensions N S MB STK
+    //faire une fonction detect reverse lines
+    hoNDArray<bool> reverse_line;
+    reverse_line.create(E1);
+    for (size_t e1 = start_E1_; e1 <= end_E1_; e1+=acc)
+    {
+        ISMRMRD::AcquisitionHeader& curr_header = headers_(e1, 0, 0, 0, 0);  //5D, fixed order [E1, E2, N, S, LOC]
+        if (curr_header.isFlagSet(ISMRMRD::ISMRMRD_ACQ_IS_REVERSE)) {
+            reverse_line(e1)=true;
+        }
+        else
+        {
+            reverse_line(e1)=false;
+        }
+    }
+
+    /*****************************************/
+
+    unsigned int compteur_pos;
+    unsigned int compteur_neg;
+
+    for (size_t a = 0; a < STK; a++) {
+
+        for (size_t m = 0; m < MB; m++) {
+
+            compteur_pos=0;
+            compteur_neg=0;
+
+            if (optimal==true)
+            {
+                for (ro = 0; ro < RO; ro++)
+                {
+                    correction_pos_hoND(ro)=epi_nav_pos_STK_(ro,m,a);
+                    correction_neg_hoND(ro)=epi_nav_neg_STK_(ro,m,a);
+                }
+            }
+            else
+            {
+                for (ro = 0; ro < RO; ro++)
+                {
+                    correction_pos_hoND(ro)=epi_nav_pos_STK_mean_(ro,a);
+                    correction_neg_hoND(ro)=epi_nav_neg_STK_mean_(ro,a);
+                }
+            }
+
+            if (undo==true)
+            {
+                for (ro = 0; ro < RO; ro++)
+                {
+                    correction_pos_hoND(ro)=epi_nav_pos_STK_(ro,m,a)/epi_nav_pos_STK_mean_(ro,a);
+                    correction_neg_hoND(ro)=epi_nav_neg_STK_(ro,m,a)/epi_nav_neg_STK_mean_(ro,a);
+                }
+            }
+
+            long long num = N * S * CHA;
+            long long ii;
+
+#pragma omp parallel for default(none) private(ii) shared(a, m, correction_neg_hoND, correction_pos_hoND, compteur_neg, compteur_pos, data,  num, S,  N,  CHA, start_E1_, end_E1_, acc , RO, reverse_line, E2, tempo_1D_hoND) if(num>1)
+            for (ii = 0; ii < num; ii++) {
+                size_t cha = ii / (N * S);
+                size_t s = (ii - cha * N * S) / (N);
+                size_t n = ii - cha * N * S - s * N;
+
+                for (size_t e2 = 0; e2 < E2; e2++)  {
+
+                    for (size_t e1 = start_E1_; e1 <= end_E1_; e1+=acc)
+                    {
+                        std::complex<float> * in = &(data(0, e1, e2, cha, m, a, n, s));
+                        std::complex<float> * out = &(tempo_1D_hoND(0));
+                        memcpy(out , in, sizeof(std::complex<float>)*RO);
+
+                        if (reverse_line(e1)==true)
+                        {
+                            // Negative readout
+                            //compteur_neg++;
+                            Gadgetron::multiply(tempo_1D_hoND, correction_neg_hoND, tempo_1D_hoND);
+                        }
+                        else
+                        {
+                            // Positive readout
+                            //compteur_pos++;
+                            Gadgetron::multiply(tempo_1D_hoND, correction_pos_hoND, tempo_1D_hoND);
+                        }
+
+                        std::complex<float> * in2 = &(tempo_1D_hoND(0));
+                        std::complex<float> * out2 = &(data(0, e1, e2, cha, m, a, n, s));
+                        memcpy(out2 , in2, sizeof(std::complex<float>)*RO);
+
+                    }
+                }
+            }
+
+            /*if (compteur_pos==0)
+            {GERROR_STREAM("apply_ghost_correction_with_STK6 : compteur_pos is equal to 0  ... "<< compteur_pos<< " "<< compteur_neg);
+            }
+            if (compteur_neg==0)
+            {GERROR_STREAM("apply_ghost_correction_with_STK6 : compteur_neg is equal to 0  ... "<< compteur_pos<< " "<< compteur_neg); }
+*/
+            /*for (n = 0; n < N; n++) {
+
+                for (s = 0; s < S; s++) {
+
+                    std::complex<float> * in = &(data(0, 0, 0, 0, m, a, s, n));
+                    std::complex<float> * out = &(tempo_hoND(0, 0, 0, 0));
+                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+
+                    Gadgetron::multiply(tempo_hoND, phase_shift, tempo_hoND);
+                    memcpy(in , out, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+                }
+            }*/
+
+        }
+    }
+
+    //std::cout << " tempo_hoND ok --------------------------------------------------------------------------"<< std::endl;
+
+    hoNDFFT<float>::instance()->fft(&data,0);
+}
+
+
+
+void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , std::string msg)
+{
+    size_t RO = data.get_size(0);
+    size_t E1 = data.get_size(1);
+    size_t E2 = data.get_size(2);
+    size_t CHA = data.get_size(3);
+    size_t MB = data.get_size(4);
+    size_t STK = data.get_size(5);
+    size_t N = data.get_size(6);
+    size_t S = data.get_size(7);
+
+    //GDEBUG_STREAM("GenericReconSMSBase - EPI stk6 data array  : [RO E1 E2 CHA N S SLC] - [" << msg << " " << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N << " " << S << "]");
+
+    size_t m, a, e1, ro, e2, cha, n, s;
+
+    hoNDFFT<float>::instance()->ifft(&data,0);
+
+    /*****************************************/
+    // TODO cela suppose que les lignes sont les mêmes pour chaque dimensions N S MB STK
+    //faire une fonction detect reverse lines
+    hoNDArray<bool> reverse_line;
+    reverse_line.create(E1);
+    for (size_t e1 = start_E1_; e1 <= end_E1_; e1+=acc)
+    {
+        ISMRMRD::AcquisitionHeader& curr_header = headers_(e1, 0, 0, 0, 0);  //5D, fixed order [E1, E2, N, S, LOC]
+        if (curr_header.isFlagSet(ISMRMRD::ISMRMRD_ACQ_IS_REVERSE)) {
+            reverse_line(e1)=true;
+        }
+        else
+        {
+            reverse_line(e1)=false;
+        }
+    }
+
+    /*****************************************/
+
+    unsigned int compteur_pos;
+    unsigned int compteur_neg;
+
+    for (a = 0; a < STK; a++) {
+
+        for (m = 0; m < MB; m++) {
+
+            compteur_pos=0;
+            compteur_neg=0;
+
+            if (optimal==true)
+            {
+                for (ro = 0; ro < RO; ro++)
+                {
+                    correction_pos_hoND(ro)=epi_nav_pos_STK_(ro,m,a);
+                    correction_neg_hoND(ro)=epi_nav_neg_STK_(ro,m,a);
+                }
+            }
+            else
+            {
+                for (ro = 0; ro < RO; ro++)
+                {
+                    correction_pos_hoND(ro)=epi_nav_pos_STK_mean_(ro,a);
+                    correction_neg_hoND(ro)=epi_nav_neg_STK_mean_(ro,a);
+                }
+            }
+
+            if (undo==true)
+            {
+                for (ro = 0; ro < RO; ro++)
+                {
+                    correction_pos_hoND(ro)=epi_nav_pos_STK_(ro,m,a)/epi_nav_pos_STK_mean_(ro,a);
+                    correction_neg_hoND(ro)=epi_nav_neg_STK_(ro,m,a)/epi_nav_neg_STK_mean_(ro,a);
+                }
+            }
+
+            for (n = 0; n < N; n++) {
+
+                for (s = 0; s < S; s++) {
+
+                    for (cha = 0; cha < CHA; cha++) {
+
+                        for (e2 = 0; e2 < E2; e2++)  {
+
+                            for (size_t e1 = start_E1_; e1 <= end_E1_; e1+=acc)
+                            {
+                                std::complex<float> * in = &(data(0, e1, e2, cha, m, a, n, s));
+                                std::complex<float> * out = &(tempo_1D_hoND(0));
+                                memcpy(out , in, sizeof(std::complex<float>)*RO);
+
+                                if (reverse_line(e1)==true)
+                                {
+                                    // Negative readout
+                                    compteur_neg++;
+                                    Gadgetron::multiply(tempo_1D_hoND, correction_neg_hoND, tempo_1D_hoND);
+                                }
+                                else
+                                {
+                                    // Positive readout
+                                    compteur_pos++;
+                                    Gadgetron::multiply(tempo_1D_hoND, correction_pos_hoND, tempo_1D_hoND);
+                                }
+
+                                std::complex<float> * in2 = &(tempo_1D_hoND(0));
+                                std::complex<float> * out2 = &(data(0, e1, e2, cha, m, a, n, s));
+                                memcpy(out2 , in2, sizeof(std::complex<float>)*RO);
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            //GDEBUG_STREAM(" ... "<< compteur_pos<< " "<< compteur_neg);
+
+            if (compteur_pos==0)
+            {GERROR_STREAM("apply_ghost_correction_with_STK6 : compteur_pos is equal to 0  ... "<< compteur_pos<< " "<< compteur_neg);
+            }
+            if (compteur_neg==0)
+            {GERROR_STREAM("apply_ghost_correction_with_STK6 : compteur_neg is equal to 0  ... "<< compteur_pos<< " "<< compteur_neg); }
+
+            /*for (n = 0; n < N; n++) {
+
+                for (s = 0; s < S; s++) {
+
+                    std::complex<float> * in = &(data(0, 0, 0, 0, m, a, s, n));
+                    std::complex<float> * out = &(tempo_hoND(0, 0, 0, 0));
+                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+
+                    Gadgetron::multiply(tempo_hoND, phase_shift, tempo_hoND);
+                    memcpy(in , out, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+                }
+            }*/
+
+        }
+    }
+
+    //std::cout << " tempo_hoND ok --------------------------------------------------------------------------"<< std::endl;
+
+    hoNDFFT<float>::instance()->fft(&data,0);
+}
 
 
 void GenericReconSMSBase::apply_ghost_correction_with_STK7(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool optimal )
@@ -1802,7 +2105,7 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
     GADGET_CHECK_THROW(STK==lNumberOfStacks_);
 
     size_t m, a, n, s;
-    size_t index;    
+    size_t index;
 
     std::complex<double> ii(0,1);
 
@@ -1820,7 +2123,7 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
             index = MapSliceSMS(a,m);
 
             std::complex<double> lala=  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
-            std::complex<float>  lili=  static_cast< std::complex<float> >(lala) ;           
+            std::complex<float>  lili=  static_cast< std::complex<float> >(lala) ;
 
             for (s = 0; s < S; s++)
             {

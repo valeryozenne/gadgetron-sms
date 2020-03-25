@@ -69,10 +69,12 @@ namespace Gadgetron {
         virtual void permute_slices_index(hoNDArray< std::complex<float> >& data, arma::uvec indice);
         virtual void create_stacks_of_slices(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& fid_stack_SB);
         virtual void create_stacks_of_slices_directly(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& fid_stack_SB, arma::uvec indice);
+        virtual void create_stacks_of_slices_directly_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& fid_stack_SB, arma::uvec indice);
 
         //mb functions
         virtual void remove_extra_dimension_and_permute_stack_dimension(hoNDArray< std::complex<float> >& data);
         virtual void reorganize_mb_data_to_8D(hoNDArray< std::complex<float> >& mb,hoNDArray< std::complex<float> >& mb_8D );
+        virtual void reorganize_mb_data_to_8D_open(hoNDArray< std::complex<float> >& mb,hoNDArray< std::complex<float> >& mb_8D );
 
         //common functions
         //virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
