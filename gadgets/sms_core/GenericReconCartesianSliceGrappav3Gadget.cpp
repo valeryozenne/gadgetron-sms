@@ -354,6 +354,7 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
                 for (size_t m = 0; m < MB_factor; m++) {
                     Gadgetron::clear(tempo_kernel);
                     std::complex<float> * in2;
+
                     if (calib_fast.value()==true)
                     {
                         in2 = &(recon_obj.kernelonov_(0, 0, m, a, n, s));
@@ -378,9 +379,9 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
 
     gt_timer_local_.stop();
 
-    //new version: code alternatif utilisant pragma omp parallel : not working
-    /*
-    gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget::process  unmix version 2 ");
+    //new version: code alternatif utilisant pragma omp parallel : fonctionne mais plus lent
+
+    /*gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget::process  unmix version 2 ");
 
 
     size_t ref_N = recon_obj.block_MB_.get_size(5);
@@ -391,8 +392,6 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
     long long ii;
 
 #pragma omp parallel default(none) private(ii) shared(num, N, S, MB_factor, ref_N, ref_S, recon_obj, voxels_number_per_image_, kernel_size_, CHA) if(num>1)
-    {
-#pragma omp for
         for (ii = 0; ii < num; ii++) {
             size_t a = ii / (N * S);
             size_t s = (ii - a * N * S) / N;
@@ -420,10 +419,10 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
 
                  }
         }
-    }
 
-    gt_timer_local_.stop();
-*/
+
+    gt_timer_local_.stop();*/
+
 
     ///////////////
 

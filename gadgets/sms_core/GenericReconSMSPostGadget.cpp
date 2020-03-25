@@ -157,7 +157,7 @@ int GenericReconSMSPostGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
 void GenericReconSMSPostGadget::post_process_ref_data(hoNDArray< std::complex<float> >& data_8D, hoNDArray< std::complex<float> >& data_7D, size_t e)
 {
 
-     undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D);
+    undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D);
 
 }
 
@@ -172,20 +172,20 @@ void GenericReconSMSPostGadget::post_process_sb_data(hoNDArray< std::complex<flo
     os << "_encoding_" << e;
     std::string suffix = os.str();
 
-     undo_blip_caipi_shift(data_8D, headers, e, true);
+    undo_blip_caipi_shift(data_8D, headers, e, true);
 
-     if (!debug_folder_full_path_.empty())
-     {
-     save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_SB4D_fin_caipi", os.str());
-     }
+    if (!debug_folder_full_path_.empty())
+    {
+        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_SB4D_fin_caipi", os.str());
+    }
 
-     load_epi_data();
+    load_epi_data();
 
-     prepare_epi_data(e);
+    prepare_epi_data(e, data_8D.get_size(1),  data_8D.get_size(2) ,  data_8D.get_size(3) );
 
-     apply_ghost_correction_with_arma_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, "POST SB" );
+    apply_ghost_correction_with_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, "POST SB" );
 
-     undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D);
+    undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D);
 
 }
 
@@ -201,12 +201,19 @@ void GenericReconSMSPostGadget::post_process_mb_data(hoNDArray< std::complex<flo
 
     if (!debug_folder_full_path_.empty())
     {
-    save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_MB4D_fin_caipi", os.str());
+        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_MB4D_fin_caipi", os.str());
     }
 
-    apply_ghost_correction_with_arma_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, "POST MB");
+    apply_ghost_correction_with_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, "POST MB");
 
+
+    /*if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation"); }
     undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D);
+    if (perform_timing.value()) { gt_timer_local_.stop();}*/
+
+    if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::undo_stacks_ordering_to_match_gt_organisation_open"); }
+    undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D);
+    if (perform_timing.value()) { gt_timer_local_.stop();}
 
 }
 
@@ -233,7 +240,7 @@ void GenericReconSMSPostGadget::set_idx(hoNDArray< ISMRMRD::AcquisitionHeader > 
                     {
                         for (ro=0; ro<RO; ro++)
                         {
-                        headers_(ro,e1,n, s, slc).idx.repetition = rep;
+                            headers_(ro,e1,n, s, slc).idx.repetition = rep;
                         }
                     }
                 }
@@ -271,7 +278,7 @@ void GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation(ho
     //GADGET_CHECK_THROW(lNumberOfSlices_ == STK*MB);
 
     size_t n, s, a, m, slc;
-    int index;
+    size_t index;
 
     for (a = 0; a < STK; a++) {
 
@@ -285,12 +292,7 @@ void GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation(ho
                 {
                     std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
                     std::complex<float> * out = &(tempo(0, 0, 0, 0, n, s, index));
-                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);                    
-
-                    //create stack
-                    //index = MapSliceSMS(a,m);
-                    //std::complex<float> * in = &(data(0, 0, 0, 0, n, s, index));
-                    //std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
+                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
                 }
             }
         }
@@ -298,20 +300,71 @@ void GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation(ho
 
     for (slc = 0; slc < SLC; slc++)
     {
-            for (s = 0; s < S; s++)
+        for (s = 0; s < S; s++)
+        {
+            for (n = 0; n < N; n++)
             {
-                for (n = 0; n < N; n++)
-                {
-                   std::complex<float> * in = &(tempo(0, 0, 0, 0, n, s, slc));
-                   std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb(slc)));
-                   memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
-
-                   //permute
-                   //std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice(slc)));
-                   //std::complex<float> * out = &(new_data(0, 0, 0, 0, n, s, slc));
-
-                }
+                std::complex<float> * in = &(tempo(0, 0, 0, 0, n, s, slc));
+                std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb(slc)));
+                memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
             }
+        }
+    }
+}
+
+
+void GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output)
+{
+
+    //TODO it should be remplaced by one single copy
+
+    size_t RO=data.get_size(0);
+    size_t E1=data.get_size(1);
+    size_t E2=data.get_size(2);
+    size_t CHA=data.get_size(3);
+    size_t MB=data.get_size(4);
+    size_t STK=data.get_size(5);
+    size_t N=data.get_size(6);
+    size_t S=data.get_size(7);
+
+    size_t SLC=output.get_size(6);
+
+    hoNDArray< std::complex<float> > tempo;
+    tempo.create(RO,E1,E2,CHA,N,S,SLC);
+
+    //GADGET_CHECK_THROW(lNumberOfSlices_ == STK*MB);
+
+    long long num = N * S * STK * MB;
+    long long ii;
+
+#pragma omp parallel for default(none) private(ii) shared(num, MB , STK,  S, N, tempo, data,RO,E1,E2,CHA) if(num>1)
+    for (ii = 0; ii < num; ii++) {
+
+        size_t   a = ii / (S * MB* N);
+        size_t   m = (ii - a * S * MB* N) / (S* N );
+        size_t  s = (ii - a * S * MB* N - m * S* N )  /  (N);
+        size_t  n=  ii - a * S * MB* N - m * S* N  -s *  N;
+
+        size_t index = MapSliceSMS(a,m);
+
+        std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
+        std::complex<float> * out = &(tempo(0, 0, 0, 0, n, s, index));
+        memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+    }
+
+
+    num = N * S * SLC;
+
+#pragma omp parallel for default(none) private(ii) shared(num, N, S, RO,E1,E2,CHA, indice_sb, tempo, output ) if(num>1)
+    for (ii = 0; ii < num; ii++) {
+        size_t slc = ii / (N * S);
+        size_t s = (ii - slc * N * S) / (N);
+        size_t n = ii - slc * N * S - s * N;
+
+        std::complex<float> * in = &(tempo(0, 0, 0, 0, n, s, slc));
+        std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb(slc)));
+        memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+
     }
 }
 
@@ -329,16 +382,16 @@ void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<fl
         // recupération de l'offset de position dans la direction de coupe
         if (undo_absolute==true)
         {
-        // true means single band data
-        get_header_and_position_and_gap(data, headers);
-        apply_absolute_phase_shift(data, true);
+            // true means single band data
+            get_header_and_position_and_gap(data, headers);
+            apply_absolute_phase_shift(data, true);
 
-        apply_relative_phase_shift(data, true);
+            apply_relative_phase_shift(data, true);
         }
         else
         {
-        // false means multiband data
-        apply_relative_phase_shift_test(data, true);
+            // false means multiband data
+            apply_relative_phase_shift_test(data, true);
         }
 
 
@@ -357,8 +410,10 @@ void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<fl
     {
         // si CMMR on ne fait rien
 
-        apply_relative_phase_shift(data, false);
 
+         if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::apply_relative_phase_shift"); }
+        apply_relative_phase_shift(data, false);
+         if (perform_timing.value()) { gt_timer_local_.stop();}
         //if (!debug_folder_full_path_.empty())
         //{
         //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data, "FID_SB4D_relative_shift", os.str());

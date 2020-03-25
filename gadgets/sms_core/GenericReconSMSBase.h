@@ -119,6 +119,15 @@ namespace Gadgetron {
         hoNDArray<std::complex<float>> epi_nav_neg_no_exp_STK_mean_;
         hoNDArray<std::complex<float>> epi_nav_pos_no_exp_STK_mean_;
 
+        //prepare epi and correction epi
+        hoNDArray< std::complex<float> > correction_pos_hoND;
+        hoNDArray< std::complex<float> > correction_neg_hoND;
+        hoNDArray< std::complex<float> > phase_shift;
+        hoNDArray< std::complex<float> > tempo_hoND;
+        hoNDArray< std::complex<float> > tempo_1D_hoND;
+
+
+
 
         // --------------------------------------------------
         // gadget functions
@@ -133,7 +142,7 @@ namespace Gadgetron {
         arma::vec z_offset_geo;
         arma::vec z_gap;
 
-        virtual void reorganize_arma_nav(arma::cx_fmat data, arma::uvec indice);
+        virtual void reorganize_arma_nav(arma::cx_fmat &data, arma::uvec indice);
 
         virtual void compute_mean_epi_arma_nav(arma::cx_fcube &input,  arma::cx_fmat& output_no_exp,  arma::cx_fmat& output);
 
@@ -157,15 +166,19 @@ namespace Gadgetron {
 
         virtual void load_epi_data();
 
-        virtual void compute_mean_epi_nav(hoNDArray< std::complex<float> >& nav, hoNDArray< std::complex<float> >& nav_mean);
+        virtual void compute_mean_epi_nav(hoNDArray< std::complex<float> >& input,  hoNDArray< std::complex<float> >& output_no_exp ,  hoNDArray< std::complex<float> >& output );
 
         virtual void create_stacks_of_nav(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack);
 
         virtual void reorganize_nav(hoNDArray< std::complex<float> >& data, arma::uvec indice);
 
-        virtual void prepare_epi_data(size_t e);
+        virtual void prepare_epi_data(size_t e, size_t E1, size_t E2, size_t CHA );
 
-        virtual void apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo , bool optimal);
+        virtual void apply_ghost_correction_with_STK6_old(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo , bool optimal);
+
+        virtual void apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , std::string msg);
+
+        virtual void apply_ghost_correction_with_STK6_open(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , std::string msg);
 
         virtual void apply_ghost_correction_with_arma_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , std::string msg);
 
@@ -185,6 +198,9 @@ namespace Gadgetron {
 
         virtual void get_header_and_position_and_gap(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > headers_);
 
+        virtual int CheckComplexNumberEqualInVector(hoNDArray< std::complex<float> >& input , arma::cx_fvec  input_arma);
+        virtual int CheckComplexNumberEqualInMatrix(hoNDArray< std::complex<float> >& input , arma::cx_fmat  input_arma);
+        virtual int CheckComplexNumberEqualInCube(hoNDArray< std::complex<float> >& input , arma::cx_fcube  input_arma);
 
 
     };

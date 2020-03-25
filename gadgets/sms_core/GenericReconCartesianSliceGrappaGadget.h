@@ -95,7 +95,7 @@ namespace Gadgetron {
         /// Grappa parameters
         GADGET_PROPERTY(grappa_kSize_RO, int, "Grappa kernel size RO", 5);
         GADGET_PROPERTY(grappa_kSize_E1, int, "Grappa kernel size E1", 5);
-        GADGET_PROPERTY(calib_fast, int, "calibration with Tikhonov", 0);
+        GADGET_PROPERTY(calib_fast, int, "calibration with Tikhonov", 1);
 
         GADGET_PROPERTY(grappa_reg_lamda, double, "Grappa regularization threshold", 0.0005);
         //GADGET_PROPERTY(grappa_calib_over_determine_ratio, double, "Grappa calibration overdermination ratio", 45);
