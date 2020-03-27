@@ -24,6 +24,8 @@ namespace Gadgetron {
         GenericReconSplitSMSGadget();
         ~GenericReconSplitSMSGadget();
 
+        GADGET_PROPERTY(use_omp, bool, "Whether to use omp acceleration", false);
+
         /// ------------------------------------------------------------------------------------
         /// parameters to control the reconstruction
         /// ------------------------------------------------------------------------------------
@@ -39,6 +41,7 @@ namespace Gadgetron {
         virtual int process_config(ACE_Message_Block* mb);
         virtual int process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1);
         virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
+        virtual void extract_sb_and_mb_from_data_open(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
 
         hoNDArray< ISMRMRD::AcquisitionHeader > headers_sb;
         hoNDArray< ISMRMRD::AcquisitionHeader > headers_mb;

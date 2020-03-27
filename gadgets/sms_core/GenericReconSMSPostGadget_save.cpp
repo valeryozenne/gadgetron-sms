@@ -185,19 +185,7 @@ void GenericReconSMSPostGadget::post_process_sb_data(hoNDArray< std::complex<flo
 
     apply_ghost_correction_with_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true, "POST SB" );
 
-
-    if(use_omp.value()==true)
-    {
-        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::undo_stacks_ordering_to_match_gt_organisation_open"); }
-        undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D);
-        if (perform_timing.value()) { gt_timer_local_.stop();}
-    }
-    else
-    {
-        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation"); }
-        undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D);
-        if (perform_timing.value()) { gt_timer_local_.stop();}
-    }
+    undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D);
 
 }
 
@@ -218,19 +206,14 @@ void GenericReconSMSPostGadget::post_process_mb_data(hoNDArray< std::complex<flo
 
     apply_ghost_correction_with_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true,  "POST MB");
 
-    if(use_omp.value()==true)
-    {
-        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::undo_stacks_ordering_to_match_gt_organisation_open"); }
-        undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D);
-        if (perform_timing.value()) { gt_timer_local_.stop();}
-    }
-    else
-    {
-        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation"); }
-        undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D);
-        if (perform_timing.value()) { gt_timer_local_.stop();}
-    }
 
+    /*if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation"); }
+    undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D);
+    if (perform_timing.value()) { gt_timer_local_.stop();}*/
+
+    if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::undo_stacks_ordering_to_match_gt_organisation_open"); }
+    undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D);
+    if (perform_timing.value()) { gt_timer_local_.stop();}
 
 }
 
@@ -428,9 +411,9 @@ void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<fl
         // si CMMR on ne fait rien
 
 
-        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::apply_relative_phase_shift"); }
+         if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::apply_relative_phase_shift"); }
         apply_relative_phase_shift(data, false);
-        if (perform_timing.value()) { gt_timer_local_.stop();}
+         if (perform_timing.value()) { gt_timer_local_.stop();}
         //if (!debug_folder_full_path_.empty())
         //{
         //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data, "FID_SB4D_relative_shift", os.str());

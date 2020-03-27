@@ -1715,10 +1715,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_arma_STK6(hoNDArray< std::
 
 
 
-void GenericReconSMSBase::do_fft_for_ref_scan(hoNDArray< std::complex<float> >& data)
-{
-     hoNDFFT<float>::instance()->fft(&data,0);
-}
+
 
 
 void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , std::string msg)
