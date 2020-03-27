@@ -1714,14 +1714,14 @@ void GenericReconSMSBase::apply_ghost_correction_with_arma_STK6(hoNDArray< std::
 }
 
 
-
+//TODO à déplacer dans slice grappa
 void GenericReconSMSBase::do_fft_for_ref_scan(hoNDArray< std::complex<float> >& data)
 {
-     hoNDFFT<float>::instance()->fft(&data,0);
+    hoNDFFT<float>::instance()->fft(&data,0);
 }
 
 
-void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , std::string msg)
+void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , bool ifft , std::string msg)
 {
     size_t RO = data.get_size(0);
     size_t E1 = data.get_size(1);
@@ -1736,7 +1736,10 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::
 
     size_t ro;
 
-    hoNDFFT<float>::instance()->ifft(&data,0);
+    if (ifft==true)
+    {
+        hoNDFFT<float>::instance()->ifft(&data,0);
+    }
 
     /*****************************************/
     // TODO cela suppose que les lignes sont les mêmes pour chaque dimensions N S MB STK
@@ -1796,40 +1799,52 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::
             long long num = N * S * CHA;
             long long ii;
 
-#pragma omp parallel for default(none) private(ii) shared(a, m, correction_neg_hoND, correction_pos_hoND, compteur_neg, compteur_pos, data,  num, S,  N,  CHA, start_E1_, end_E1_, acc , RO, reverse_line, E2, tempo_1D_hoND) if(num>1)
+#pragma omp parallel for default(none) private(ii) shared(a, m, correction_neg_hoND, correction_pos_hoND, compteur_neg, compteur_pos, data,  num, S,  N,  CHA, start_E1_, end_E1_, acc , RO, reverse_line, E2) if(num>1)
             for (ii = 0; ii < num; ii++) {
                 size_t cha = ii / (N * S);
                 size_t s = (ii - cha * N * S) / (N);
                 size_t n = ii - cha * N * S - s * N;
 
+                /*for (size_t n = 0; n < N; n++) {
+
+                for (size_t s = 0; s < S; s++) {
+
+                    for (size_t cha = 0; cha < CHA; cha++) {*/
+
                 for (size_t e2 = 0; e2 < E2; e2++)  {
+
+                    hoNDArray< std::complex<float> > tempo_1D_hoND_local;
+                    tempo_1D_hoND_local.create(RO);
 
                     for (size_t e1 = start_E1_; e1 <= end_E1_; e1+=acc)
                     {
                         std::complex<float> * in = &(data(0, e1, e2, cha, m, a, n, s));
-                        std::complex<float> * out = &(tempo_1D_hoND(0));
+                        std::complex<float> * out = &(tempo_1D_hoND_local(0));
                         memcpy(out , in, sizeof(std::complex<float>)*RO);
 
                         if (reverse_line(e1)==true)
                         {
                             // Negative readout
                             //compteur_neg++;
-                            Gadgetron::multiply(tempo_1D_hoND, correction_neg_hoND, tempo_1D_hoND);
+                            Gadgetron::multiply(tempo_1D_hoND_local, correction_neg_hoND, tempo_1D_hoND_local);
                         }
                         else
                         {
                             // Positive readout
                             //compteur_pos++;
-                            Gadgetron::multiply(tempo_1D_hoND, correction_pos_hoND, tempo_1D_hoND);
+                            Gadgetron::multiply(tempo_1D_hoND_local, correction_pos_hoND, tempo_1D_hoND_local);
                         }
 
-                        std::complex<float> * in2 = &(tempo_1D_hoND(0));
+                        std::complex<float> * in2 = &(tempo_1D_hoND_local(0));
                         std::complex<float> * out2 = &(data(0, e1, e2, cha, m, a, n, s));
                         memcpy(out2 , in2, sizeof(std::complex<float>)*RO);
 
                     }
                 }
+                //  }
+                //}
             }
+
 
             /*if (compteur_pos==0)
             {GERROR_STREAM("apply_ghost_correction_with_STK6 : compteur_pos is equal to 0  ... "<< compteur_pos<< " "<< compteur_neg);
@@ -1877,7 +1892,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
 
     if (ifft==true)
     {
-    hoNDFFT<float>::instance()->ifft(&data,0);
+        hoNDFFT<float>::instance()->ifft(&data,0);
     }
 
     /*****************************************/

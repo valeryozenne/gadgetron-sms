@@ -157,7 +157,7 @@ int GenericReconSMSPostGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
 void GenericReconSMSPostGadget::post_process_ref_data(hoNDArray< std::complex<float> >& data_8D, hoNDArray< std::complex<float> >& data_7D, size_t e)
 {
 
-    undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D);
+    undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D, MapSliceSMS,  indice_sb);
 
 }
 
@@ -189,13 +189,13 @@ void GenericReconSMSPostGadget::post_process_sb_data(hoNDArray< std::complex<flo
     if(use_omp.value()==true)
     {
         if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::undo_stacks_ordering_to_match_gt_organisation_open"); }
-        undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D);
+        undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D, MapSliceSMS,  indice_sb);
         if (perform_timing.value()) { gt_timer_local_.stop();}
     }
     else
     {
         if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation"); }
-        undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D);
+        undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D, MapSliceSMS,  indice_sb);
         if (perform_timing.value()) { gt_timer_local_.stop();}
     }
 
@@ -221,13 +221,13 @@ void GenericReconSMSPostGadget::post_process_mb_data(hoNDArray< std::complex<flo
     if(use_omp.value()==true)
     {
         if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::undo_stacks_ordering_to_match_gt_organisation_open"); }
-        undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D);
+        undo_stacks_ordering_to_match_gt_organisation_open(data_8D, data_7D, MapSliceSMS,  indice_sb);
         if (perform_timing.value()) { gt_timer_local_.stop();}
     }
     else
     {
         if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation"); }
-        undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D);
+        undo_stacks_ordering_to_match_gt_organisation(data_8D, data_7D, MapSliceSMS,  indice_sb);
         if (perform_timing.value()) { gt_timer_local_.stop();}
     }
 
@@ -271,119 +271,6 @@ void GenericReconSMSPostGadget::set_idx(hoNDArray< ISMRMRD::AcquisitionHeader > 
 }
 
 
-
-
-void GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output)
-{
-
-    //TODO it should be remplaced by one single copy
-
-    size_t RO=data.get_size(0);
-    size_t E1=data.get_size(1);
-    size_t E2=data.get_size(2);
-    size_t CHA=data.get_size(3);
-    size_t MB=data.get_size(4);
-    size_t STK=data.get_size(5);
-    size_t N=data.get_size(6);
-    size_t S=data.get_size(7);
-
-    size_t SLC=output.get_size(6);
-
-    hoNDArray< std::complex<float> > tempo;
-    tempo.create(RO,E1,E2,CHA,N,S,SLC);
-
-    //GADGET_CHECK_THROW(lNumberOfSlices_ == STK*MB);
-
-    size_t n, s, a, m, slc;
-    size_t index;
-
-    for (a = 0; a < STK; a++) {
-
-        for (m = 0; m < MB; m++) {
-
-            index = MapSliceSMS(a,m);
-
-            for (s = 0; s < S; s++)
-            {
-                for (n = 0; n < N; n++)
-                {
-                    std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
-                    std::complex<float> * out = &(tempo(0, 0, 0, 0, n, s, index));
-                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
-                }
-            }
-        }
-    }
-
-    for (slc = 0; slc < SLC; slc++)
-    {
-        for (s = 0; s < S; s++)
-        {
-            for (n = 0; n < N; n++)
-            {
-                std::complex<float> * in = &(tempo(0, 0, 0, 0, n, s, slc));
-                std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb(slc)));
-                memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
-            }
-        }
-    }
-}
-
-
-void GenericReconSMSPostGadget::undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output)
-{
-
-    //TODO it should be remplaced by one single copy
-
-    size_t RO=data.get_size(0);
-    size_t E1=data.get_size(1);
-    size_t E2=data.get_size(2);
-    size_t CHA=data.get_size(3);
-    size_t MB=data.get_size(4);
-    size_t STK=data.get_size(5);
-    size_t N=data.get_size(6);
-    size_t S=data.get_size(7);
-
-    size_t SLC=output.get_size(6);
-
-    hoNDArray< std::complex<float> > tempo;
-    tempo.create(RO,E1,E2,CHA,N,S,SLC);
-
-    //GADGET_CHECK_THROW(lNumberOfSlices_ == STK*MB);
-
-    long long num = N * S * STK * MB;
-    long long ii;
-
-#pragma omp parallel for default(none) private(ii) shared(num, MB , STK,  S, N, tempo, data,RO,E1,E2,CHA) if(num>1)
-    for (ii = 0; ii < num; ii++) {
-
-        size_t   a = ii / (S * MB* N);
-        size_t   m = (ii - a * S * MB* N) / (S* N );
-        size_t  s = (ii - a * S * MB* N - m * S* N )  /  (N);
-        size_t  n=  ii - a * S * MB* N - m * S* N  -s *  N;
-
-        size_t index = MapSliceSMS(a,m);
-
-        std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
-        std::complex<float> * out = &(tempo(0, 0, 0, 0, n, s, index));
-        memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
-    }
-
-
-    num = N * S * SLC;
-
-#pragma omp parallel for default(none) private(ii) shared(num, N, S, RO,E1,E2,CHA, indice_sb, tempo, output ) if(num>1)
-    for (ii = 0; ii < num; ii++) {
-        size_t slc = ii / (N * S);
-        size_t s = (ii - slc * N * S) / (N);
-        size_t n = ii - slc * N * S - s * N;
-
-        std::complex<float> * in = &(tempo(0, 0, 0, 0, n, s, slc));
-        std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb(slc)));
-        memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
-
-    }
-}
 
 
 

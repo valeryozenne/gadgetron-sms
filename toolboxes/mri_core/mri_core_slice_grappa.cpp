@@ -1,5 +1,5 @@
 
-/** \file   mri_core_grappa.cpp
+/** \file   mri_core_slice_grappa.cpp
     \brief  GRAPPA implementation for 2D and 3D MRI parallel imaging
     \author Hui Xue
 
@@ -63,22 +63,22 @@ template <typename T> void im2col(hoNDArray<T>& input, hoNDArray<T>& output, con
         size_t S = input.get_size(7);
 
         size_t rowIdx, colIdx;
-        size_t c,m,a,n,s;
+
         size_t i,j,xx,yy;
         // input ici vaut : e1, readout, cha
 
         //long long num = MB * STK * N * S;
         //long long ii;
         // TODO #pragma omp parallel for default() private() shared()
-        for (s = 0; s < S; s++)    {
+        for (size_t s = 0; s < S; s++)    {
 
-            for (n = 0; n < N; n++)  {
+            for (size_t n = 0; n < N; n++)  {
 
-                for (a = 0; a < STK; a++) {
+                for (size_t a = 0; a < STK; a++) {
 
-                    for (m = 0; m < MB; m++) {
+                    for (size_t m = 0; m < MB; m++) {
 
-                        for ( c = 0; c < CHA; c++)
+                        for (size_t cha = 0; cha < CHA; cha++)
                         {
                             for ( j = 0; j < blocks_RO; j++)
                             {
@@ -92,7 +92,7 @@ template <typename T> void im2col(hoNDArray<T>& input, hoNDArray<T>& output, con
                                         {
                                             colIdx = xx + yy*grappa_kSize_E1;
 
-                                            output(rowIdx, colIdx, c, m, a, n,s)=input(j+yy , i+xx, c, m, a, n, s);  //[128 63 12 2 4 1 1 1]
+                                            output(rowIdx, colIdx, cha, m, a, n,s)=input(j+yy , i+xx, cha, m, a, n, s);  //[128 63 12 2 4 1 1 1]
 
                                             //if (c==0 && a==0 && m==0 && xx==3 && yy==3)
                                             //{
@@ -119,9 +119,89 @@ template <typename T> void im2col(hoNDArray<T>& input, hoNDArray<T>& output, con
 }
 
 
+
+
+template <typename T> void im2col_open(hoNDArray<T>& input, hoNDArray<T>& output, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1 )
+{
+
+
+    try
+    {
+
+        ///------------------------------------------------------------------------
+        /// FR on recoit l'image folded pour une coupe uniquement [E1 Readout Coil ]
+        /// UK
+        ///
+
+        size_t RO = input.get_size(0);
+        size_t E1 = input.get_size(1);
+        size_t CHA = input.get_size(2);
+        size_t MB = input.get_size(3);
+        size_t STK = input.get_size(4);
+        size_t N = input.get_size(6);
+        size_t S = input.get_size(7);
+
+        //size_t rowIdx, colIdx;
+
+        //size_t i,j,xx,yy;
+        // input ici vaut : e1, readout, cha
+
+        long long num = STK * CHA * N * S * MB;
+        long long ii;
+
+#pragma omp parallel for default(none) private(ii) shared(num, MB , STK, S, N,  input, output ,RO,E1,CHA) if(num>1)
+        for (ii = 0; ii < num; ii++) {
+
+            size_t   a = ii / (S * MB* N * CHA);
+            size_t   m = (ii - a * S * MB* N* CHA) / (S* N * CHA );
+            size_t   s = (ii - a * S * MB* N* CHA - m * S* N * CHA)  /  (N * CHA);
+            size_t   cha=  (ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N) / (N);
+            size_t   n = ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N * CHA - cha;
+
+            for (size_t j = 0; j < blocks_RO; j++)
+            {
+                for (size_t i = 0; i < blocks_E1; i++)
+                {
+                    size_t rowIdx = i + j*blocks_E1;
+
+                    for (size_t yy = 0; yy < grappa_kSize_RO; yy++)
+                    {
+                        for (size_t xx = 0; xx < grappa_kSize_E1; xx++)
+                        {
+                            size_t colIdx = xx + yy*grappa_kSize_E1;
+
+                            output(rowIdx, colIdx, cha, m, a, n,s)=input(j+yy , i+xx, cha, m, a, n, s);  //[128 63 12 2 4 1 1 1]
+
+                            //if (c==0 && a==0 && m==0 && xx==3 && yy==3)
+                            //{
+                            //  std::cout<<   i <<  " " <<  j << " "<<  rowIdx  << " " <<   xx <<  " " <<  yy<< " "<<  colIdx <<   " "<< abs(block_SB(rowIdx, colIdx, c, m, a, n,s)) <<std::endl;
+                            //}
+
+                        }
+                    }
+                    // }
+                    //}
+                    // }
+                    // }
+                }
+            }
+        }
+
+    }
+    catch(...)
+    {
+        GADGET_THROW("Errors in im2col(...) ... ");
+    }
+
+    return;
+}
+
+
 template EXPORTMRICORE void im2col(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& block_SB, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1);
 template EXPORTMRICORE void im2col(hoNDArray< std::complex<double> >& input, hoNDArray< std::complex<double> >& block_SB, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1);
 
+template EXPORTMRICORE void im2col_open(hoNDArray< std::complex<float> >& input, hoNDArray< std::complex<float> >& block_SB, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1);
+template EXPORTMRICORE void im2col_open(hoNDArray< std::complex<double> >& input, hoNDArray< std::complex<double> >& block_SB, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1);
 
 
 
@@ -139,8 +219,6 @@ template <typename T> void remove_unnecessary_kspace(hoNDArray<T>& input, hoNDAr
 
     size_t index;
 
-    size_t s,n,a,m,cha,e2,e1;
-
     //std::cout << "end_E1_ " << start_E1_<<  " end_E1_ " <<  end_E1_<< "acc "   << acc << std::endl;
 
     if (is_mb==true)
@@ -148,22 +226,20 @@ template <typename T> void remove_unnecessary_kspace(hoNDArray<T>& input, hoNDAr
         MB=1;
     }
 
-
-
     // parallelisable sur cha m a n s
-    for (s = 0; s < S; s++)
+    for (size_t s = 0; s < S; s++)
     {
-        for (n = 0; n < N; n++)
+        for (size_t n = 0; n < N; n++)
         {
-            for (a = 0; a < STK; a++) {
+            for (size_t a = 0; a < STK; a++) {
 
-                for (m = 0; m < MB; m++) {
+                for (size_t m = 0; m < MB; m++) {
 
-                    for (cha = 0; cha < CHA; cha++) {
+                    for (size_t cha = 0; cha < CHA; cha++) {
 
                         index=0;
 
-                        for (e1 = startE1; e1 <= endE1; e1+=acc) {
+                        for (size_t e1 = startE1; e1 <= endE1; e1+=acc) {
 
                             T* in = &(input(0, e1, 0, cha, m, a, n, s));
                             T* out = &(output(0, index, cha, m, a, n, s));
@@ -182,9 +258,73 @@ template <typename T> void remove_unnecessary_kspace(hoNDArray<T>& input, hoNDAr
     //GADGET_CHECK_THROW(reduced_E1_ == index);
 }
 
+
+
+template <typename T> void remove_unnecessary_kspace_open(hoNDArray<T>& input, hoNDArray<T>& output, const size_t acc, const size_t startE1, const size_t endE1, bool is_mb )
+{
+
+    size_t RO = input.get_size(0);
+    size_t E1 = input.get_size(1);
+    size_t E2 = input.get_size(2);
+    size_t CHA = input.get_size(3);
+    size_t MB = input.get_size(4);
+    size_t STK = input.get_size(5);
+    size_t N = input.get_size(6);
+    size_t S = input.get_size(7);
+
+    //std::cout << "end_E1_ " << start_E1_<<  " end_E1_ " <<  end_E1_<< "acc "   << acc << std::endl;
+
+    if (is_mb==true)
+    {
+        MB=1;
+    }
+
+    long long num = STK * CHA * N * S * MB;
+    long long ii;
+
+#pragma omp parallel for default(none) private(ii) shared(num, MB , STK, S, N,  input, output ,RO,E1,E2,CHA) if(num>1)
+    for (ii = 0; ii < num; ii++) {
+
+        size_t   a = ii / (S * MB* N * CHA);
+        size_t   m = (ii - a * S * MB* N* CHA) / (S* N * CHA );
+        size_t   s = (ii - a * S * MB* N* CHA - m * S* N * CHA)  /  (N * CHA);
+        size_t   cha=  (ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N) / (N);
+        size_t   n = ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N * CHA - cha;
+
+        // parallelisable sur cha m a n s
+        // for (size_t s = 0; s < S; s++)  {
+        //for (size_t n = 0; n < N; n++)    {
+        //for (size_t a = 0; a < STK; a++) {
+        //for (size_t m = 0; m < MB; m++) {
+        //for (size_t cha = 0; cha < CHA; cha++) {
+
+        size_t index=0;
+
+        for (size_t e1 = startE1; e1 <= endE1; e1+=acc) {
+
+            T* in = &(input(0, e1, 0, cha, m, a, n, s));
+            T* out = &(output(0, index, cha, m, a, n, s));
+
+            memcpy(out , in, sizeof(T)*RO);
+            //if (m==0 && cha==0 && a==0) { std::cout << " e1 " << e1 <<  " index "<< index <<" e1 +2 " << e1 +2 <<  std::endl;}
+            index++;
+
+            // }
+            // }
+            // }
+            // }
+        }
+    }
+
+    //std::cout << "reduced_E1_"<< reduced_E1_<< "  index+1 "<< index+1 << std::endl;
+    //GADGET_CHECK_THROW(reduced_E1_ == index);
+}
+
 template EXPORTMRICORE void remove_unnecessary_kspace(hoNDArray< std::complex<float> >& input, hoNDArray<std::complex<float> >& output, const size_t acc , const size_t startE1, const size_t endE1, bool is_mb );
 template EXPORTMRICORE void remove_unnecessary_kspace(hoNDArray< std::complex<double> >& input, hoNDArray<std::complex<double> >& output, const size_t acc , const size_t startE1, const size_t endE1, bool is_mb );
 
+template EXPORTMRICORE void remove_unnecessary_kspace_open(hoNDArray< std::complex<float> >& input, hoNDArray<std::complex<float> >& output, const size_t acc , const size_t startE1, const size_t endE1, bool is_mb );
+template EXPORTMRICORE void remove_unnecessary_kspace_open(hoNDArray< std::complex<double> >& input, hoNDArray<std::complex<double> >& output, const size_t acc , const size_t startE1, const size_t endE1, bool is_mb );
 
 
 
@@ -305,7 +445,7 @@ void apply_unmix_coeff_kspace_SMS(hoNDArray<T>& in, hoNDArray<T>& kernel, hoNDAr
 
         //size_t MB_factor = kernel.get_size(2);
 
-  /*      size_t X1 = in.get_size(0);
+        /*      size_t X1 = in.get_size(0);
     size_t X2 = in.get_size(1);
     size_t X3 = in.get_size(2);
     size_t X4 = in.get_size(3);
@@ -345,6 +485,292 @@ void apply_unmix_coeff_kspace_SMS(hoNDArray<T>& in, hoNDArray<T>& kernel, hoNDAr
 
 }
 
+
 template EXPORTMRICORE void apply_unmix_coeff_kspace_SMS(hoNDArray<std::complex<float>>& in, hoNDArray<std::complex<float>>& kernel, hoNDArray<std::complex<float>>& out);
+
+
+
+//sur les données single band
+template <typename T>
+void create_stacks_of_slices_directly_sb(hoNDArray< T >& data, hoNDArray< T >& new_stack , arma::uvec &indice, arma::imat &MapSliceSMS)
+{
+
+    size_t RO=data.get_size(0);
+    size_t E1=data.get_size(1);
+    size_t E2=data.get_size(2);
+    size_t CHA=data.get_size(3);
+    size_t N=data.get_size(4);
+    size_t S=data.get_size(5);
+
+    size_t MB=new_stack.get_size(4);
+    size_t STK=new_stack.get_size(5);
+
+    size_t n, s, a, m;
+    size_t index;
+
+    // copy of the data in the 8D array
+
+    for (a = 0; a < STK; a++) {
+
+        for (m = 0; m < MB; m++) {
+
+            index = MapSliceSMS(a,m);
+
+            for (s = 0; s < S; s++)
+            {
+                for (n = 0; n < N; n++)
+                {
+                    std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice(index)));
+                    std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
+                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+                }
+            }
+        }
+    }
+}
+
+template EXPORTMRICORE void create_stacks_of_slices_directly_sb(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack , arma::uvec &indice, arma::imat &MapSliceSMS);
+
+//sur les données single band
+template <typename T>
+void create_stacks_of_slices_directly_sb_open(hoNDArray< T >& data, hoNDArray< T >& new_stack, arma::uvec &indice, arma::imat &MapSliceSMS)
+{
+
+    size_t RO=data.get_size(0);
+    size_t E1=data.get_size(1);
+    size_t E2=data.get_size(2);
+    size_t CHA=data.get_size(3);
+    size_t N=data.get_size(4);
+    size_t S=data.get_size(5);
+
+    size_t MB=new_stack.get_size(4);
+    size_t STK=new_stack.get_size(5);
+
+    long long num = STK * MB * N * S;
+    long long ii;
+
+#pragma omp parallel for default(none) private(ii) shared(num, MB , STK, S, N, indice, new_stack, data,RO,E1,E2,CHA, MapSliceSMS) if(num>1)
+    for (ii = 0; ii < num; ii++) {
+
+        size_t   a = ii / (S * MB* N);
+        size_t   m = (ii - a * S * MB* N) / (S* N );
+        size_t  s = (ii - a * S * MB* N - m * S* N )  /  (N);
+        size_t  n=  ii - a * S * MB* N - m * S* N  -s *  N;
+
+        size_t index = MapSliceSMS(a,m);
+
+        std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice(index)));
+        std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
+        memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+    }
+}
+
+template EXPORTMRICORE void create_stacks_of_slices_directly_sb_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack, arma::uvec &indice, arma::imat &MapSliceSMS);
+
+template <typename T>
+void create_stacks_of_slices_directly_mb_open(hoNDArray<T >& mb,hoNDArray< T>& mb_8D , arma::uvec& indice_mb, arma::uvec& indice_slice_mb )
+{
+    size_t RO=mb.get_size(0);
+    size_t E1=mb.get_size(1);
+    size_t E2=mb.get_size(2);
+    size_t CHA=mb.get_size(3);
+    size_t N=mb.get_size(4);
+    size_t S=mb.get_size(5);
+    size_t SLC=mb.get_size(6);
+
+    size_t lNumberOfStacks_=size(indice_mb,0);
+
+    long long num = N * S * lNumberOfStacks_;
+    long long ii;
+
+    // only allow this for loop openmp if num>1 and 2D recon
+#pragma omp parallel for default(none) private(ii) shared(num, S,  N,  RO, E1, E2, CHA, mb , mb_8D, indice_slice_mb, indice_mb ) if(num>1)
+    for (ii = 0; ii < num; ii++) {
+        size_t a = ii / (N * S);
+        size_t s = (ii - a * N * S) / (N);
+        size_t n = ii - a * N * S - s * N;
+
+        size_t index_in=indice_slice_mb[a];
+        size_t index_out=indice_mb[a];
+
+        size_t usedS = s;
+        if (usedS >= S) usedS = S - 1;
+
+        size_t usedN = n;
+        if (usedN >= N) usedN = N - 1;
+
+        std::complex<float> * in = &(mb(0, 0, 0, 0, n, s, index_in));
+        std::complex<float> * out = &(mb_8D(0, 0, 0, 0,  0, index_out, 0, s));
+
+        memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+
+    }
+}
+
+template EXPORTMRICORE void create_stacks_of_slices_directly_mb_open(hoNDArray< std::complex<float> >& mb,hoNDArray<  std::complex<float> >& mb_8D, arma::uvec& indice_mb, arma::uvec& indice_slice_mb );
+
+template <typename T>
+void create_stacks_of_slices_directly_mb(hoNDArray< T >& mb,hoNDArray< T>& mb_8D , arma::uvec& indice_mb, arma::uvec& indice_slice_mb )
+{
+    size_t RO=mb.get_size(0);
+    size_t E1=mb.get_size(1);
+    size_t E2=mb.get_size(2);
+    size_t CHA=mb.get_size(3);
+    size_t N=mb.get_size(4);
+    size_t S=mb.get_size(5);
+    size_t SLC=mb.get_size(6);
+
+    size_t index_in;
+    size_t index_out;
+
+    size_t lNumberOfStacks_=size(indice_mb,0);
+
+    for (int a = 0; a < lNumberOfStacks_; a++)
+    {
+        index_in=indice_slice_mb[a];
+        index_out=indice_mb[a];
+
+        for (size_t s = 0; s < S; s++)
+        {
+            size_t usedS = s;
+            if (usedS >= S) usedS = S - 1;
+
+            for (size_t n = 0; n < N; n++)
+            {
+                size_t usedN = n;
+                if (usedN >= N) usedN = N - 1;
+
+                std::complex<float> * in = &(mb(0, 0, 0, 0, n, s, index_in));
+                std::complex<float> * out = &(mb_8D(0, 0, 0, 0,  0, index_out, 0, s));
+
+                memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+
+            }
+        }
+    }
+
+}
+
+template EXPORTMRICORE void create_stacks_of_slices_directly_mb(hoNDArray< std::complex<float> >& mb,hoNDArray<  std::complex<float> >& mb_8D, arma::uvec& indice_mb, arma::uvec& indice_slice_mb );
+
+
+template <typename T>
+void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< T >& data, hoNDArray<T > &output, arma::imat& MapSliceSMS, arma::uvec& indice_sb)
+{
+
+    //TODO it should be remplaced by one single copy
+
+    size_t RO=data.get_size(0);
+    size_t E1=data.get_size(1);
+    size_t E2=data.get_size(2);
+    size_t CHA=data.get_size(3);
+    size_t MB=data.get_size(4);
+    size_t STK=data.get_size(5);
+    size_t N=data.get_size(6);
+    size_t S=data.get_size(7);
+
+    size_t SLC=output.get_size(6);
+
+    hoNDArray< T > tempo;
+    tempo.create(RO,E1,E2,CHA,N,S,SLC);
+
+    //GADGET_CHECK_THROW(lNumberOfSlices_ == STK*MB);
+
+    size_t n, s, a, m, slc;
+    size_t index;
+
+    for (a = 0; a < STK; a++) {
+
+        for (m = 0; m < MB; m++) {
+
+            index = MapSliceSMS(a,m);
+
+            for (s = 0; s < S; s++)
+            {
+                for (n = 0; n < N; n++)
+                {
+                    std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
+                    std::complex<float> * out = &(tempo(0, 0, 0, 0, n, s, index));
+                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+                }
+            }
+        }
+    }
+
+    for (slc = 0; slc < SLC; slc++)
+    {
+        for (s = 0; s < S; s++)
+        {
+            for (n = 0; n < N; n++)
+            {
+                std::complex<float> * in = &(tempo(0, 0, 0, 0, n, s, slc));
+                std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb(slc)));
+                memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+            }
+        }
+    }
+}
+
+template EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output, arma::imat& MapSliceSMS, arma::uvec& indice_sb);
+
+template <typename T>
+void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< T >& data, hoNDArray< T > &output, arma::imat& MapSliceSMS, arma::uvec& indice_sb)
+{
+
+    //TODO it should be remplaced by one single copy
+
+    size_t RO=data.get_size(0);
+    size_t E1=data.get_size(1);
+    size_t E2=data.get_size(2);
+    size_t CHA=data.get_size(3);
+    size_t MB=data.get_size(4);
+    size_t STK=data.get_size(5);
+    size_t N=data.get_size(6);
+    size_t S=data.get_size(7);
+
+    size_t SLC=output.get_size(6);
+
+    hoNDArray< T > tempo;
+    tempo.create(RO,E1,E2,CHA,N,S,SLC);
+
+    //GADGET_CHECK_THROW(lNumberOfSlices_ == STK*MB);
+
+    long long num = N * S * STK * MB;
+    long long ii;
+
+#pragma omp parallel for default(none) private(ii) shared(num, MB , STK,  S, N, tempo, data,RO,E1,E2,CHA, MapSliceSMS) if(num>1)
+    for (ii = 0; ii < num; ii++) {
+
+        size_t   a = ii / (S * MB* N);
+        size_t   m = (ii - a * S * MB* N) / (S* N );
+        size_t  s = (ii - a * S * MB* N - m * S* N )  /  (N);
+        size_t  n=  ii - a * S * MB* N - m * S* N  -s *  N;
+
+        size_t index = MapSliceSMS(a,m);
+
+        std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
+        std::complex<float> * out = &(tempo(0, 0, 0, 0, n, s, index));
+        memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+    }
+
+
+    num = N * S * SLC;
+
+#pragma omp parallel for default(none) private(ii) shared(num, N, S, RO,E1,E2,CHA, indice_sb, tempo, output ) if(num>1)
+    for (ii = 0; ii < num; ii++) {
+        size_t slc = ii / (N * S);
+        size_t s = (ii - slc * N * S) / (N);
+        size_t n = ii - slc * N * S - s * N;
+
+        std::complex<float> * in = &(tempo(0, 0, 0, 0, n, s, slc));
+        std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb(slc)));
+        memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+
+    }
+}
+
+template EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output, arma::imat& MapSliceSMS, arma::uvec& indice_sb);
+
+
 
 }

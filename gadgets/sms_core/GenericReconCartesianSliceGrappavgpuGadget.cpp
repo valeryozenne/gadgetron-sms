@@ -1,5 +1,5 @@
 
-#include "GenericReconCartesianSliceGrappav3Gadget.h"
+#include "GenericReconCartesianSliceGrappavgpuGadget.h"
 #include "mri_core_grappa.h"
 #include "hoNDArray_reductions.h"
 #include "hoNDArray_linalg.h"
@@ -17,13 +17,13 @@
 
 namespace Gadgetron {
 
-GenericReconCartesianSliceGrappav3Gadget::GenericReconCartesianSliceGrappav3Gadget() : BaseClass() {
+GenericReconCartesianSliceGrappavgpuGadget::GenericReconCartesianSliceGrappavgpuGadget() : BaseClass() {
 }
 
-GenericReconCartesianSliceGrappav3Gadget::~GenericReconCartesianSliceGrappav3Gadget() {
+GenericReconCartesianSliceGrappavgpuGadget::~GenericReconCartesianSliceGrappavgpuGadget() {
 }
 
-int GenericReconCartesianSliceGrappav3Gadget::process_config(ACE_Message_Block *mb) {
+int GenericReconCartesianSliceGrappavgpuGadget::process_config(ACE_Message_Block *mb) {
     GADGET_CHECK_RETURN(BaseClass::process_config(mb) == GADGET_OK, GADGET_FAIL);
 
     // -------------------------------------------------
@@ -50,9 +50,9 @@ int GenericReconCartesianSliceGrappav3Gadget::process_config(ACE_Message_Block *
     return GADGET_OK;
 }
 
-int GenericReconCartesianSliceGrappav3Gadget::process(Gadgetron::GadgetContainerMessage<IsmrmrdReconData> *m1) {
+int GenericReconCartesianSliceGrappavgpuGadget::process(Gadgetron::GadgetContainerMessage<IsmrmrdReconData> *m1) {
 
-    if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappav3Gadget::process"); }
+    if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappavgpuGadget::process"); }
 
     process_called_times_++;
 
@@ -108,7 +108,7 @@ int GenericReconCartesianSliceGrappav3Gadget::process(Gadgetron::GadgetContainer
                 this->prepare_down_stream_coil_compression_ref_data(recon_bit_->rbit_[e].data_.data_, recon_obj_[e].sb_compression_, e);
                 recon_bit_->rbit_[e].data_.data_=recon_obj_[e].sb_compression_;
 
-                if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappav3Gadget::perform_calib"); }
+                if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappavgpuGadget::perform_calib"); }
                 this->perform_slice_grappa_calib(recon_bit_->rbit_[e], recon_obj_[e], e);
                 if (perform_timing.value()) { gt_timer_.stop(); }
 
@@ -122,7 +122,7 @@ int GenericReconCartesianSliceGrappav3Gadget::process(Gadgetron::GadgetContainer
                 this->prepare_down_stream_coil_compression_ref_data(recon_bit_->rbit_[e].data_.data_, recon_obj_[e].mb_compression_, e);
                 recon_bit_->rbit_[e].data_.data_=recon_obj_[e].mb_compression_;
 
-                if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping"); }
+                if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping"); }
                 this->perform_slice_grappa_unwrapping(recon_bit_->rbit_[e], recon_obj_[e], e);
                 if (perform_timing.value()) { gt_timer_.stop();}
 
@@ -148,7 +148,7 @@ int GenericReconCartesianSliceGrappav3Gadget::process(Gadgetron::GadgetContainer
 }
 
 
-void GenericReconCartesianSliceGrappav3Gadget::define_kernel_parameters(IsmrmrdReconBit &recon_bit, size_t e)
+void GenericReconCartesianSliceGrappavgpuGadget::define_kernel_parameters(IsmrmrdReconBit &recon_bit, size_t e)
 {
 
     hoNDArray< std::complex<float> >& data = recon_bit.data_.data_;
@@ -170,7 +170,7 @@ void GenericReconCartesianSliceGrappav3Gadget::define_kernel_parameters(IsmrmrdR
 
 //TODO the mecanism for coil compression should be simplified and optmized
 //TODO
-void GenericReconCartesianSliceGrappav3Gadget::prepare_down_stream_coil_compression_ref_data(
+void GenericReconCartesianSliceGrappavgpuGadget::prepare_down_stream_coil_compression_ref_data(
          hoNDArray<std::complex<float> > &ref_src, hoNDArray<std::complex<float> > &ref_dst, size_t e) {
 
     if (!downstream_coil_compression.value()) {
@@ -262,7 +262,7 @@ void GenericReconCartesianSliceGrappav3Gadget::prepare_down_stream_coil_compress
 }
 
 
-void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(IsmrmrdReconBit &recon_bit, ReconObjType &recon_obj, size_t e)
+void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping(IsmrmrdReconBit &recon_bit, ReconObjType &recon_obj, size_t e)
 {
     // unwrapping function : liste des opérations:
     // 1) remove_unnecessary_kspace (in presence of grappa)
@@ -284,7 +284,7 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
     size_t N = data.get_size(6);
     size_t S = data.get_size(7);
 
-    GDEBUG_STREAM("GenericReconCartesianSliceGrappav3Gadget - incoming data array data : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA <<  " " << MB <<  " " << STK << " " << N << " " << S<<  "]");
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappavgpuGadget - incoming data array data : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA <<  " " << MB <<  " " << STK << " " << N << " " << S<<  "]");
 
     // TODO attention dimension MB =1 car c'est mb par définition il n'y a pas plusieurs coupes dans cette direction
 
@@ -346,7 +346,7 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
 
     size_t s, n, a;
 
-    gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget:: unmix version 1 ");
+    gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget:: unmix version 1 ");
 
     //old version part 1/3
     hoNDArray<std::complex<float> > tempo_MB(voxels_number_per_image_, kernel_size_*CHA);
@@ -396,7 +396,7 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
 
     //new version: code alternatif utilisant pragma omp parallel : fonctionne mais plus lent
 
-    /*gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget::process  unmix version 2 ");
+    /*gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::process  unmix version 2 ");
 
 
     size_t ref_N = recon_obj.block_MB_.get_size(5);
@@ -484,7 +484,7 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
 
 
 
-void  GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e)
+void  GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e)
 {
 
     hoNDArray< std::complex<float> >& sb = recon_obj.sb_compression_;
@@ -498,7 +498,7 @@ void  GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_calib(Ismrm
     size_t N = sb.get_size(6);
     size_t S = sb.get_size(7);
 
-    GDEBUG_STREAM("GenericReconCartesianSliceGrappav3Gadget - incoming data array sb : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N<< " " << S << "]");
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappavgpuGadget - incoming data array sb : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N<< " " << S << "]");
 
     recon_obj.sb_e1_reduce_.create(RO, reduced_E1_, CHA, MB, STK, N, S);
 
@@ -610,7 +610,7 @@ void  GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_calib(Ismrm
 
                     double thres=grappa_reg_lamda.value();
 
-                    gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget::process  Tikhonov ");
+                    gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::process  Tikhonov ");
 
                     for (unsigned long m = 0; m < MB; m++)
                     {
@@ -657,7 +657,7 @@ void  GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_calib(Ismrm
                     ///
                     size_t p, q;
 
-                    gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget::process  pinv ");
+                    gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::process  pinv ");
 
                     for (p = 0; p < size(measured_data_matrix,0); p++)
                     {
@@ -721,7 +721,7 @@ void  GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_calib(Ismrm
 
 
 
-void GenericReconCartesianSliceGrappav3Gadget::recopy_kspace(  ReconObjType &recon_obj, hoNDArray< std::complex<float> >& output, size_t acc )
+void GenericReconCartesianSliceGrappavgpuGadget::recopy_kspace(  ReconObjType &recon_obj, hoNDArray< std::complex<float> >& output, size_t acc )
 {
 
     size_t RO = recon_obj.unfolded_image_.get_size(1);
@@ -783,5 +783,5 @@ void GenericReconCartesianSliceGrappav3Gadget::recopy_kspace(  ReconObjType &rec
 
 
 
-GADGET_FACTORY_DECLARE(GenericReconCartesianSliceGrappav3Gadget)
+GADGET_FACTORY_DECLARE(GenericReconCartesianSliceGrappavgpuGadget)
 }
