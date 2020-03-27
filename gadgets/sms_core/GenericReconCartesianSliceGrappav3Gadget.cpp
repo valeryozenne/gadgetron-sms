@@ -51,7 +51,8 @@ int GenericReconCartesianSliceGrappav3Gadget::process_config(ACE_Message_Block *
 }
 
 int GenericReconCartesianSliceGrappav3Gadget::process(Gadgetron::GadgetContainerMessage<IsmrmrdReconData> *m1) {
-    if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget::process"); }
+
+    if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget::process all"); }
 
     process_called_times_++;
 

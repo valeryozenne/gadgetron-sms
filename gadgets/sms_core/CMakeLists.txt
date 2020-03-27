@@ -112,6 +112,7 @@ set( gadgetron_smscore_config_files
     config/Generic_Cartesian_Slice_Grappa_EPI_v3.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_v4.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_v5.xml
+    config/Generic_Cartesian_Slice_Grappa_EPI_v6.xml
 )
 
 add_library(gadgetron_smscore SHARED 
