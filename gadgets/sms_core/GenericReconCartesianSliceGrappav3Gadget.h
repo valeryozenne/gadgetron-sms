@@ -167,15 +167,15 @@ namespace Gadgetron {
         arma::cx_fmat CMK_matrix;
         arma::cx_fmat measured_data_matrix;
 
-        virtual void define_kernel_parameters(IsmrmrdReconBit &recon_bit, size_t e);
+        void define_kernel_parameters(IsmrmrdReconBit &recon_bit, size_t e);
 
-        virtual void perform_slice_grappa_unwrapping(IsmrmrdReconBit& recon_bit, ReconObjType& recon_obj, size_t encoding);
+        void perform_slice_grappa_unwrapping(IsmrmrdReconBit& recon_bit, ReconObjType& recon_obj, size_t encoding);
 
-        virtual void perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e);
+        void perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e);
 
-        virtual void recopy_kspace( ReconObjType &recon_obj, hoNDArray< std::complex<float> >& output, size_t acc );
+        void recopy_kspace( ReconObjType &recon_obj, hoNDArray< std::complex<float> >& output, size_t acc );
 
-        virtual void prepare_down_stream_coil_compression_ref_data(hoNDArray<std::complex<float> > &ref_src, hoNDArray<std::complex<float> > &ref_dst, size_t e);
+        void prepare_down_stream_coil_compression_ref_data(hoNDArray<std::complex<float> > &ref_src, hoNDArray<std::complex<float> > &ref_dst, size_t e);
 
     };
 }

@@ -8,6 +8,8 @@
 #include "GenericReconGadget.h"
 #include "hoArmadillo.h"
 #include "GenericReconSMSBase.h"
+#include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
 
 namespace Gadgetron {
 
@@ -67,7 +69,7 @@ namespace Gadgetron {
         ///  [voxels_number_per_image_, kernel_size_, CHA, MB, STK, N, S]
         hoNDArray<T > block_SB_;
 
-        /// [oxels_number_per_image_, kernel_size_, CHA, 1, STK, N, S]
+        /// [voxels_number_per_image_, kernel_size_, CHA, 1, STK, N, S]
         hoNDArray<T> block_MB_;
 
         /// [voxels_number_per_image_, CHA, MB, STK, N, S]
@@ -167,15 +169,27 @@ namespace Gadgetron {
         arma::cx_fmat CMK_matrix;
         arma::cx_fmat measured_data_matrix;
 
-        virtual void define_kernel_parameters(IsmrmrdReconBit &recon_bit, size_t e);
+        void define_kernel_parameters(IsmrmrdReconBit &recon_bit, size_t e);
 
-        virtual void perform_slice_grappa_unwrapping(IsmrmrdReconBit& recon_bit, ReconObjType& recon_obj, size_t encoding);
+        void perform_slice_grappa_unwrapping(IsmrmrdReconBit& recon_bit, ReconObjType& recon_obj, size_t encoding);
 
-        virtual void perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e);
+        void remove_unnecessary_kspace_gpu(hoNDArray<std::complex<float> >& input, hoNDArray<std::complex<float> >& output, const size_t acc, const size_t startE1, const size_t endE1, bool is_mb );
+        void perform_slice_grappa_unwrapping_gpu(hoNDArray<std::complex<float> > & input);
 
-        virtual void recopy_kspace( ReconObjType &recon_obj, hoNDArray< std::complex<float> >& output, size_t acc );
 
-        virtual void prepare_down_stream_coil_compression_ref_data(hoNDArray<std::complex<float> > &ref_src, hoNDArray<std::complex<float> > &ref_dst, size_t e);
+        void perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e);
+
+        void recopy_kspace( ReconObjType &recon_obj, hoNDArray< std::complex<float> >& output, size_t acc );
+
+        void prepare_down_stream_coil_compression_ref_data(hoNDArray<std::complex<float> > &ref_src, hoNDArray<std::complex<float> > &ref_dst, size_t e);
+
+        void im2col_gpu(hoNDArray<std::complex<float> >& input, hoNDArray<std::complex<float> >& output, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1 );
+
+        void do_gpu_test(hoNDArray<std::complex<float> > & input);
+        ///////////
+
+        GADGET_PROPERTY(deviceno,int,"GPU device number", 0);
+        int device_number_;
 
     };
 }

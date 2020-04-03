@@ -4,6 +4,16 @@
 #include "hoNDArray_reductions.h"
 #include "hoNDArray_linalg.h"
 #include "mri_core_slice_grappa.h"
+#include "GPUTimer.h"
+#include "cuNDArray_operators.h"
+#include "cuNDArray_elemwise.h"
+#include "cuNDArray_blas.h"
+#include "cuNDArray_utils.h"
+#include "cuNDArray_reductions.h"
+#include "cuNDFFT.h"
+#include "b1_map.h"
+#include "setup_grid.h"
+#include "test_slice_grappa.h"
 
 /*
     The input is IsmrmrdReconData and output is single 2D or 3D ISMRMRD images
@@ -92,10 +102,10 @@ int GenericReconCartesianSliceGrappavgpuGadget::process(Gadgetron::GadgetContain
 
             if (compteur==0)
             {
-            define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
-            this->define_kernel_parameters(recon_bit_->rbit_[e], e);
-            compteur++;
-            //std::cout <<" compteur  "<<  compteur << "  is_single_band " <<  is_single_band << std::endl;
+                define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
+                this->define_kernel_parameters(recon_bit_->rbit_[e], e);
+                compteur++;
+                //std::cout <<" compteur  "<<  compteur << "  is_single_band " <<  is_single_band << std::endl;
             }
 
 
@@ -114,6 +124,11 @@ int GenericReconCartesianSliceGrappavgpuGadget::process(Gadgetron::GadgetContain
 
 
 
+
+
+
+
+
             }
             else
             {
@@ -126,7 +141,7 @@ int GenericReconCartesianSliceGrappavgpuGadget::process(Gadgetron::GadgetContain
                 this->perform_slice_grappa_unwrapping(recon_bit_->rbit_[e], recon_obj_[e], e);
                 if (perform_timing.value()) { gt_timer_.stop();}
 
-                ///////////////                
+                ///////////////
 
                 recopy_kspace( recon_obj_[e], recon_bit_->rbit_[e].data_.data_, acceFactorSMSE1_[e] );
 
@@ -171,7 +186,7 @@ void GenericReconCartesianSliceGrappavgpuGadget::define_kernel_parameters(Ismrmr
 //TODO the mecanism for coil compression should be simplified and optmized
 //TODO
 void GenericReconCartesianSliceGrappavgpuGadget::prepare_down_stream_coil_compression_ref_data(
-         hoNDArray<std::complex<float> > &ref_src, hoNDArray<std::complex<float> > &ref_dst, size_t e) {
+        hoNDArray<std::complex<float> > &ref_src, hoNDArray<std::complex<float> > &ref_dst, size_t e) {
 
     if (!downstream_coil_compression.value()) {
         GDEBUG_CONDITION_STREAM(verbose.value(), "Downstream coil compression is not prescribed ... ");
@@ -204,7 +219,7 @@ void GenericReconCartesianSliceGrappavgpuGadget::prepare_down_stream_coil_compre
 
     size_t dstCHA = CHA;
     if (downstream_coil_compression_num_modesKept.value() > 0 &&
-        downstream_coil_compression_num_modesKept.value() <= CHA) {
+            downstream_coil_compression_num_modesKept.value() <= CHA) {
         dstCHA = downstream_coil_compression_num_modesKept.value();
     } else {
         std::vector<float> E(CHA, 0);
@@ -232,7 +247,7 @@ void GenericReconCartesianSliceGrappavgpuGadget::prepare_down_stream_coil_compre
 
     GDEBUG_CONDITION_STREAM(verbose.value(),
                             "Downstream coil compression is prescribed to use " << dstCHA << " out of " << CHA
-                                                                                << " channels ...");
+                            << " channels ...");
 
     if (dstCHA < CHA) {
         ref_dst.create(RO, E1, E2, dstCHA, N, S, SLC);
@@ -262,6 +277,509 @@ void GenericReconCartesianSliceGrappavgpuGadget::prepare_down_stream_coil_compre
 }
 
 
+void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping_gpu(hoNDArray<std::complex<float> > & input)
+{
+    //////////////////////////////
+    try
+    {
+
+        size_t RO = input.get_size(0);
+        size_t E1 = input.get_size(1);
+        size_t E2 = input.get_size(2);
+        size_t CHA = input.get_size(3);
+        size_t MB = input.get_size(4);
+        size_t STK = input.get_size(5);
+        size_t N = input.get_size(6);
+        size_t S = input.get_size(7);
+
+
+
+    }
+    catch(...)
+    {
+        GERROR_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!! unable to perform_slice_grappa_unwrapping_gpu");
+    }
+
+}
+
+
+
+void GenericReconCartesianSliceGrappavgpuGadget::im2col_gpu(hoNDArray<std::complex<float> >& input, hoNDArray<std::complex<float> >& output, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1 )
+{
+
+    bool do_2D=false;
+
+
+    if (do_2D==true)
+    {
+        //////////////////////////////
+        try
+        {
+            std::cout << "coucou im2col gpu"<< std::endl;
+            size_t RO = input.get_size(0);
+            size_t E1 = input.get_size(1);
+            size_t CHA = input.get_size(2);
+            size_t MB = input.get_size(3);
+            size_t STK = input.get_size(4);
+            size_t N = input.get_size(5);
+            size_t S = input.get_size(6);
+
+            // input [RO, reduced_E1_, CHA, MB, STK, N, S]
+            // output [voxels_number_per_image_, kernel_size_, CHA, MB, STK, N, S]
+
+            hoNDArray<std::complex<float> > data;
+            data.create(RO,E1);
+
+            hoNDArray<std::complex<float> > data_out;
+            data_out.create(blocks_RO*blocks_E1,grappa_kSize_RO*grappa_kSize_E1);
+
+            hoNDArray<float_complext>* host_data_out =
+                    reinterpret_cast< hoNDArray<float_complext>* >(&data_out);
+
+            cuNDArray<float_complext> device_data_out(host_data_out);
+
+            for (size_t s = 0; s < S; s++)    {
+
+                for (size_t n = 0; n < N; n++)  {
+
+                    for (size_t stk = 0; stk < STK; stk++)  {
+
+                        for (size_t mb = 0; mb < MB; mb++)  {
+
+                            for (size_t cha = 0; cha < CHA; cha++)  {
+
+                                std::complex<float> * in = &(input(0, 0, cha, mb, stk, n,s));
+                                std::complex<float> * out = &(data(0, 0 ));
+                                memcpy(out , in, sizeof(std::complex<float>)*RO*E1);
+
+                                hoNDArray<float_complext>* host_data =
+                                        reinterpret_cast< hoNDArray<float_complext>* >(&data);
+
+                                cuNDArray<float_complext> device_data(host_data);
+
+                                compute_im2col_2D(device_data , device_data_out ,  blocks_RO, blocks_E1,  grappa_kSize_RO, grappa_kSize_E1);
+
+                                device_data_out.to_host(host_data_out);
+
+                                //boost::shared_ptr< hoNDArray<float_complext  > >  host_result = device_data_out.to_host();
+
+                                //hoNDArray<std::complex<float>> *test=reinterpret_cast<hoNDArray<std::complex<float> >*>(host_result.get());
+
+                                //std::cout << " voxels_number_per_image_ ùkernel" << test->get_number_of_elements()<< std::endl;
+                                //std::cout << " voxels_number_per_image_ ùkernel" << voxels_number_per_image_ *kernel_size_<< std::endl;
+
+                                std::complex<float> * out2 = &(output(0, 0, cha, mb, stk, n, s ));
+                                memcpy(out2 , data_out.get_data_ptr(), sizeof(std::complex<float>)*voxels_number_per_image_*kernel_size_ );
+
+
+                            }
+
+                        }
+                    }
+                }
+
+            }
+        }
+        catch(...)
+        {
+            GERROR_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!! unable to perform_slice_grappa_unwrapping_gpu");
+        }
+
+    }
+    else
+    {
+
+        try
+        {
+            std::cout << "coucou im2col gpu"<< std::endl;
+            size_t RO = input.get_size(0);
+            size_t E1 = input.get_size(1);
+            size_t CHA = input.get_size(2);
+            size_t MB = input.get_size(3);
+            size_t STK = input.get_size(4);
+            size_t N = input.get_size(5);
+            size_t S = input.get_size(6);
+
+            // input [RO, reduced_E1_, CHA, MB, STK, N, S]
+            // output [voxels_number_per_image_, kernel_size_, CHA, MB, STK, N, S]
+
+            hoNDArray<std::complex<float> > data;
+            data.create(RO, E1, CHA, MB, STK );
+
+            hoNDArray<std::complex<float> > data_out;
+            data_out.create(blocks_RO*blocks_E1,grappa_kSize_RO*grappa_kSize_E1, CHA, MB, STK);
+
+            hoNDArray<float_complext>* host_data_out =
+                    reinterpret_cast< hoNDArray<float_complext>* >(&data_out);
+
+            cuNDArray<float_complext> device_data_out(host_data_out);
+
+            for (size_t s = 0; s < S; s++)    {
+
+                for (size_t n = 0; n < N; n++)  {
+
+                    std::complex<float> * in = &(input(0, 0, 0, 0, 0, n,s));
+                    std::complex<float> * out = &(data(0, 0 ));
+                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*MB*CHA*STK);
+
+                    hoNDArray<float_complext>* host_data =
+                            reinterpret_cast< hoNDArray<float_complext>* >(&data);
+
+                    cuNDArray<float_complext> device_data(host_data);
+
+                    compute_im2col_5D(device_data , device_data_out ,  blocks_RO, blocks_E1,  grappa_kSize_RO, grappa_kSize_E1);
+
+                    device_data_out.to_host(host_data_out);
+
+                    //boost::shared_ptr< hoNDArray<float_complext  > >  host_result = device_data_out.to_host();
+
+                    //hoNDArray<std::complex<float>> *test=reinterpret_cast<hoNDArray<std::complex<float> >*>(host_result.get());
+
+                    std::complex<float> * out2 = &(output(0, 0, 0, 0, 0, n, s ));
+                    memcpy(out2 , data_out.get_data_ptr(), sizeof(std::complex<float>)*voxels_number_per_image_*kernel_size_*CHA*MB*STK );
+
+                }
+            }
+        }
+        catch(...)
+        {
+            GERROR_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!! unable to perform_slice_grappa_unwrapping_gpu");
+        }
+
+    }
+
+}
+
+void GenericReconCartesianSliceGrappavgpuGadget::remove_unnecessary_kspace_gpu(hoNDArray<std::complex<float> >& input, hoNDArray<std::complex<float> >& output, const size_t acc, const size_t startE1, const size_t endE1, bool is_mb )
+{
+
+    //////////////////////////////
+    try
+    {
+
+        size_t RO = input.get_size(0);
+        size_t E1 = input.get_size(1);
+        size_t E2 = input.get_size(2);
+        size_t CHA = input.get_size(3);
+        size_t MB = input.get_size(4);
+        size_t STK = input.get_size(5);
+        size_t N = input.get_size(6);
+        size_t S = input.get_size(7);
+
+        if (is_mb==true)
+        {
+            MB=1; //TODO il y a une erreur par ici
+
+            hoNDArray<std::complex<float> > data;
+            data.create(RO,E1,E2,CHA,STK);
+
+            for (size_t s = 0; s < S; s++)    {
+
+                for (size_t n = 0; n < N; n++)  {
+
+                    std::complex<float> * in = &(input(0, 0, 0, 0, 0, 0, n,s));
+                    std::complex<float> * out = &(data(0, 0, 0, 0, 0 ));
+                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA*STK);
+
+                    hoNDArray<float_complext>* host_data =
+                            reinterpret_cast< hoNDArray<float_complext>* >(&data);
+
+                    cuNDArray<float_complext> device_data(host_data);
+                    device_data.squeeze();
+
+                    size_t ROg = device_data.get_size(0);
+                    size_t E1g = device_data.get_size(1);
+                    size_t CHAg = device_data.get_size(2);
+                    size_t STKg = device_data.get_size(3);
+
+
+
+                    GDEBUG_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!: [RO E1 CHA STK] - [" << ROg << " " << E1g << " " << CHAg << " "  << " " << STKg  << "]");
+
+                    cuNDArray<float_complext> device_data_out;
+                    device_data_out.create(ROg,reduced_E1_,CHAg, STKg);
+
+                    boost::shared_ptr<GPUTimer> process_timer;
+                    process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::estimate_feasibility_no_STK (MB=1)") );
+                    //TODO
+                    estimate_feasibility_no_STK<float>( device_data, device_data_out,  acceFactorSMSE1_[0], start_E1_, end_E1_, reduced_E1_);
+                    process_timer.reset();
+
+                    boost::shared_ptr< hoNDArray<float_complext  > >  host_result = device_data_out.to_host();
+
+                    hoNDArray<std::complex<float>> *test=reinterpret_cast<hoNDArray<std::complex<float> >*>(host_result.get());
+
+                    /*std::cout << test->get_size(0) << std::endl;
+                    std::cout << test->get_size(1) << std::endl;
+                    std::cout << test->get_size(2) << std::endl;
+                    std::cout << test->get_size(3) << std::endl;
+                    std::cout << test->get_size(4) << std::endl;
+
+                    hoNDArray<std::complex<float>> test2;
+                    test2.create(RO,reduced_E1_,CHA,STK);
+
+                    memcpy(&test2(0,0,0,0) , test->get_data_ptr(), sizeof(std::complex<float>)*RO*reduced_E1_*CHA*STK);
+
+                    std::cout << output.get_size(0) << std::endl;
+                    std::cout << output.get_size(1) << std::endl;
+                    std::cout << output.get_size(2) << std::endl;
+                    std::cout << output.get_size(3) << std::endl;
+                    std::cout << output.get_size(4) << std::endl;*/
+
+                    for (size_t stk = 0; stk < STK; stk++)
+                    {
+                        //std::complex<float> * in2 = &test2(0, 0, 0, stk);
+                        std::complex<float> * out2 = &(output(0, 0, 0, 0, stk, n, s ));
+                        //memcpy(out2 , in2, sizeof(std::complex<float>)*RO*reduced_E1_*CHA);
+                        memcpy(out2 , test->get_data_ptr() + stk*RO*reduced_E1_*CHA , sizeof(std::complex<float>)*RO*reduced_E1_*CHA);
+                    }
+                    //recon_obj.mb_e1_reduce_.create(RO, reduced_E1_, CHA, 1, STK, N, S);
+
+
+                    // sinon faire la copie avec le pointeur direct et rajouter l'offset
+                }
+            }
+
+        }
+        else
+        {
+            hoNDArray<std::complex<float> > data;
+            data.create(RO,E1,E2,CHA,MB,STK);
+
+            for (size_t s = 0; s < S; s++)    {
+
+                for (size_t n = 0; n < N; n++)  {
+
+                    std::complex<float> * in = &(input(0, 0, 0, 0, 0, 0, n,s));
+                    std::complex<float> * out = &(data(0, 0, 0, 0, 0, 0 ));
+                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA*MB*STK);
+
+                    hoNDArray<float_complext>* host_data =
+                            reinterpret_cast< hoNDArray<float_complext>* >(&data);
+
+                    cuNDArray<float_complext> device_data(host_data);
+                    device_data.squeeze();
+
+                    size_t ROg = device_data.get_size(0);
+                    size_t E1g = device_data.get_size(1);
+                    size_t CHAg = device_data.get_size(2);
+                    size_t MBg = device_data.get_size(3);
+                    size_t STKg = device_data.get_size(4);
+
+                    GDEBUG_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!: [RO E1 CHA MB STK] - [" << ROg << " " << E1g << " " << CHAg << " " << MBg  << " " << STKg  << "]");
+
+                    cuNDArray<float_complext> device_data_out;
+                    device_data_out.create(ROg,reduced_E1_,CHAg, MBg, STKg);
+
+                    boost::shared_ptr<GPUTimer> process_timer;
+                    process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::estimate_feasibility_with_STK (MB>1)") );
+
+                    //TODO
+                    estimate_feasibility_with_STK<float>( device_data, device_data_out,  acceFactorSMSE1_[0], start_E1_, end_E1_, reduced_E1_);
+                    process_timer.reset();
+
+                    //boost::shared_ptr< hoNDArray<complext<float> > >  host_result_tempo = device_data_out.to_host();
+                    boost::shared_ptr< hoNDArray<float_complext  > >  host_result = device_data_out.to_host();
+
+                    //boost::shared_ptr< hoNDArray<complext<float> > >  host_result = reinterpret_cast<hoNDArray<std::complex<float> > >(device_data_out.to_host());
+
+                    hoNDArray<std::complex<float>> *test=reinterpret_cast<hoNDArray<std::complex<float> >*>(host_result.get());
+
+                    //hoNDArray<std::complex<float>> test2;
+                    //test2.create(RO,reduced_E1_,CHA, MB, STK);
+                    //hoNDArray<std::complex<float>> test2(RO,reduced_E1_,CHA, MB, STK,test->get_data_ptr() );
+                    //memcpy(&test2(0,0,0,0,0) , test->get_data_ptr(), sizeof(std::complex<float>)*RO*reduced_E1_*CHA*MB*STK);
+                    //std::complex<float> * in2 = &test2(0, 0, 0, 0, 0);
+
+                    std::complex<float> * out2 = &(output(0, 0, 0, 0, 0, n, s ));
+                    memcpy(out2 , test->get_data_ptr(), sizeof(std::complex<float>)*RO*reduced_E1_*CHA*MB*STK);
+
+                }
+            }
+
+        }
+
+    }
+    catch(...)
+    {
+        GERROR_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!! unable to perform_slice_grappa_unwrapping_gpu");
+    }
+
+}
+
+
+void GenericReconCartesianSliceGrappavgpuGadget::do_gpu_test(hoNDArray<std::complex<float> > & input)
+{
+    //////////////////////////////
+
+    //https://forums.developer.nvidia.com/t/how-do-you-allocate-4d-or-5d-arrays-on-gpu/27690/2
+    //https://stackoverflow.com/questions/11798067/segmentation-of-4d-data-on-gpu
+    //https://stackoverflow.com/questions/34529387/kernel-for-processing-a-4d-tensor-in-cuda
+    //https://rvr.typepad.com/wind/2017/04/using-pycuda-to-boost-fits-image-processing-time.html
+    //http://www-personal.umich.edu/~smeyer/cuda/grid.pdf
+    //https://www.olcf.ornl.gov/wp-content/uploads/2018/03/Intro_to_CUDA.pdf
+    try
+    {
+
+        //////////////////////////////////////////
+
+
+        size_t RO = input.get_size(0);
+        size_t E1 = input.get_size(1);
+        size_t E2 = input.get_size(2);
+        size_t CHA = input.get_size(3);
+        size_t MB = input.get_size(4);
+        size_t STK = input.get_size(5);
+        size_t N = input.get_size(6);
+        size_t S = input.get_size(7);
+
+
+
+        //noter que l'on peut boucler sur les stacks pour que ce soit plus facile:
+
+
+        hoNDArray< std::complex<float> > reduce_host_data;
+        reduce_host_data.create(RO,E1,E2,CHA,MB);
+
+        for (int a = 0; a < lNumberOfStacks_; a++)
+        {
+
+            std::complex<float> * in = &(input(0, 0, 0, 0, 0, a, 0 ,0 ));
+            std::complex<float> * out = &(reduce_host_data(0, 0, 0, 0,  0));
+
+            memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA *MB);
+
+        }
+
+
+
+        GDEBUG_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!: [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N<< " " << S << "]");
+
+        hoNDArray<float_complext>* host_data =
+                reinterpret_cast< hoNDArray<float_complext>* >(&reduce_host_data);
+
+
+        cuNDArray<float_complext> fourD_device_data(host_data);
+        fourD_device_data.squeeze();
+
+        cuNDArray<float_complext> fourD_device_data_two(host_data);
+        fourD_device_data_two.squeeze();
+
+        //std::vector<size_t> ftdims(2,0); ftdims[1] = 1;
+
+        //Go to image space
+        //cuNDFFT<float>::instance()->ifft( &device_data, &ftdims);
+
+        size_t ROg = fourD_device_data.get_size(0);
+        size_t E1g = fourD_device_data.get_size(1);
+        //size_t E2g = device_data.get_size(2);
+        size_t CHAg = fourD_device_data.get_size(2);
+        size_t MBg = fourD_device_data.get_size(3);
+        size_t STKg = fourD_device_data.get_size(4);
+        size_t Ng = fourD_device_data.get_size(5);
+        size_t Sg = fourD_device_data.get_size(6);
+
+        GDEBUG_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!: [RO E1 E2 CHA MB STK N S] - [" << ROg << " " << E1g << " " << CHAg << " " << MBg << " " << STKg << " " << Ng<< " " << Sg << "]");
+
+        //std::vector<size_t> ftdims(2,0); ftdims[1] = 1;
+
+
+
+        unsigned int dim_to_transform=0;
+        if (perform_timing.value()) { gt_timer_local_.start("gpuExample:: fft and ifft cpu time");}
+        boost::shared_ptr<GPUTimer> process_timer;
+        process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::fft and ifft gpu time") );
+
+
+        hoNDArray<float_complext>* host =
+                reinterpret_cast< hoNDArray<float_complext>* >(&input);
+
+        cuNDArray<float_complext> device_d(host);
+
+        cuNDFFT<float>::instance()->fft(&device_d, dim_to_transform);
+        cuNDFFT<float>::instance()->ifft(&device_d, dim_to_transform);
+
+
+        boost::shared_ptr< hoNDArray<float_complext  > >  host_result = device_d.to_host();
+
+        hoNDArray<std::complex<float>> *host_result_cast=reinterpret_cast<hoNDArray<std::complex<float> >*>(host_result.get());
+
+        process_timer.reset();
+
+
+        gt_timer_local_.stop();
+
+
+
+
+
+        if (perform_timing.value()) { gt_timer_local_.start("cpuExample:: fft and ifft");}
+
+        hoNDFFT<float>::instance()->fft(&input,0);
+        hoNDFFT<float>::instance()->ifft(&input,0);
+
+        gt_timer_local_.stop();
+
+        // du coup il faut ecrire les fonctions
+        //remove() t //im2col pour commencer
+
+        //int target_coils_=10;
+
+        //auto device_data_test = estimate_feasibility<float,2>( device_data,target_coils_);
+
+        process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::estimate_feasibility_no_STK") );
+        //TODO
+        estimate_feasibility_no_STK<float>( fourD_device_data, fourD_device_data_two,  acceFactorSMSE1_[0], start_E1_, end_E1_, reduced_E1_);
+        process_timer.reset();
+
+
+
+        //cuNDArray<float_complext> device_data(reduce_host_data);
+        //device_data.squeeze();
+
+        //cuNDArray<float_complext> device_data_two(reduce_host_data);
+        //device_data.squeeze();
+
+        //process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::estimate_feasibility_with_STK") );
+        //TODO
+        //estimate_feasibility_with_STK<float>( device_data, device_data_two,  acceFactorSMSE1_[0], start_E1_, end_E1_, reduced_E1_);
+        //process_timer.reset();
+
+        // unsigned int number_of_batches = device_data.get_size(CHAg);
+        //unsigned int number_of_elements = device_data.get_number_of_elements()/number_of_batches;
+
+        //std::cout<< " number_of_batches :  "  << number_of_batches << " number_of_elements :" << number_of_elements << std::endl;
+
+        // Setup block/grid dimensions
+        //dim3 blockDim;
+        //dim3 gridDim;
+        //setup_grid( number_of_elements, &blockDim, &gridDim );
+
+        // Find element stride
+        //unsigned int stride; std::vector<size_t> dims;
+        //find_stride< std::complex<float> >( device_data, dim, &stride, &dims );
+
+        //std::cout<< " stride :  "  << stride  << std::endl;
+
+    }
+    catch(...)
+    {
+        GERROR_STREAM("!!!!!!!!!!!!!!!!!!!!!!!!! unable to do the gpu stuff");
+    }
+
+    ////////////////////////////////
+    //boost::shared_array< hoNDArray<float_complext> >  csm_host_;
+    //int slices_=10;
+    //int sets_=5;
+    //csm_host_ = boost::shared_array< hoNDArray<float_complext> >(new hoNDArray<float_complext>[slices_*sets_]);
+    //boost::shared_ptr< cuNDArray<float_complext> > csm(new cuNDArray<float_complext> (csm_host_.get()));
+    //boost::shared_ptr< cuNDArray<float_complext> > device_samples(new cuNDArray<float_complext> (j->dat_host_.get()));
+
+    //////////////////////////////////////////
+
+}
+
+
 void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping(IsmrmrdReconBit &recon_bit, ReconObjType &recon_obj, size_t e)
 {
     // unwrapping function : liste des opérations:
@@ -275,6 +793,8 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
     //hoNDArray< std::complex<float> >& data = recon_bit.data_.data_;
     hoNDArray< std::complex<float> >& data = recon_obj.mb_compression_;
 
+    //do_gpu_test(data);
+
     size_t RO = data.get_size(0);
     size_t E1 = data.get_size(1);
     size_t E2 = data.get_size(2);
@@ -286,44 +806,64 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
 
     GDEBUG_STREAM("GenericReconCartesianSliceGrappavgpuGadget - incoming data array data : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA <<  " " << MB <<  " " << STK << " " << N << " " << S<<  "]");
 
-    // TODO attention dimension MB =1 car c'est mb par définition il n'y a pas plusieurs coupes dans cette direction
-
     recon_obj.mb_e1_reduce_.create(RO, reduced_E1_, CHA, 1, STK, N, S);
+
+    if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::cpuExample:: remove_unnecessary_kspace global");}
 
     if (use_omp.value()==true)
     {
-    remove_unnecessary_kspace_open( recon_obj.mb_compression_ ,  recon_obj.mb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_, true);
+        remove_unnecessary_kspace_open( recon_obj.mb_compression_ ,  recon_obj.mb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_, true);
     }
     else
     {
-    remove_unnecessary_kspace( recon_obj.mb_compression_ ,  recon_obj.mb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_, true);
+        remove_unnecessary_kspace( recon_obj.mb_compression_ ,  recon_obj.mb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_, true);
     }
+    if (perform_timing.value()) { gt_timer_local_.stop();}
+
+    //if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::gpuExample:: remove_unnecessary_kspace global");}
+    //remove_unnecessary_kspace_gpu( recon_obj.mb_compression_  ,  recon_obj.mb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_, true);
+    //if (perform_timing.value()) { gt_timer_local_.stop();}
 
     if (!debug_folder_full_path_.empty())
     {
         //show_size(mb_reduce,"mb_reduce");
-        save_4D_with_STK_5(recon_obj.mb_e1_reduce_, "mb_e1_reduce", "0");
+        save_4D_with_STK_5(recon_obj.mb_e1_reduce_, "mb_e1_reduce_", "0");
     }
 
     //std::cout << "create  block_MB"<< " voxels_number_per_image_ "<< voxels_number_per_image_ << "  kernel_size_ "<< kernel_size_ << std::endl;
 
+    // lui il doit être créé à chaque fois car on le reshape
     recon_obj.block_MB_.create(voxels_number_per_image_, kernel_size_, CHA, 1, STK, N, S);
+
+    if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::cpuExample:: im2col global");}
 
     if (use_omp.value()==true)
     {
-    im2col_open(recon_obj.mb_e1_reduce_,recon_obj.block_MB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
+        im2col_open(recon_obj.mb_e1_reduce_,recon_obj.block_MB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
     }
     else
     {
-    im2col(recon_obj.mb_e1_reduce_,recon_obj.block_MB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
+        im2col(recon_obj.mb_e1_reduce_,recon_obj.block_MB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
     }
+    if (perform_timing.value()) { gt_timer_local_.stop();}
+
+
+    if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::gpuExample:: im2col global");}
+
+    if (use_gpu.value()==true)
+    {
+        im2col_gpu(recon_obj.mb_e1_reduce_,recon_obj.block_MB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
+    }
+
+    if (perform_timing.value()) { gt_timer_local_.stop();}
 
     if (!debug_folder_full_path_.empty())
     {
-    //show_size(block_MB,"block_MB");
-    save_4D_with_STK_5(recon_obj.block_MB_,"block_MB_", "0");
+        //show_size(block_MB,"block_MB");
+        save_4D_with_STK_5(recon_obj.block_MB_,"block_MB_", "0");
     }
 
+    if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::cpuExample:: reshape global");}
     std::vector<size_t> newdims;
     newdims.push_back(blocks_RO_*blocks_E1_);
     newdims.push_back(kernel_size_*CHA);
@@ -334,30 +874,33 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
     newdims.push_back(S); //S
     recon_obj.block_MB_.reshape(&newdims);
 
+    if (perform_timing.value()) { gt_timer_local_.stop();}
+
     if (!debug_folder_full_path_.empty())
     {
-    //show_size(recon_obj.block_MB_,"block_MB reshape");
-    save_4D_with_STK_5(recon_obj.block_MB_,"", "0");
+        //show_size(recon_obj.block_MB_,"block_MB reshape");
+        save_4D_with_STK_5(recon_obj.block_MB_,"", "0");
     }
 
     //TODO ceci devrait etre alloué une seule fois et non a chaque passage
     recon_obj.unfolded_image_.create(voxels_number_per_image_, CHA, MB_factor, STK,  N, S);
     recon_obj.unfolded_image_permute_.create(blocks_RO_,blocks_E1_,CHA, MB_factor, STK,  N, S);
 
-    size_t s, n, a;
 
-    gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget:: unmix version 1 ");
-
+    /*
     //old version part 1/3
+    //TODO à simplifier, ne pas créer tout ce monde à chaque fois
     hoNDArray<std::complex<float> > tempo_MB(voxels_number_per_image_, kernel_size_*CHA);
     hoNDArray<std::complex<float> > tempo_kernel(kernel_size_*CHA, CHA );
     hoNDArray<std::complex<float> > tempo_kspace_unfolded(voxels_number_per_image_, CHA);
 
-    for (a = 0; a < STK; a++) {
+    if (perform_timing.value()) {gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::cpuExample:: unmix version 1 ");}
 
-        for (s = 0; s < S; s++)    {
+    for (long long a = 0; a < STK; a++) {
 
-           for (n = 0; n < N; n++)  {
+        for (long long s = 0; s < S; s++)    {
+
+            for (long long n = 0; n < N; n++)  {
 
                 //old version part 2/3
                 Gadgetron::clear(tempo_MB);
@@ -387,42 +930,56 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
 
                     memcpy(image_out , image_in, sizeof(std::complex<float>)*voxels_number_per_image_*CHA);
                 }
-
             }
         }
     }
 
-    gt_timer_local_.stop();
+    if (perform_timing.value()) {gt_timer_local_.stop();}*/
 
-    //new version: code alternatif utilisant pragma omp parallel : fonctionne mais plus lent
+    //new version: code alternatif utilisant pragma omp parallel : calcul quelque chose mais c'est faux
 
-    /*gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::process  unmix version 2 ");
-
+    gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::process  unmix version 2 ");
 
     size_t ref_N = recon_obj.block_MB_.get_size(5);
     size_t ref_S = recon_obj.block_MB_.get_size(6);
 
     typedef std::complex<float> T;
-    long long num = N * S * STK;
-    long long ii;
+    //long long num = N * S * STK;
+    //long long ii;
 
-#pragma omp parallel default(none) private(ii) shared(num, N, S, MB_factor, ref_N, ref_S, recon_obj, voxels_number_per_image_, kernel_size_, CHA) if(num>1)
-        for (ii = 0; ii < num; ii++) {
-            size_t a = ii / (N * S);
-            size_t s = (ii - a * N * S) / N;
-            size_t n = ii - a * N * S - s * N;
+    //#pragma omp parallel default(none) private(ii) shared(num, N, S, MB_factor, ref_N, ref_S, recon_obj, voxels_number_per_image_, kernel_size_, CHA) if(num>1)
+    //    for (ii = 0; ii < num; ii++) {
+    //        size_t a = ii / (N * S);
+    //       size_t s = (ii - a * N * S) / N;
+    //      size_t n = ii - a * N * S - s * N;
+    for (long long a = 0; a < STK; a++) {
 
-            size_t usedN = n;
-            if (n >= ref_N) usedN = ref_N - 1;
+        for (long long s = 0; s < S; s++)    {
 
-            size_t usedS = s;
-            if (s >= ref_S) usedS = ref_S - 1;
+            for (long long n = 0; n < N; n++)  {
+
+                size_t usedN = n;
+                if (n >= ref_N) usedN = ref_N - 1;
+
+                size_t usedS = s;
+                if (s >= ref_S) usedS = ref_S - 1;
 
                 T *pIn = &(recon_obj.block_MB_(0, 0, 0, 0, a, n, s));
 
                 for (size_t m = 0; m < MB_factor; m++) {
 
-                    T *pkernel = &(recon_obj.kernel_(0, 0, m, a, n, s));
+                    T *pkernel;
+
+                    if (calib_fast.value()==true)
+                    {
+                        pkernel = &(recon_obj.kernelonov_(0, 0, m, a, n, s));
+                    }
+                    else
+                    {
+                        pkernel = &(recon_obj.kernel_(0, 0, m, a, n, s));
+                    }
+
+                    //T *pkernel = &(recon_obj.kernelonov_(0, 0, m, a, n, s));
 
                     T *pOut = &(recon_obj.unfolded_image_(0, 0, m, a, n, s));
 
@@ -432,21 +989,23 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
 
                     Gadgetron::apply_unmix_coeff_kspace_SMS(tempo_MB, tempo_kernel, tempo_kspace_unfolded );
 
-                 }
+                }
+            }
         }
+    }
 
-
-    gt_timer_local_.stop();*/
-
+    gt_timer_local_.stop();
 
     ///////////////
 
     if (!debug_folder_full_path_.empty())
     {
-    //show_size(recon_obj.unfolded_image_,"unfolded_image");
-    save_4D_with_STK_5(recon_obj.unfolded_image_, "unfolded_image", "0");
-    save_4D_data(recon_obj.unfolded_image_, "unfolded_image", "0");
+        //show_size(recon_obj.unfolded_image_,"unfolded_image");
+        save_4D_with_STK_5(recon_obj.unfolded_image_, "unfolded_image", "0");
+        save_4D_data(recon_obj.unfolded_image_, "unfolded_image", "0");
     }
+
+    if (perform_timing.value()) {gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::cpuExample:: reshape 2 ");}
 
     std::vector<size_t> newdims2;
     newdims2.push_back(blocks_E1_);
@@ -458,12 +1017,15 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
     newdims2.push_back(S); //STK
     recon_obj.unfolded_image_.reshape(&newdims2);
 
+    if (perform_timing.value()) {gt_timer_local_.stop();}
+
     if (!debug_folder_full_path_.empty())
     {
-    //show_size(recon_obj.unfolded_image_,"unfolded_image_reshape");
-    save_4D_with_STK_5(recon_obj.unfolded_image_, "unfolded_image_reshape", "0");
+        //show_size(recon_obj.unfolded_image_,"unfolded_image_reshape");
+        save_4D_with_STK_5(recon_obj.unfolded_image_, "unfolded_image_reshape", "0");
     }
 
+    if (perform_timing.value()) {gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::cpuExample:: permute");}
     std::vector<size_t> newdims3;
     newdims3.push_back(1);
     newdims3.push_back(0);
@@ -475,9 +1037,11 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
 
     recon_obj.unfolded_image_permute_=permute(recon_obj.unfolded_image_,newdims3);
 
+    if (perform_timing.value()) {gt_timer_local_.stop();}
+
     if (!debug_folder_full_path_.empty())
     {
-    //show_size(recon_obj.unfolded_image_permute_,"unfolded_image_permute");
+        //show_size(recon_obj.unfolded_image_permute_,"unfolded_image_permute");
     }
 
 }
@@ -502,19 +1066,34 @@ void  GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_calib(Ism
 
     recon_obj.sb_e1_reduce_.create(RO, reduced_E1_, CHA, MB, STK, N, S);
 
+    //---------------------------------
+    // TODO attention dimension MB =1 car c'est mb par définition il n'y a pas plusieurs coupes dans cette direction
+    // recon_obj.mb_e1_reduce_.create(RO, reduced_E1_, CHA, 1, STK, N, S);
+    // TODO ceci devrait etre alloué une seule fois et non a chaque passage
+    // recon_obj.unfolded_image_.create(voxels_number_per_image_, CHA, MB_factor, STK,  N, S);
+    // recon_obj.unfolded_image_permute_.create(blocks_RO_,blocks_E1_,CHA, MB_factor, STK,  N, S);
+    // allocation unmixing comme cela c est fait une seule fois
+    //---------------------------------
+
+    if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::cpuExample:: remove_unnecessary_kspace calib");}
+
     if (use_omp.value()==true)
     {
-    remove_unnecessary_kspace_open( recon_obj.sb_compression_ ,  recon_obj.sb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_ , false);
+        remove_unnecessary_kspace_open( recon_obj.sb_compression_ ,  recon_obj.sb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_ , false);
     }
     else
     {
-    remove_unnecessary_kspace( recon_obj.sb_compression_ ,  recon_obj.sb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_ , false);
+        remove_unnecessary_kspace( recon_obj.sb_compression_ ,  recon_obj.sb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_ , false);
     }
+
+    //if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::gpuExample:: remove_unnecessary_kspace calib");}
+    //remove_unnecessary_kspace_gpu( recon_obj.sb_compression_ ,  recon_obj.sb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_, false);
+    //if (perform_timing.value()) { gt_timer_local_.stop();}
 
     if (!debug_folder_full_path_.empty())
     {
         //show_size(sb_reduce,"sb_reduce");
-        save_4D_with_STK_5(recon_obj.sb_e1_reduce_, "sb_e1_reduce", "0");
+        save_4D_with_STK_5(recon_obj.sb_e1_reduce_, "sb_e1_reduce_", "0");
     }
 
     ///////////////
@@ -528,22 +1107,22 @@ void  GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_calib(Ism
     /////////
     if (use_omp.value()==true)
     {
-    im2col_open(recon_obj.sb_e1_reduce_, recon_obj.block_SB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
+        im2col_open(recon_obj.sb_e1_reduce_, recon_obj.block_SB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
     }
     else
     {
-    im2col(recon_obj.sb_e1_reduce_, recon_obj.block_SB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
+        im2col(recon_obj.sb_e1_reduce_, recon_obj.block_SB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
     }
 
 
     if (!debug_folder_full_path_.empty())
     {
-    save_4D_8D_kspace(recon_obj.block_SB_, "block_SB", "0");
+        save_4D_8D_kspace(recon_obj.block_SB_, "block_SB_", "0");
     }
 
     if (blocking==true)
     {
-         GDEBUG("blocking == true\n");
+        GDEBUG("blocking == true\n");
     }
     else
     {
@@ -553,13 +1132,13 @@ void  GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_calib(Ism
 
     if (!debug_folder_full_path_.empty())
     {
-    save_4D_8D_kspace(recon_obj.missing_data_, "missing_data", "0");
+        save_4D_8D_kspace(recon_obj.missing_data_, "missing_data", "0");
     }
 
     CMK_matrix.set_size(CHA*kernel_size_, voxels_number_per_image_);
     measured_data_matrix.set_size(voxels_number_per_image_, CHA*kernel_size_);
 
-    size_t s, n, a, m, cha, e2, e1;
+    long long s, n, a, m, cha, e2, e1;
 
     hoNDArray<std::complex<float> > tempo_matrix(voxels_number_per_image_, kernel_size_,  CHA, MB);
 
@@ -612,7 +1191,7 @@ void  GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_calib(Ism
 
                     gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::process  Tikhonov ");
 
-                    for (unsigned long m = 0; m < MB; m++)
+                    for (long long m = 0; m < MB; m++)
                     {
                         hoMatrix<std::complex<float>> A, B, x(colA, colB);
 
@@ -667,7 +1246,7 @@ void  GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_calib(Ism
                         }
                     }
 
-                    CMK_matrix = pinv(measured_data_matrix.t()*measured_data_matrix)*measured_data_matrix.t();                 
+                    CMK_matrix = pinv(measured_data_matrix.t()*measured_data_matrix)*measured_data_matrix.t();
 
                     hoNDArray<std::complex<float> > CMK(measured_data.get_size(1),measured_data.get_size(0));
 
@@ -679,7 +1258,7 @@ void  GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_calib(Ism
                         }
                     }
 
-                    for (unsigned long m = 0; m < MB; m++)
+                    for (long long m = 0; m < MB; m++)
                     {
                         hoNDArray< std::complex<float> > miss(voxels_number_per_image_, CHA);
 
@@ -702,14 +1281,14 @@ void  GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_calib(Ism
 
                     }
                     gt_timer_local_.stop();
-                }               
+                }
             }
         }
 
         if (!debug_folder_full_path_.empty())
         {
-        save_4D_data(recon_obj.kernel_, "kernel", "0");
-        save_4D_data(recon_obj.kernelonov_, "kernelonov", "0");
+            save_4D_data(recon_obj.kernel_, "kernel", "0");
+            save_4D_data(recon_obj.kernelonov_, "kernelonov", "0");
         }
 
     }
@@ -773,9 +1352,9 @@ void GenericReconCartesianSliceGrappavgpuGadget::recopy_kspace(  ReconObjType &r
         }
     }
 
-//std::cout << "reduced_E1_-4  "<< reduced_E1_-2*acc<< "  index_x "<< index_x  << "  index_y "<< index_y  << std::endl;
+    //std::cout << "reduced_E1_-4  "<< reduced_E1_-2*acc<< "  index_x "<< index_x  << "  index_y "<< index_y  << std::endl;
 
-//recopy_kspace( m1->getObjectPtr()->rbit_[e].data_.data_ ,  acceFactorSMSE1_[e] );}
+    //recopy_kspace( m1->getObjectPtr()->rbit_[e].data_.data_ ,  acceFactorSMSE1_[e] );}
 
     //GADGET_CHECK_THROW(reduced_E1_ == index+1);
 

@@ -13,6 +13,7 @@
 #include "hoNDArray_elemwise.h"
 #include "hoNDKLT.h"
 #include "hoArmadillo.h"
+#include "test_slice_grappa.h"
 
 namespace Gadgetron {
 
@@ -25,6 +26,7 @@ namespace Gadgetron {
         //typedef hoNDKLT< std::complex<float> > KLTType;
 
         GADGET_PROPERTY(use_omp, bool, "Whether to use omp acceleration", false);
+        GADGET_PROPERTY(use_gpu, bool, "Whether to use gpu acceleration", false);
 
         GenericReconSMSBase();
         ~GenericReconSMSBase();

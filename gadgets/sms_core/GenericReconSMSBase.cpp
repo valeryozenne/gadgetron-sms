@@ -5,6 +5,13 @@
 #include "hoNDArray_reductions.h"
 #include "mri_core_def.h"
 #include "hoNDFFT.h"
+#include "GPUTimer.h"
+#include "cuNDArray_operators.h"
+#include "cuNDArray_elemwise.h"
+#include "cuNDArray_blas.h"
+#include "cuNDArray_utils.h"
+#include "cuNDArray_reductions.h"
+#include "cuNDFFT.h"
 
 namespace Gadgetron {
 
@@ -422,7 +429,7 @@ void GenericReconSMSBase::apply_relative_phase_shift_test(hoNDArray< std::comple
     phase.zeros();
     phase.set_imag(index_imag);
 
-    size_t m,a,n,s,cha,e2,e1,ro;
+    long long m,a,n,s,cha,e2,e1,ro;
     float caipi_factor;
 
     int facteur;
@@ -466,12 +473,12 @@ void GenericReconSMSBase::apply_relative_phase_shift_test(hoNDArray< std::comple
 
             for (s = 0; s < S; s++)
             {
-                size_t usedS = s;
+                long long usedS = s;
                 if (usedS >= S) usedS = S - 1;
 
                 for (n = 0; n < N; n++)
                 {
-                    size_t usedN = n;
+                    long long usedN = n;
                     if (usedN >= N) usedN = N - 1;
 
                     std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
@@ -497,7 +504,7 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
     size_t STK=lNumberOfStacks_;
     size_t MB=MB_factor;
 
-    size_t e1,s,a,m;
+    long long e1,s,a,m;
 
     size_t start_E1(0), end_E1(0);
     auto t = Gadgetron::detect_sampled_region_E1(data);
@@ -603,11 +610,9 @@ void GenericReconSMSBase::save_7D_containers_as_4D_matrix_with_a_loop_along_the_
     }
 
     hoNDArray< std::complex<float> > output;
-    output.create(RO, E1, CHA , SLC);
+    output.create(RO, E1, CHA , SLC);  
 
-    size_t slc;
-
-    for (slc = 0; slc < SLC; slc++)
+    for (long long slc = 0; slc < SLC; slc++)
     {
         memcpy(&output(0, 0, 0, slc), &input(0, 0, 0, 0 ,0, 0, slc), sizeof(std::complex<float>)*RO*E1*CHA);
     }
@@ -635,7 +640,7 @@ void GenericReconSMSBase::save_8D_containers_as_4D_matrix_with_a_loop_along_the_
     hoNDArray< std::complex<float> > output;
     output.create(RO, E1, CHA , MB);
 
-    size_t a,m;
+    long long a,m;
 
     for (a = 0; a < STK; a++)
     {
@@ -1032,7 +1037,7 @@ void GenericReconSMSBase::compute_mean_epi_nav(hoNDArray< std::complex<float> >&
     size_t MB=input.get_size(1);
     size_t STK=input.get_size(2);
 
-    for (size_t a = 0; a < STK; a++)
+    for (long long a = 0; a < STK; a++)
     {
         hoNDArray<std::complex<float> > nav(RO, MB);
         hoNDArray<std::complex<float> > nav_sum_2nd(RO,1);
@@ -1051,9 +1056,9 @@ void GenericReconSMSBase::compute_mean_epi_nav(hoNDArray< std::complex<float> >&
         memcpy(out2, in2, sizeof(std::complex<float>)*RO);
     }
 
-    for (size_t a = 0; a < output.get_size(1); a++)
+    for (long long a = 0; a < output.get_size(1); a++)
     {
-        for (size_t ro = 0; ro < output.get_size(0); ro++)
+        for (long long ro = 0; ro < output.get_size(0); ro++)
         {
             output(ro,a)=std::exp(output_no_exp(ro,a));
         }
@@ -1072,7 +1077,7 @@ void GenericReconSMSBase::compute_mean_epi_arma_nav(arma::cx_fcube &input,  arma
     size_t MB=size(input,1);
     size_t STK=size(input,2);
 
-    for (size_t a = 0; a < STK; a++)
+    for (long long a = 0; a < STK; a++)
     {
         arma::cx_fmat nav=input.slice(a);
 
@@ -1734,7 +1739,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::
 
     //GDEBUG_STREAM("GenericReconSMSBase - EPI stk6 data array  : [RO E1 E2 CHA N S SLC] - [" << msg << " " << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N << " " << S << "]");
 
-    size_t ro;
+    long long ro;
 
     if (ifft==true)
     {
@@ -1746,7 +1751,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::
     //faire une fonction detect reverse lines
     hoNDArray<bool> reverse_line;
     reverse_line.create(E1);
-    for (size_t e1 = start_E1_; e1 <= end_E1_; e1+=acc)
+    for (long long e1 = start_E1_; e1 <= end_E1_; e1+=acc)
     {
         ISMRMRD::AcquisitionHeader& curr_header = headers_(e1, 0, 0, 0, 0);  //5D, fixed order [E1, E2, N, S, LOC]
         if (curr_header.isFlagSet(ISMRMRD::ISMRMRD_ACQ_IS_REVERSE)) {
@@ -1763,9 +1768,9 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::
     unsigned int compteur_pos;
     unsigned int compteur_neg;
 
-    for (size_t a = 0; a < STK; a++) {
+    for (long long a = 0; a < STK; a++) {
 
-        for (size_t m = 0; m < MB; m++) {
+        for (long long m = 0; m < MB; m++) {
 
             compteur_pos=0;
             compteur_neg=0;
@@ -1801,9 +1806,9 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::
 
 #pragma omp parallel for default(none) private(ii) shared(a, m, correction_neg_hoND, correction_pos_hoND, compteur_neg, compteur_pos, data,  num, S,  N,  CHA, start_E1_, end_E1_, acc , RO, reverse_line, E2) if(num>1)
             for (ii = 0; ii < num; ii++) {
-                size_t cha = ii / (N * S);
-                size_t s = (ii - cha * N * S) / (N);
-                size_t n = ii - cha * N * S - s * N;
+                long long cha = ii / (N * S);
+                long long s = (ii - cha * N * S) / (N);
+                long long n = ii - cha * N * S - s * N;
 
                 /*for (size_t n = 0; n < N; n++) {
 
@@ -1811,12 +1816,12 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::
 
                     for (size_t cha = 0; cha < CHA; cha++) {*/
 
-                for (size_t e2 = 0; e2 < E2; e2++)  {
+                for (long long e2 = 0; e2 < E2; e2++)  {
 
                     hoNDArray< std::complex<float> > tempo_1D_hoND_local;
                     tempo_1D_hoND_local.create(RO);
 
-                    for (size_t e1 = start_E1_; e1 <= end_E1_; e1+=acc)
+                    for (long long e1 = start_E1_; e1 <= end_E1_; e1+=acc)
                     {
                         std::complex<float> * in = &(data(0, e1, e2, cha, m, a, n, s));
                         std::complex<float> * out = &(tempo_1D_hoND_local(0));
@@ -1875,7 +1880,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_open(hoNDArray< std::
 
 
 
-void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , bool ifft, std::string msg)
+void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , bool ifft , std::string msg)
 {
     size_t RO = data.get_size(0);
     size_t E1 = data.get_size(1);
@@ -1892,8 +1897,52 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
 
     if (ifft==true)
     {
+        if (use_gpu==true)
+        {
+
+            std::cout << " coucou uisn gpu fft"<<std::endl;
+
+            unsigned int dim_to_transform=0;
+
+            if (perform_timing.value()) { gt_timer_local_.start("gpuExample::ifft cpu time");}
+
+            boost::shared_ptr<GPUTimer> process_timer;
+            process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::ifft gpu time") );
+
+            hoNDArray<float_complext>* host =
+                    reinterpret_cast< hoNDArray<float_complext>* >(&data);
+
+            cuNDArray<float_complext> device_d(host);
+
+            cuNDFFT<float>::instance()->ifft(&device_d, dim_to_transform);
+
+            device_d.to_host(host);
+
+            // boost::shared_ptr< hoNDArray<float_complext  > >  host_result = device_d.to_host();
+
+            // hoNDArray<std::complex<float>> *host_result_cast=reinterpret_cast<hoNDArray<std::complex<float> >*>(host_result.get());
+
+            // unsigned int number_of_elements=host_result_cast->get_number_of_elements();
+
+            // memcpy(data.get_data_ptr() , host_result_cast->get_data_ptr(), sizeof(std::complex<float>)*number_of_elements);
+
+             process_timer.reset();
+
+             gt_timer_local_.stop();
+
+
+        }
+        else
+        {
+        if (perform_timing.value()) { gt_timer_local_.start("cpuExample::ifft cpu time");}
+
         hoNDFFT<float>::instance()->ifft(&data,0);
+
+        if (perform_timing.value()) { gt_timer_local_.stop();}
+        }
     }
+
+
 
     /*****************************************/
     // TODO cela suppose que les lignes sont les mêmes pour chaque dimensions N S MB STK
@@ -2125,8 +2174,8 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
     //GADGET_CHECK_THROW(CHA==lNumberOfChannels_)
     GADGET_CHECK_THROW(STK==lNumberOfStacks_);
 
-    size_t m, a, n, s;
-    size_t index;
+    long long m, a, n, s;
+    long long index;
 
     std::complex<double> ii(0,1);
 
@@ -2152,7 +2201,7 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
                 {
                     std::complex<float> *in = &(data(0, 0, 0, 0, m, a, n, s));
 
-                    for (size_t j = 0; j < RO * E1 * E2 * CHA; j++) {
+                    for (long long j = 0; j < RO * E1 * E2 * CHA; j++) {
 
                         in[j] = in[j]*lili;
                     }
