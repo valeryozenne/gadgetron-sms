@@ -54,6 +54,8 @@ cuda_add_library(gadgetron_toolbox_gpuparallelmri SHARED
     htgrappa.cu
     trajectory_utils.h
     trajectory_utils.cu
+    test_slice_grappa.cu
+    test_slice_grappa.h
   )
 
 set_target_properties(gadgetron_toolbox_gpuparallelmri PROPERTIES VERSION ${GADGETRON_VERSION_STRING} SOVERSION ${GADGETRON_SOVERSION})
@@ -86,5 +88,6 @@ install(FILES
 	cuSenseBuffer.h
 	cuSenseBufferCg.h
 	cuSpiritBuffer.h
+        test_slice_grappa.h
 	gpupmri_export.h
 DESTINATION ${GADGETRON_INSTALL_INCLUDE_PATH} COMPONENT main)

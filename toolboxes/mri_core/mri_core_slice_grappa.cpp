@@ -59,26 +59,26 @@ template <typename T> void im2col(hoNDArray<T>& input, hoNDArray<T>& output, con
         size_t CHA = input.get_size(2);
         size_t MB = input.get_size(3);
         size_t STK = input.get_size(4);
-        size_t N = input.get_size(6);
-        size_t S = input.get_size(7);
+        size_t N = input.get_size(5);
+        size_t S = input.get_size(6);
 
-        size_t rowIdx, colIdx;
+        long long rowIdx, colIdx;
 
-        size_t i,j,xx,yy;
+        long long i,j,xx,yy;
         // input ici vaut : e1, readout, cha
 
         //long long num = MB * STK * N * S;
         //long long ii;
         // TODO #pragma omp parallel for default() private() shared()
-        for (size_t s = 0; s < S; s++)    {
+        for (long long s = 0; s < S; s++)    {
 
-            for (size_t n = 0; n < N; n++)  {
+            for (long long n = 0; n < N; n++)  {
 
-                for (size_t a = 0; a < STK; a++) {
+                for (long long a = 0; a < STK; a++) {
 
-                    for (size_t m = 0; m < MB; m++) {
+                    for (long long m = 0; m < MB; m++) {
 
-                        for (size_t cha = 0; cha < CHA; cha++)
+                        for (long long cha = 0; cha < CHA; cha++)
                         {
                             for ( j = 0; j < blocks_RO; j++)
                             {
@@ -138,8 +138,8 @@ template <typename T> void im2col_open(hoNDArray<T>& input, hoNDArray<T>& output
         size_t CHA = input.get_size(2);
         size_t MB = input.get_size(3);
         size_t STK = input.get_size(4);
-        size_t N = input.get_size(6);
-        size_t S = input.get_size(7);
+        size_t N = input.get_size(5);
+        size_t S = input.get_size(6);
 
         //size_t rowIdx, colIdx;
 
@@ -152,23 +152,23 @@ template <typename T> void im2col_open(hoNDArray<T>& input, hoNDArray<T>& output
 #pragma omp parallel for default(none) private(ii) shared(num, MB , STK, S, N,  input, output ,RO,E1,CHA) if(num>1)
         for (ii = 0; ii < num; ii++) {
 
-            size_t   a = ii / (S * MB* N * CHA);
-            size_t   m = (ii - a * S * MB* N* CHA) / (S* N * CHA );
-            size_t   s = (ii - a * S * MB* N* CHA - m * S* N * CHA)  /  (N * CHA);
-            size_t   cha=  (ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N) / (N);
-            size_t   n = ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N * CHA - cha;
+            long long   a = ii / (S * MB* N * CHA);
+            long long   m = (ii - a * S * MB* N* CHA) / (S* N * CHA );
+            long long   s = (ii - a * S * MB* N* CHA - m * S* N * CHA)  /  (N * CHA);
+            long long   cha=  (ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N) / (N);
+            long long   n = ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N * CHA - cha;
 
-            for (size_t j = 0; j < blocks_RO; j++)
+            for (long long j = 0; j < blocks_RO; j++)
             {
-                for (size_t i = 0; i < blocks_E1; i++)
+                for (long long i = 0; i < blocks_E1; i++)
                 {
-                    size_t rowIdx = i + j*blocks_E1;
+                    long long rowIdx = i + j*blocks_E1;
 
-                    for (size_t yy = 0; yy < grappa_kSize_RO; yy++)
+                    for (long long yy = 0; yy < grappa_kSize_RO; yy++)
                     {
-                        for (size_t xx = 0; xx < grappa_kSize_E1; xx++)
+                        for (long long xx = 0; xx < grappa_kSize_E1; xx++)
                         {
-                            size_t colIdx = xx + yy*grappa_kSize_E1;
+                            long long colIdx = xx + yy*grappa_kSize_E1;
 
                             output(rowIdx, colIdx, cha, m, a, n,s)=input(j+yy , i+xx, cha, m, a, n, s);  //[128 63 12 2 4 1 1 1]
 
@@ -217,7 +217,7 @@ template <typename T> void remove_unnecessary_kspace(hoNDArray<T>& input, hoNDAr
     size_t N = input.get_size(6);
     size_t S = input.get_size(7);
 
-    size_t index;
+    long long index;
 
     //std::cout << "end_E1_ " << start_E1_<<  " end_E1_ " <<  end_E1_<< "acc "   << acc << std::endl;
 
@@ -227,19 +227,19 @@ template <typename T> void remove_unnecessary_kspace(hoNDArray<T>& input, hoNDAr
     }
 
     // parallelisable sur cha m a n s
-    for (size_t s = 0; s < S; s++)
+    for (long long s = 0; s < S; s++)
     {
-        for (size_t n = 0; n < N; n++)
+        for (long long n = 0; n < N; n++)
         {
-            for (size_t a = 0; a < STK; a++) {
+            for (long long a = 0; a < STK; a++) {
 
-                for (size_t m = 0; m < MB; m++) {
+                for (long long m = 0; m < MB; m++) {
 
-                    for (size_t cha = 0; cha < CHA; cha++) {
+                    for (long long cha = 0; cha < CHA; cha++) {
 
                         index=0;
 
-                        for (size_t e1 = startE1; e1 <= endE1; e1+=acc) {
+                        for (long long e1 = startE1; e1 <= endE1; e1+=acc) {
 
                             T* in = &(input(0, e1, 0, cha, m, a, n, s));
                             T* out = &(output(0, index, cha, m, a, n, s));
@@ -285,11 +285,11 @@ template <typename T> void remove_unnecessary_kspace_open(hoNDArray<T>& input, h
 #pragma omp parallel for default(none) private(ii) shared(num, MB , STK, S, N,  input, output ,RO,E1,E2,CHA) if(num>1)
     for (ii = 0; ii < num; ii++) {
 
-        size_t   a = ii / (S * MB* N * CHA);
-        size_t   m = (ii - a * S * MB* N* CHA) / (S* N * CHA );
-        size_t   s = (ii - a * S * MB* N* CHA - m * S* N * CHA)  /  (N * CHA);
-        size_t   cha=  (ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N) / (N);
-        size_t   n = ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N * CHA - cha;
+        long long   a = ii / (S * MB* N * CHA);
+        long long   m = (ii - a * S * MB* N* CHA) / (S* N * CHA );
+        long long   s = (ii - a * S * MB* N* CHA - m * S* N * CHA)  /  (N * CHA);
+        long long   cha=  (ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N) / (N);
+        long long   n = ii - a * S * MB* N * CHA - m * S* N * CHA -s *  N * CHA - cha;
 
         // parallelisable sur cha m a n s
         // for (size_t s = 0; s < S; s++)  {
@@ -300,7 +300,7 @@ template <typename T> void remove_unnecessary_kspace_open(hoNDArray<T>& input, h
 
         size_t index=0;
 
-        for (size_t e1 = startE1; e1 <= endE1; e1+=acc) {
+        for (long long e1 = startE1; e1 <= endE1; e1+=acc) {
 
             T* in = &(input(0, e1, 0, cha, m, a, n, s));
             T* out = &(output(0, index, cha, m, a, n, s));
@@ -400,10 +400,10 @@ template <typename T> void extract_milieu_kernel(hoNDArray< T >& block_SB, hoNDA
     size_t N = block_SB.get_size(5);
     size_t S = block_SB.get_size(6);
 
-    size_t c,m,a,n,s;
-    size_t p;
+    long long c,m,a,n,s;
+    long long p;
 
-    size_t milieu=round(float(kernel_size)/2)-1;
+    long long milieu=round(float(kernel_size)/2)-1;
 
     //GDEBUG("Le milieu du kernel est %d  \n",milieu );
 
@@ -505,10 +505,16 @@ void create_stacks_of_slices_directly_sb(hoNDArray< T >& data, hoNDArray< T >& n
     size_t MB=new_stack.get_size(4);
     size_t STK=new_stack.get_size(5);
 
-    size_t n, s, a, m;
-    size_t index;
+    long long n, s, a, m;
+    long long index;
 
     // copy of the data in the 8D array
+
+    // [RO,E1,E2,CHA, N,S, SLC]
+    //    ->
+    // [RO,E1,E2,CHA, N,S, M, STK] //8D
+    //    ->
+    // [RO,E1,E2,CHA, M, STK, N,S] // 8D reorder
 
     for (a = 0; a < STK; a++) {
 
@@ -523,6 +529,9 @@ void create_stacks_of_slices_directly_sb(hoNDArray< T >& data, hoNDArray< T >& n
                     std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice(index)));
                     std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
                     memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+                    // using namespace Gadgetron::Indexing;
+                    // std::copy_n(in,RO*E1*E2*CHA,out); in 4.1
+                    // new_stack(slice,slice,slice,slice,m,a,n,s) = data(slice,slice,slice,n,s,indice(index)); in 4.1
                 }
             }
         }
@@ -552,12 +561,12 @@ void create_stacks_of_slices_directly_sb_open(hoNDArray< T >& data, hoNDArray< T
 #pragma omp parallel for default(none) private(ii) shared(num, MB , STK, S, N, indice, new_stack, data,RO,E1,E2,CHA, MapSliceSMS) if(num>1)
     for (ii = 0; ii < num; ii++) {
 
-        size_t   a = ii / (S * MB* N);
-        size_t   m = (ii - a * S * MB* N) / (S* N );
-        size_t  s = (ii - a * S * MB* N - m * S* N )  /  (N);
-        size_t  n=  ii - a * S * MB* N - m * S* N  -s *  N;
+        long long   a = ii / (S * MB* N);
+        long long   m = (ii - a * S * MB* N) / (S* N );
+        long long  s = (ii - a * S * MB* N - m * S* N )  /  (N);
+        long long  n=  ii - a * S * MB* N - m * S* N  -s *  N;
 
-        size_t index = MapSliceSMS(a,m);
+        long long index = MapSliceSMS(a,m);
 
         std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice(index)));
         std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
@@ -586,17 +595,17 @@ void create_stacks_of_slices_directly_mb_open(hoNDArray<T >& mb,hoNDArray< T>& m
     // only allow this for loop openmp if num>1 and 2D recon
 #pragma omp parallel for default(none) private(ii) shared(num, S,  N,  RO, E1, E2, CHA, mb , mb_8D, indice_slice_mb, indice_mb ) if(num>1)
     for (ii = 0; ii < num; ii++) {
-        size_t a = ii / (N * S);
-        size_t s = (ii - a * N * S) / (N);
-        size_t n = ii - a * N * S - s * N;
+        long long a = ii / (N * S);
+        long long s = (ii - a * N * S) / (N);
+        long long n = ii - a * N * S - s * N;
 
-        size_t index_in=indice_slice_mb[a];
-        size_t index_out=indice_mb[a];
+        long long index_in=indice_slice_mb[a];
+        long long index_out=indice_mb[a];
 
-        size_t usedS = s;
+        long long usedS = s;
         if (usedS >= S) usedS = S - 1;
 
-        size_t usedN = n;
+        long long usedN = n;
         if (usedN >= N) usedN = N - 1;
 
         std::complex<float> * in = &(mb(0, 0, 0, 0, n, s, index_in));
@@ -620,8 +629,8 @@ void create_stacks_of_slices_directly_mb(hoNDArray< T >& mb,hoNDArray< T>& mb_8D
     size_t S=mb.get_size(5);
     size_t SLC=mb.get_size(6);
 
-    size_t index_in;
-    size_t index_out;
+    long long index_in;
+    long long index_out;
 
     size_t lNumberOfStacks_=size(indice_mb,0);
 
@@ -630,14 +639,14 @@ void create_stacks_of_slices_directly_mb(hoNDArray< T >& mb,hoNDArray< T>& mb_8D
         index_in=indice_slice_mb[a];
         index_out=indice_mb[a];
 
-        for (size_t s = 0; s < S; s++)
+        for (long long s = 0; s < S; s++)
         {
-            size_t usedS = s;
+            long long usedS = s;
             if (usedS >= S) usedS = S - 1;
 
-            for (size_t n = 0; n < N; n++)
+            for (long long n = 0; n < N; n++)
             {
-                size_t usedN = n;
+                long long usedN = n;
                 if (usedN >= N) usedN = N - 1;
 
                 std::complex<float> * in = &(mb(0, 0, 0, 0, n, s, index_in));
@@ -676,8 +685,8 @@ void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< T >& data, hoNDArr
 
     //GADGET_CHECK_THROW(lNumberOfSlices_ == STK*MB);
 
-    size_t n, s, a, m, slc;
-    size_t index;
+    long long n, s, a, m, slc;
+    long long index;
 
     for (a = 0; a < STK; a++) {
 
@@ -741,12 +750,12 @@ void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< T >& data, ho
 #pragma omp parallel for default(none) private(ii) shared(num, MB , STK,  S, N, tempo, data,RO,E1,E2,CHA, MapSliceSMS) if(num>1)
     for (ii = 0; ii < num; ii++) {
 
-        size_t   a = ii / (S * MB* N);
-        size_t   m = (ii - a * S * MB* N) / (S* N );
-        size_t  s = (ii - a * S * MB* N - m * S* N )  /  (N);
-        size_t  n=  ii - a * S * MB* N - m * S* N  -s *  N;
+        long long   a = ii / (S * MB* N);
+        long long   m = (ii - a * S * MB* N) / (S* N );
+        long long  s = (ii - a * S * MB* N - m * S* N )  /  (N);
+        long long  n=  ii - a * S * MB* N - m * S* N  -s *  N;
 
-        size_t index = MapSliceSMS(a,m);
+        long long index = MapSliceSMS(a,m);
 
         std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
         std::complex<float> * out = &(tempo(0, 0, 0, 0, n, s, index));
@@ -758,9 +767,9 @@ void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< T >& data, ho
 
 #pragma omp parallel for default(none) private(ii) shared(num, N, S, RO,E1,E2,CHA, indice_sb, tempo, output ) if(num>1)
     for (ii = 0; ii < num; ii++) {
-        size_t slc = ii / (N * S);
-        size_t s = (ii - slc * N * S) / (N);
-        size_t n = ii - slc * N * S - s * N;
+        long long slc = ii / (N * S);
+        long long s = (ii - slc * N * S) / (N);
+        long long n = ii - slc * N * S - s * N;
 
         std::complex<float> * in = &(tempo(0, 0, 0, 0, n, s, slc));
         std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb(slc)));
