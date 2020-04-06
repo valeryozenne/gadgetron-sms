@@ -155,6 +155,7 @@
 -->
 
     <gadget>
+
     <name>SliceGrappavgpuGadget</name>
     <dll>gadgetron_smscore</dll>
     <classname>GenericReconCartesianSliceGrappavgpuGadget</classname>

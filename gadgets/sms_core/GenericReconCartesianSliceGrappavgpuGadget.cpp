@@ -852,7 +852,7 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
 
     if (use_gpu.value()==true)
     {
-        im2col_gpu(recon_obj.mb_e1_reduce_,recon_obj.block_MB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
+    //    im2col_gpu(recon_obj.mb_e1_reduce_,recon_obj.block_MB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
     }
 
     if (perform_timing.value()) { gt_timer_local_.stop();}
