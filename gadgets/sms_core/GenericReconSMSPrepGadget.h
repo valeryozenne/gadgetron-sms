@@ -35,22 +35,13 @@ namespace Gadgetron {
         // variables for protocol
         // --------------------------------------------------
 
-        // for every encoding space
-        // calibration mode
-        //std::vector<Gadgetron::ismrmrdCALIBMODE> calib_mode_;
-
         // --------------------------------------------------
         // variable for recon
-        // --------------------------------------------------
+        // --------------------------------------------------       
 
-        unsigned int center_k_space_xml;
-
-       hoNDArray< std::complex<float> > ref_8D;
-
+        hoNDArray< std::complex<float> > ref_8D;
         hoNDArray< std::complex<float> > sb_8D;
-
         hoNDArray< std::complex<float> > mb_8D;
-
 
         // --------------------------------------------------
         // gadget functions
@@ -59,24 +50,19 @@ namespace Gadgetron {
         virtual int process_config(ACE_Message_Block* mb);
         virtual int process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1);
 
-        //virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb);
+        //main functions
+        virtual void pre_process_ref_data(hoNDArray< std::complex<float> >& ref, hoNDArray< std::complex<float> >& ref_8D, size_t e);
         virtual void pre_process_sb_data(hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& sb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, size_t encoding);
         virtual void pre_process_mb_data(hoNDArray< std::complex<float> >& mb, hoNDArray< std::complex<float> >& mb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb, size_t encoding);
-        virtual void pre_process_ref_data(hoNDArray< std::complex<float> >& ref, hoNDArray< std::complex<float> >& ref_8D, size_t e);
 
         //sb functions
         virtual void reorganize_sb_data_to_8D(hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& sb_8D, size_t encoding);
-        virtual void create_stacks_of_slices_directly(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& fid_stack_SB, arma::uvec indice);
-        virtual void create_stacks_of_slices_directly_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& fid_stack_SB, arma::uvec indice);
+        virtual void apply_blip_caipi_shift_sb(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, size_t e);
+        virtual void apply_averaged_epi_ghost_correction_sb(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_sb, size_t e);
 
-        //mb functions       
-        virtual void reorganize_mb_data_to_8D(hoNDArray< std::complex<float> >& mb,hoNDArray< std::complex<float> >& mb_8D );
-        virtual void reorganize_mb_data_to_8D_open(hoNDArray< std::complex<float> >& mb,hoNDArray< std::complex<float> >& mb_8D );
-
-        virtual void apply_blip_caipi_shift(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, size_t e);
-        virtual void apply_averaged_epi_ghost_correction(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_sb, size_t e);
-
-
+         //mb functions
+        virtual void reorganize_mb_data_to_8D(hoNDArray< std::complex<float> >& mb, hoNDArray< std::complex<float> >& mb_8D, size_t encoding);
+        virtual void apply_averaged_epi_ghost_correction_mb(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_sb, size_t e);
 
           };
 }

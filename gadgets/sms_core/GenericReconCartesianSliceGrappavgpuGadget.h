@@ -1,4 +1,4 @@
-/** \file   GenericReconCartesianSliceGrappav3Gadget.h
+/** \file   GenericReconCartesianSliceGrappavgpuGadget.h
     \brief  This is the class gadget for both 2DT and 3DT cartesian grappa and grappaone reconstruction, working on the IsmrmrdReconData.
     \author Hui Xue
 */
@@ -8,17 +8,19 @@
 #include "GenericReconGadget.h"
 #include "hoArmadillo.h"
 #include "GenericReconSMSBase.h"
+#include <boost/shared_ptr.hpp>
+#include <boost/shared_array.hpp>
 
 namespace Gadgetron {
 
     /// define the recon status
     template <typename T>
-    class EXPORTGADGETSSMSCORE GenericReconCartesianSliceGrappaObj
+    class EXPORTGADGETSSMSCORE GenericReconCartesianSliceGrappaGpuObj
     {
     public:
 
-        GenericReconCartesianSliceGrappaObj() {}
-        virtual ~GenericReconCartesianSliceGrappaObj()
+        GenericReconCartesianSliceGrappaGpuObj() {}
+        virtual ~GenericReconCartesianSliceGrappaGpuObj()
         {
             if (this->recon_res_.data_.delete_data_on_destruct()) this->recon_res_.data_.clear();
             if (this->recon_res_.headers_.delete_data_on_destruct()) this->recon_res_.headers_.clear();
@@ -67,7 +69,7 @@ namespace Gadgetron {
         ///  [voxels_number_per_image_, kernel_size_, CHA, MB, STK, N, S]
         hoNDArray<T > block_SB_;
 
-        /// [oxels_number_per_image_, kernel_size_, CHA, 1, STK, N, S]
+        /// [voxels_number_per_image_, kernel_size_, CHA, 1, STK, N, S]
         hoNDArray<T> block_MB_;
 
         /// [voxels_number_per_image_, CHA, MB, STK, N, S]
@@ -94,16 +96,16 @@ namespace Gadgetron {
 
 namespace Gadgetron {
 
-    class EXPORTGADGETSSMSCORE GenericReconCartesianSliceGrappav3Gadget : public GenericReconSMSBase
+    class EXPORTGADGETSSMSCORE GenericReconCartesianSliceGrappavgpuGadget : public GenericReconSMSBase
     {
     public:
-        GADGET_DECLARE(GenericReconCartesianSliceGrappav3Gadget);
+        GADGET_DECLARE(GenericReconCartesianSliceGrappavgpuGadget);
 
         typedef GenericReconSMSBase BaseClass;
-        typedef Gadgetron::GenericReconCartesianSliceGrappaObj< std::complex<float> > ReconObjType;
+        typedef Gadgetron::GenericReconCartesianSliceGrappaGpuObj< std::complex<float> > ReconObjType;
 
-        GenericReconCartesianSliceGrappav3Gadget();
-        ~GenericReconCartesianSliceGrappav3Gadget();
+        GenericReconCartesianSliceGrappavgpuGadget();
+        ~GenericReconCartesianSliceGrappavgpuGadget();
 
         /// ------------------------------------------------------------------------------------
         /// parameters to control the reconstruction
@@ -171,11 +173,23 @@ namespace Gadgetron {
 
         void perform_slice_grappa_unwrapping(IsmrmrdReconBit& recon_bit, ReconObjType& recon_obj, size_t encoding);
 
+        void remove_unnecessary_kspace_gpu(hoNDArray<std::complex<float> >& input, hoNDArray<std::complex<float> >& output, const size_t acc, const size_t startE1, const size_t endE1, bool is_mb );
+        void perform_slice_grappa_unwrapping_gpu(hoNDArray<std::complex<float> > & input);
+
+
         void perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e);
 
         void recopy_kspace( ReconObjType &recon_obj, hoNDArray< std::complex<float> >& output, size_t acc );
 
         void prepare_down_stream_coil_compression_ref_data(hoNDArray<std::complex<float> > &ref_src, hoNDArray<std::complex<float> > &ref_dst, size_t e);
+
+        void im2col_gpu(hoNDArray<std::complex<float> >& input, hoNDArray<std::complex<float> >& output, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1 );
+
+        void do_gpu_test(hoNDArray<std::complex<float> > & input);
+        ///////////
+
+        GADGET_PROPERTY(deviceno,int,"GPU device number", 0);
+        int device_number_;
 
     };
 }

@@ -69,8 +69,7 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
         if (recon_bit_->rbit_[e].data_.data_.get_number_of_elements() > 0)
         {
             // std::cout << " je suis la structure qui contient les données single band et/ou multiband" << std::endl;
-
-            GDEBUG("GenericSMSPrepGadget - |--------------------------------------------------------------------------|\n");
+            //GDEBUG("GenericSMSPrepGadget - |--------------------------------------------------------------------------|\n");
 
             bool is_single_band=false;
 
@@ -90,12 +89,13 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
                 size_t S = data.get_size(5);
                 size_t SLC = data.get_size(6);
 
-                //TODO should be done somewhere else
+                //TODO this initiailisation should be done somewhere else but it must be done once at the first repetition
                 sb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
                 mb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
             }
 
-            //TODO mettre recon_bit_->rbit_[e] a la place de data + header
+            //TODO mettre recon_bit_->rbit_[e] a la place de data + header ici !
+            //TODO on pourrait faire aussi un recon object qui contient, est-ce vraiement utile ? A discuter
             hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
             hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit_->rbit_[e].data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
 
@@ -104,9 +104,9 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
             if (is_single_band==true)
             {
                 define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
+                //TODO mettre recon_bit_->rbit_[e] a la place de data + header et ici !
                 pre_process_sb_data(data, sb_8D, headers_, e);
                 recon_bit_->rbit_[e].data_.data_ = sb_8D;
-
             }
             else
             {
@@ -133,20 +133,18 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
 
 
 
-//sur les données single band
+//sur les données reference
 void GenericReconSMSPrepGadget::pre_process_ref_data(hoNDArray< std::complex<float> >& ref, hoNDArray< std::complex<float> >& ref_8D, size_t e)
 {
-    // three steps are necessary
+    // two steps are necessary
     // 1) to reorganize the slices in the stack of slices according the to the slice acceleration
-    // 2) to apply (or not depending of the sequence implementation) a blip caipi shift along the y
-    // 3) to apply the averaged epi ghost correction
+    // 2) to apply a fft
 
     reorganize_sb_data_to_8D(ref, ref_8D, e);
 
+    // fait dans SMSBAse car contient la lib KLT et FFT
+    // ici ce n'est pas le cas
     do_fft_for_ref_scan(ref_8D);
-
-    //apply_relative_phase_shift(ref_8D, false);
-
 
 }
 
@@ -161,12 +159,22 @@ void GenericReconSMSPrepGadget::pre_process_sb_data(hoNDArray< std::complex<floa
 
     reorganize_sb_data_to_8D(sb, sb_8D, e);
 
-    apply_averaged_epi_ghost_correction(sb_8D, h_sb, e);
+    apply_averaged_epi_ghost_correction_sb(sb_8D, h_sb, e);
 
-    apply_blip_caipi_shift(sb_8D, h_sb,  e);
+    apply_blip_caipi_shift_sb(sb_8D, h_sb,  e);
+
+}
 
 
+void GenericReconSMSPrepGadget::pre_process_mb_data(hoNDArray< std::complex<float> >& mb, hoNDArray< std::complex<float> >& mb_8D,hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb, size_t e)
+{
+    // three steps are necessary
+    // 1) to reorganize the slices in the stack of slices according the to the slice acceleration
+    // 2) to apply the averaged epi ghost correction
 
+    reorganize_mb_data_to_8D(mb, mb_8D, e);
+
+    apply_averaged_epi_ghost_correction_mb(mb_8D, h_mb, e);
 }
 
 
@@ -184,17 +192,15 @@ void GenericReconSMSPrepGadget::reorganize_sb_data_to_8D(hoNDArray< std::complex
     if (use_omp.value()==true)
     {
         if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::create_stacks_of_slices_directly_open"); }
-        create_stacks_of_slices_directly_open(sb, sb_8D, indice_sb);
+        create_stacks_of_slices_directly_sb_open(sb, sb_8D, indice_sb, MapSliceSMS);
         if (perform_timing.value()) { gt_timer_local_.stop(); }
     }
     else
     {
         if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::create_stacks_of_slices_directly"); }
-        create_stacks_of_slices_directly(sb, sb_8D, indice_sb);
+        create_stacks_of_slices_directly_sb(sb, sb_8D, indice_sb , MapSliceSMS);
         if (perform_timing.value()) { gt_timer_local_.stop(); }
     }
-
-
 
     if (!debug_folder_full_path_.empty())
     {
@@ -203,7 +209,48 @@ void GenericReconSMSPrepGadget::reorganize_sb_data_to_8D(hoNDArray< std::complex
 }
 
 
-void GenericReconSMSPrepGadget::apply_blip_caipi_shift(hoNDArray< std::complex<float> >& sb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_sb, size_t e)
+
+void GenericReconSMSPrepGadget::reorganize_mb_data_to_8D(hoNDArray< std::complex<float> >& mb, hoNDArray< std::complex<float> >& mb_8D, size_t e)
+{
+
+    std::stringstream os;
+    os << "_encoding_" << e;
+    std::string suffix = os.str();
+
+    if (!debug_folder_full_path_.empty())
+    {
+        save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(mb, "FID_MB4D", os.str());
+    }
+
+    if (use_omp.value()==true)
+    {
+        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::create_stacks_of_slices_directly_mb_open"); }
+        create_stacks_of_slices_directly_mb_open(mb, mb_8D,  indice_mb, indice_slice_mb);
+        if (perform_timing.value()) { gt_timer_local_.stop(); }
+    }
+    else
+    {
+        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::create_stacks_of_slices_directly_mb"); }
+        create_stacks_of_slices_directly_mb(mb, mb_8D,  indice_mb, indice_slice_mb);
+        if (perform_timing.value()) { gt_timer_local_.stop(); }
+    }
+
+
+    if (!debug_folder_full_path_.empty())
+    {
+        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(mb_8D, "FID_MB4D_remove", os.str());
+    }
+
+}
+
+
+
+
+
+
+
+
+void GenericReconSMSPrepGadget::apply_blip_caipi_shift_sb(hoNDArray< std::complex<float> >& sb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_sb, size_t e)
 {
     std::stringstream os;
     os << "_encoding_" << e;
@@ -254,7 +301,7 @@ void GenericReconSMSPrepGadget::apply_blip_caipi_shift(hoNDArray< std::complex<f
 }
 
 
-void GenericReconSMSPrepGadget::apply_averaged_epi_ghost_correction(hoNDArray< std::complex<float> >& sb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_sb, size_t e)
+void GenericReconSMSPrepGadget::apply_averaged_epi_ghost_correction_sb(hoNDArray< std::complex<float> >& sb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_sb, size_t e)
 {
     std::stringstream os;
     os << "_encoding_" << e;
@@ -302,10 +349,6 @@ void GenericReconSMSPrepGadget::apply_averaged_epi_ghost_correction(hoNDArray< s
     if (perform_timing.value()) { gt_timer_local_.stop(); }
 */
 
-
-
-
-
     //apply_ghost_correction_with_STK6(sb_8D_optimal, headers_sb ,  acceFactorSMSE1_[e] , true);
 
     if (!debug_folder_full_path_.empty())
@@ -320,37 +363,12 @@ void GenericReconSMSPrepGadget::apply_averaged_epi_ghost_correction(hoNDArray< s
 
 }
 
-void GenericReconSMSPrepGadget::pre_process_mb_data(hoNDArray< std::complex<float> >& mb, hoNDArray< std::complex<float> >& mb_8D,hoNDArray< ISMRMRD::AcquisitionHeader > & headers_mb, size_t e)
-{
 
+void GenericReconSMSPrepGadget::apply_averaged_epi_ghost_correction_mb(hoNDArray< std::complex<float> >& mb_8D, hoNDArray< ISMRMRD::AcquisitionHeader > & headers_mb, size_t e)
+{
     std::stringstream os;
     os << "_encoding_" << e;
     std::string suffix = os.str();
-
-    if (!debug_folder_full_path_.empty())
-    {
-        save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(mb, "FID_MB4D", os.str());
-    }
-
-
-    if (use_omp.value()==true)
-    {
-        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::reorganize_mb_data_to_8D_open"); }
-        reorganize_mb_data_to_8D_open(mb, mb_8D);
-        if (perform_timing.value()) { gt_timer_local_.stop(); }
-    }
-    else
-    {
-        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::reorganize_mb_data_to_8D"); }
-        reorganize_mb_data_to_8D(mb, mb_8D);
-        if (perform_timing.value()) { gt_timer_local_.stop(); }
-    }
-
-
-    if (!debug_folder_full_path_.empty())
-    {
-        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(mb_8D, "FID_MB4D_remove", os.str());
-    }
 
     //apply the average slice navigator
     if (!debug_folder_full_path_.empty())
@@ -363,171 +381,24 @@ void GenericReconSMSPrepGadget::pre_process_mb_data(hoNDArray< std::complex<floa
     if (perform_timing.value()) { gt_timer_local_.stop(); }
     */
 
-    if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 MB"); }
-    apply_ghost_correction_with_STK6(mb_8D, headers_mb ,  acceFactorSMSE1_[e], false , false , false, " Prep MB ");
-    if (perform_timing.value()) { gt_timer_local_.stop(); }
-
-    /*  if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 open MB"); }
-    apply_ghost_correction_with_STK6_open(mb_8D, headers_mb ,  acceFactorSMSE1_[e], false , false , " Prep MB ");
-    if (perform_timing.value()) { gt_timer_local_.stop(); }*/
+    if (use_omp.value()==true)
+    {
+        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 open MB"); }
+        apply_ghost_correction_with_STK6_open(mb_8D, headers_mb ,  acceFactorSMSE1_[e], false , false , false, " Prep MB ");
+        if (perform_timing.value()) { gt_timer_local_.stop(); }
+    }
+    else
+    {
+        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 MB"); }
+        apply_ghost_correction_with_STK6(mb_8D, headers_mb ,  acceFactorSMSE1_[e], false , false , false, " Prep MB ");
+        if (perform_timing.value()) { gt_timer_local_.stop(); }
+    }
 
     if (!debug_folder_full_path_.empty())
     {
         save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(mb_8D, "FID_MB_apres_epi_nav", os.str());
     }
 
-}
-
-void GenericReconSMSPrepGadget::reorganize_mb_data_to_8D_open(hoNDArray< std::complex<float> >& mb,hoNDArray< std::complex<float> >& mb_8D )
-{
-    size_t RO=mb.get_size(0);
-    size_t E1=mb.get_size(1);
-    size_t E2=mb.get_size(2);
-    size_t CHA=mb.get_size(3);
-    size_t N=mb.get_size(4);
-    size_t S=mb.get_size(5);
-    size_t SLC=mb.get_size(6);
-
-    long long num = N * S * lNumberOfStacks_;
-    long long ii;
-
-    // only allow this for loop openmp if num>1 and 2D recon
-#pragma omp parallel for default(none) private(ii) shared(num, S,  N,  RO, E1, E2, CHA, mb , mb_8D ) if(num>1)
-    for (ii = 0; ii < num; ii++) {
-        size_t a = ii / (N * S);
-        size_t s = (ii - a * N * S) / (N);
-        size_t n = ii - a * N * S - s * N;
-
-        size_t index_in=indice_slice_mb[a];
-        size_t index_out=indice_mb[a];
-
-        size_t usedS = s;
-        if (usedS >= S) usedS = S - 1;
-
-        size_t usedN = n;
-        if (usedN >= N) usedN = N - 1;
-
-        std::complex<float> * in = &(mb(0, 0, 0, 0, n, s, index_in));
-        std::complex<float> * out = &(mb_8D(0, 0, 0, 0,  0, index_out, 0, s));
-
-        memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
-
-    }
-}
-
-
-void GenericReconSMSPrepGadget::reorganize_mb_data_to_8D(hoNDArray< std::complex<float> >& mb,hoNDArray< std::complex<float> >& mb_8D )
-{
-    size_t RO=mb.get_size(0);
-    size_t E1=mb.get_size(1);
-    size_t E2=mb.get_size(2);
-    size_t CHA=mb.get_size(3);
-    size_t N=mb.get_size(4);
-    size_t S=mb.get_size(5);
-    size_t SLC=mb.get_size(6);
-
-    size_t index_in;
-    size_t index_out;
-
-    for (int a = 0; a < lNumberOfStacks_; a++)
-    {
-        index_in=indice_slice_mb[a];
-        index_out=indice_mb[a];
-
-        for (size_t s = 0; s < S; s++)
-        {
-            size_t usedS = s;
-            if (usedS >= S) usedS = S - 1;
-
-            for (size_t n = 0; n < N; n++)
-            {
-                size_t usedN = n;
-                if (usedN >= N) usedN = N - 1;
-
-                std::complex<float> * in = &(mb(0, 0, 0, 0, n, s, index_in));
-                std::complex<float> * out = &(mb_8D(0, 0, 0, 0,  0, index_out, 0, s));
-
-                memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
-
-            }
-        }
-    }
-
-}
-
-
-
-//sur les données single band
-void GenericReconSMSPrepGadget::create_stacks_of_slices_directly(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack, arma::uvec indice)
-{
-
-    size_t RO=data.get_size(0);
-    size_t E1=data.get_size(1);
-    size_t E2=data.get_size(2);
-    size_t CHA=data.get_size(3);
-    size_t N=data.get_size(4);
-    size_t S=data.get_size(5);
-
-    size_t MB=new_stack.get_size(4);
-    size_t STK=new_stack.get_size(5);
-
-    size_t n, s, a, m;
-    size_t index;
-
-    // copy of the data in the 8D array
-
-    for (a = 0; a < STK; a++) {
-
-        for (m = 0; m < MB; m++) {
-
-            index = MapSliceSMS(a,m);
-
-            for (s = 0; s < S; s++)
-            {
-                for (n = 0; n < N; n++)
-                {
-                    std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice(index)));
-                    std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
-                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
-                }
-            }
-        }
-    }
-}
-
-
-
-//sur les données single band
-void GenericReconSMSPrepGadget::create_stacks_of_slices_directly_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack, arma::uvec indice)
-{
-
-    size_t RO=data.get_size(0);
-    size_t E1=data.get_size(1);
-    size_t E2=data.get_size(2);
-    size_t CHA=data.get_size(3);
-    size_t N=data.get_size(4);
-    size_t S=data.get_size(5);
-
-    size_t MB=new_stack.get_size(4);
-    size_t STK=new_stack.get_size(5);
-
-    long long num = STK * MB * N * S;
-    long long ii;
-
-#pragma omp parallel for default(none) private(ii) shared(num, MB , STK, S, N, indice, new_stack, data,RO,E1,E2,CHA) if(num>1)
-    for (ii = 0; ii < num; ii++) {
-
-        size_t   a = ii / (S * MB* N);
-        size_t   m = (ii - a * S * MB* N) / (S* N );
-        size_t  s = (ii - a * S * MB* N - m * S* N )  /  (N);
-        size_t  n=  ii - a * S * MB* N - m * S* N  -s *  N;
-
-        size_t index = MapSliceSMS(a,m);
-
-        std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice(index)));
-        std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
-        memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
-    }
 }
 
 

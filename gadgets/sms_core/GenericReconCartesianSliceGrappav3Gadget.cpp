@@ -52,7 +52,7 @@ int GenericReconCartesianSliceGrappav3Gadget::process_config(ACE_Message_Block *
 
 int GenericReconCartesianSliceGrappav3Gadget::process(Gadgetron::GadgetContainerMessage<IsmrmrdReconData> *m1) {
 
-    if (perform_timing.value()) { gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget::process all"); }
+    if (perform_timing.value()) { gt_timer_.start("GenericReconCartesianSliceGrappav3Gadget::process"); }
 
     process_called_times_++;
 
@@ -136,7 +136,7 @@ int GenericReconCartesianSliceGrappav3Gadget::process(Gadgetron::GadgetContainer
         }
     }
 
-    if (perform_timing.value()) { gt_timer_local_.stop(); }
+    if (perform_timing.value()) { gt_timer_.stop();  }
 
     if (this->next()->putq(m1) < 0)
     {
@@ -265,7 +265,7 @@ void GenericReconCartesianSliceGrappav3Gadget::prepare_down_stream_coil_compress
 void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(IsmrmrdReconBit &recon_bit, ReconObjType &recon_obj, size_t e)
 {
     // unwrapping function : liste des opérations:
-    // 1) remove_unnecessary_kspace
+    // 1) remove_unnecessary_kspace (in presence of grappa)
     // 2) im2col
     // 3) reshape
     // 4) apply kernel : SB= MB*kernel -> gemm (SB, MB , Kernel)
@@ -290,7 +290,14 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
 
     recon_obj.mb_e1_reduce_.create(RO, reduced_E1_, CHA, 1, STK, N, S);
 
+    if (use_omp.value()==true)
+    {
+    remove_unnecessary_kspace_open( recon_obj.mb_compression_ ,  recon_obj.mb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_, true);
+    }
+    else
+    {
     remove_unnecessary_kspace( recon_obj.mb_compression_ ,  recon_obj.mb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_, true);
+    }
 
     if (!debug_folder_full_path_.empty())
     {
@@ -302,7 +309,14 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
 
     recon_obj.block_MB_.create(voxels_number_per_image_, kernel_size_, CHA, 1, STK, N, S);
 
+    if (use_omp.value()==true)
+    {
+    im2col_open(recon_obj.mb_e1_reduce_,recon_obj.block_MB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
+    }
+    else
+    {
     im2col(recon_obj.mb_e1_reduce_,recon_obj.block_MB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
+    }
 
     if (!debug_folder_full_path_.empty())
     {
@@ -332,7 +346,8 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
 
     size_t s, n, a;
 
-    gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget::process  unmix version 1 ");
+    /*
+    gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget:: unmix version 1 ");
 
     //old version part 1/3
     hoNDArray<std::complex<float> > tempo_MB(voxels_number_per_image_, kernel_size_*CHA);
@@ -378,37 +393,53 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
         }
     }
 
-    gt_timer_local_.stop();
+    gt_timer_local_.stop();*/
 
     //new version: code alternatif utilisant pragma omp parallel : fonctionne mais plus lent
 
-    /*gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget::process  unmix version 2 ");
+    gt_timer_local_.start("GenericReconCartesianSliceGrappav3Gadget::process  unmix version 2 ");
 
 
     size_t ref_N = recon_obj.block_MB_.get_size(5);
     size_t ref_S = recon_obj.block_MB_.get_size(6);
 
     typedef std::complex<float> T;
-    long long num = N * S * STK;
-    long long ii;
+    //long long num = N * S * STK;
+    //long long ii;
 
-#pragma omp parallel default(none) private(ii) shared(num, N, S, MB_factor, ref_N, ref_S, recon_obj, voxels_number_per_image_, kernel_size_, CHA) if(num>1)
-        for (ii = 0; ii < num; ii++) {
-            size_t a = ii / (N * S);
-            size_t s = (ii - a * N * S) / N;
-            size_t n = ii - a * N * S - s * N;
+    //#pragma omp parallel default(none) private(ii) shared(num, N, S, MB_factor, ref_N, ref_S, recon_obj, voxels_number_per_image_, kernel_size_, CHA) if(num>1)
+    //    for (ii = 0; ii < num; ii++) {
+    //        size_t a = ii / (N * S);
+    //       size_t s = (ii - a * N * S) / N;
+    //      size_t n = ii - a * N * S - s * N;
+    for (long long a = 0; a < STK; a++) {
 
-            size_t usedN = n;
-            if (n >= ref_N) usedN = ref_N - 1;
+        for (long long s = 0; s < S; s++)    {
 
-            size_t usedS = s;
-            if (s >= ref_S) usedS = ref_S - 1;
+            for (long long n = 0; n < N; n++)  {
+
+                size_t usedN = n;
+                if (n >= ref_N) usedN = ref_N - 1;
+
+                size_t usedS = s;
+                if (s >= ref_S) usedS = ref_S - 1;
 
                 T *pIn = &(recon_obj.block_MB_(0, 0, 0, 0, a, n, s));
 
                 for (size_t m = 0; m < MB_factor; m++) {
 
-                    T *pkernel = &(recon_obj.kernel_(0, 0, m, a, n, s));
+                    T *pkernel;
+
+                    if (calib_fast.value()==true)
+                    {
+                        pkernel = &(recon_obj.kernelonov_(0, 0, m, a, n, s));
+                    }
+                    else
+                    {
+                        pkernel = &(recon_obj.kernel_(0, 0, m, a, n, s));
+                    }
+
+                    //T *pkernel = &(recon_obj.kernelonov_(0, 0, m, a, n, s));
 
                     T *pOut = &(recon_obj.unfolded_image_(0, 0, m, a, n, s));
 
@@ -418,12 +449,12 @@ void GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_unwrapping(I
 
                     Gadgetron::apply_unmix_coeff_kspace_SMS(tempo_MB, tempo_kernel, tempo_kspace_unfolded );
 
-                 }
+                }
+            }
         }
+    }
 
-
-    gt_timer_local_.stop();*/
-
+    gt_timer_local_.stop();
 
     ///////////////
 
@@ -488,7 +519,14 @@ void  GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_calib(Ismrm
 
     recon_obj.sb_e1_reduce_.create(RO, reduced_E1_, CHA, MB, STK, N, S);
 
+    if (use_omp.value()==true)
+    {
+    remove_unnecessary_kspace_open( recon_obj.sb_compression_ ,  recon_obj.sb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_ , false);
+    }
+    else
+    {
     remove_unnecessary_kspace( recon_obj.sb_compression_ ,  recon_obj.sb_e1_reduce_,  acceFactorSMSE1_[e], start_E1_, end_E1_ , false);
+    }
 
     if (!debug_folder_full_path_.empty())
     {
@@ -505,8 +543,15 @@ void  GenericReconCartesianSliceGrappav3Gadget::perform_slice_grappa_calib(Ismrm
     recon_obj.kernelonov_.create( CHA*kernel_size_, CHA, MB, STK, N, S);
 
     /////////
-
+    if (use_omp.value()==true)
+    {
+    im2col_open(recon_obj.sb_e1_reduce_, recon_obj.block_SB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
+    }
+    else
+    {
     im2col(recon_obj.sb_e1_reduce_, recon_obj.block_SB_, blocks_RO_,  blocks_E1_,  grappa_kSize_RO.value(), grappa_kSize_E1.value() );
+    }
+
 
     if (!debug_folder_full_path_.empty())
     {
