@@ -202,3 +202,4 @@ int WriteSingleBandFlagsGadget::process(GadgetContainerMessage<ISMRMRD::Acquisit
 
 GADGET_FACTORY_DECLARE(WriteSingleBandFlagsGadget)
 }
+
