@@ -8,6 +8,9 @@ class RMSCoilCombine(Gadget):
 
     def process(self, h, im):
 
+        print(h.channels)
+        print(im.shape)
+        print(len(im.shape)-1)
         combined_image = np.sqrt(np.sum(np.square(np.abs(im)),axis=(len(im.shape)-1)))
 
         print("RMS coil",im.shape,combined_image.shape)

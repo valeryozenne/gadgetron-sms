@@ -65,7 +65,7 @@ set(gadgetron_dicom_src_files
     DicomImageWriter.cpp 
     dicom_ismrmrd_utility.cpp )
 
-set(gadgetron_dicom_config_files dicom.xml )
+set(gadgetron_dicom_config_files dicom.xml dicom_phase.xml )
 
 add_library(gadgetron_dicom SHARED
             ${gadgetron_dicom_header_files}
