@@ -25,6 +25,7 @@ namespace Gadgetron
       std::set<uint16_t> set;
       std::set<uint16_t> segment;
       std::set<uint16_t> average;
+      std::set<uint16_t> user_0;
   };
 
 
