@@ -13,8 +13,8 @@ namespace std {
     template<>
     struct less<BufferKey>{
         bool operator()(const BufferKey& idx1, const BufferKey& idx2) const {
-            return std::tie(idx1.average,idx1.slice,idx1.contrast,idx1.phase,idx1.repetition,idx1.set,idx1.segment) <
-                std::tie(idx2.average,idx2.slice,idx2.contrast,idx2.phase,idx2.repetition,idx2.set,idx2.segment);
+            return std::tie(idx1.average,idx1.slice,idx1.contrast,idx1.phase,idx1.repetition,idx1.set,idx1.segment,idx1.user_0) <
+                std::tie(idx2.average,idx2.slice,idx2.contrast,idx2.phase,idx2.repetition,idx2.set,idx2.segment,idx2.user_0);
         }
     };
 
@@ -22,7 +22,7 @@ namespace std {
         bool operator()(const BufferKey& idx1, const BufferKey& idx2) const {
             return idx1.average == idx2.average
                    && idx1.slice == idx2.slice && idx1.contrast == idx2.contrast && idx1.phase == idx2.phase
-                   && idx1.repetition == idx2.repetition && idx1.set == idx2.set && idx1.segment == idx2.segment;
+                   && idx1.repetition == idx2.repetition && idx1.set == idx2.set && idx1.segment == idx2.segment && idx1.user_0 == idx2.user_0 ;
         }
     };
 }
@@ -101,7 +101,7 @@ namespace Gadgetron {
     namespace {
         void clear(BucketToBufferGadget::Dimension dim, BufferKey& idx) {
             switch (dim) {
-
+            case BucketToBufferGadget::Dimension::user_0: idx.user_0 = 0; break;
             case BucketToBufferGadget::Dimension::average: idx.average = 0; break;
             case BucketToBufferGadget::Dimension::contrast: idx.contrast = 0; break;
             case BucketToBufferGadget::Dimension::phase: idx.phase = 0; break;
@@ -116,7 +116,7 @@ namespace Gadgetron {
 
         size_t getDimensionKey(BucketToBufferGadget::Dimension dim, const ISMRMRD::EncodingCounters& idx) {
             switch (dim) {
-
+            case BucketToBufferGadget::Dimension::user_0: return idx.user[0];
             case BucketToBufferGadget::Dimension::average: return idx.average;
             case BucketToBufferGadget::Dimension::contrast: return idx.contrast;
             case BucketToBufferGadget::Dimension::phase: return idx.phase;
@@ -144,6 +144,7 @@ namespace Gadgetron {
     namespace {
         uint16_t getSizeFromDimension(BucketToBufferGadget::Dimension dimension, const AcquisitionBucketStats& stats) {
             switch (dimension) {
+            case BucketToBufferGadget::Dimension::user_0: return *stats.user_0.rbegin() - *stats.user_0.begin() + 1;
             case BucketToBufferGadget::Dimension::phase: return *stats.phase.rbegin() - *stats.phase.begin() + 1;
             case BucketToBufferGadget::Dimension::contrast:
                 return *stats.contrast.rbegin() - *stats.contrast.begin() + 1;
@@ -553,7 +554,7 @@ namespace Gadgetron {
         const std::map<std::string, BucketToBufferGadget::Dimension> dimension_from_name
             = { { "average", Dimension::average }, { "contrast", Dimension::contrast }, { "phase", Dimension::phase },
                   { "repetition", Dimension::repetition }, { "set", Dimension::set }, { "segment", Dimension::segment },
-                  { "slice", Dimension::slice }, { "", Dimension::none }, { "none", Dimension::none }
+                  { "slice", Dimension::slice },  { "user_0", Dimension::user_0 }, { "", Dimension::none }, { "none", Dimension::none }
 
               };
     }

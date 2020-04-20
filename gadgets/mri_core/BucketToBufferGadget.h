@@ -25,12 +25,12 @@ namespace Gadgetron {
     class BucketToBufferGadget : public Core::ChannelGadget<AcquisitionBucket> {
     public:
         BucketToBufferGadget(const Core::Context& context, const Core::GadgetProperties& props);
-        enum class Dimension { average, contrast, phase, repetition, set, segment, slice, none };
+        enum class Dimension { average, contrast, phase, repetition, set, segment, slice, user_0, none };
 
     struct BufferKey {
-        uint16_t average,slice,contrast,phase,repetition,set,segment;
+        uint16_t average,slice,contrast,phase,repetition,set,segment, user_0;
         BufferKey(const BufferKey&) = default;
-        BufferKey(const ISMRMRD::EncodingCounters& idx) : average{idx.average}, slice{idx.slice},contrast{idx.contrast}, phase{idx.phase},repetition{idx.repetition},set{idx.set},segment{idx.segment}{
+        BufferKey(const ISMRMRD::EncodingCounters& idx) : average{idx.average}, slice{idx.slice},contrast{idx.contrast}, phase{idx.phase},repetition{idx.repetition},set{idx.set},segment{idx.segment},user_0{idx.user[0]}{
             
         }
     };

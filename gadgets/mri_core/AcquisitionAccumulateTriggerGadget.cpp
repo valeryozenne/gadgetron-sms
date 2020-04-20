@@ -45,6 +45,7 @@ namespace Gadgetron {
             stats.repetition.insert(header.idx.repetition);
             stats.set.insert(header.idx.set);
             stats.segment.insert(header.idx.segment);
+            stats.user_0.insert(header.idx.user[0]);
         }
 
         void add_acquisition(AcquisitionBucket& bucket, Core::Acquisition acq) {
