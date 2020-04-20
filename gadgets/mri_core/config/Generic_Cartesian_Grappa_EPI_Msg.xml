@@ -235,11 +235,36 @@
         <classname>ComplexToFloatGadget</classname>
     </gadget>
 
+   
+
+   <gadget>
+        <name>MessageContainerNumberGadget</name>
+        <dll>gadgetron_smscore</dll>
+        <classname>MessageContainerNumberGadget</classname>
+        <property><name>avant</name><value>true</value></property>
+    </gadget>
+
+    <gadget>
+        <name>MultiplyMessageContainerGadget</name>
+        <dll>gadgetron_smscore</dll>
+        <classname>MultiplyMessageContainerGadget</classname>
+    </gadget>
+
+    <gadget>
+        <name>MessageContainerNumberGadget</name>
+        <dll>gadgetron_smscore</dll>
+        <classname>MessageContainerNumberGadget</classname>
+        <property><name>avant</name><value>false</value></property>
+    </gadget>
+
     <gadget>
         <name>FloatToShortAttrib</name>
         <dll>gadgetron_mricore</dll>
         <classname>FloatToUShortGadget</classname>
     </gadget>
+
+
+
 
     <gadget>
         <name>ImageFinish</name>
