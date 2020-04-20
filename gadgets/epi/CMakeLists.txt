@@ -6,6 +6,7 @@ endif ()
 add_library(gadgetron_epi SHARED 
   EPIReconXGadget.h EPIReconXGadget.cpp
   EPICorrGadget.h EPICorrGadget.cpp
+  EPICorrSMSGadget.h EPICorrSMSGadget.cpp
   EPIPackNavigatorGadget.h EPIPackNavigatorGadget.cpp
   FFTXGadget.h FFTXGadget.cpp
   CutXGadget.h CutXGadget.cpp
