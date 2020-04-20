@@ -130,7 +130,7 @@ set(gadgetron_mricore_src_files
         writers/GadgetIsmrmrdWriter.cpp
         ImageResizingGadget.cpp
         AutoScaleGadget.cpp
-        DenoiseGadget.cpp)
+        DenoiseGadget.cpp        )
 
 set(gadgetron_mricore_config_files
         config/default.xml
@@ -141,6 +141,9 @@ set(gadgetron_mricore_config_files
         config/isalive.xml
         config/gtquery.xml
         config/Generic_Cartesian_FFT.xml
+        config/Generic_Cartesian_FFT_python.xml
+        config/Generic_Cartesian_FFT_EPI.xml
+        config/Generic_Cartesian_FFT_EPI_python.xml
         config/Generic_Cartesian_Grappa.xml
         config/Generic_Cartesian_Grappa_SNR.xml
         config/Generic_Cartesian_Grappa_T2W.xml
@@ -148,6 +151,7 @@ set(gadgetron_mricore_config_files
         config/Generic_Cartesian_Grappa_RealTimeCine_Cloud.xml
         config/Generic_Cartesian_Grappa_EPI.xml
         config/Generic_Cartesian_Grappa_EPI_AVE.xml
+        config/Generic_Cartesian_Grappa_EPI_Msg.xml
         config/Generic_Cartesian_Spirit.xml
         config/Generic_Cartesian_Spirit_RealTimeCine.xml
         config/Generic_Cartesian_Spirit_SASHA.xml
