@@ -192,35 +192,11 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
     order_of_acquisition_mb=map_interleaved_acquisitions(lNumberOfStacks_, no_reordering);
     order_of_acquisition_sb=map_interleaved_acquisitions(lNumberOfSlices_, no_reordering);
 
-    //std::cout <<  order_of_acquisition_mb << std::endl;
-    //std::cout <<  order_of_acquisition_sb << std::endl;
-
     indice_mb =  arma::sort_index( order_of_acquisition_mb );
     indice_sb =  arma::sort_index( order_of_acquisition_sb );
     indice_slice_mb=indice_sb.rows(0,lNumberOfStacks_-1);
 
-    // std::cout <<  indice_mb << std::endl;
-    // std::cout <<  indice_sb << std::endl;
-    // std::cout <<  indice_slice_mb << std::endl;
-
-    // std::vector<hoNDArray<float> > MapSliceSMS;
-    // MapSliceSMS.resize(lNumberOfStacks_);
-    // for (size_t i = 0; i < MapSliceSMS.size(); ++i) {
-    //    MapSliceSMS[i].create(MB_factor);
-    // }
-
-
-    //arma::uvec plot_mb= arma::sort( indice_sb );
-    // std::cout << plot_mb << std::endl;  ;
-    //for (unsigned int i = 0; i < lNumberOfStacks_; i++)
-    //{
-    //    std::cout << i <<   ;
-    //}
-
-
-
     MapSliceSMS=get_map_slice_single_band( MB_factor,  lNumberOfStacks_,  order_of_acquisition_mb,  no_reordering);
-    std::cout <<  MapSliceSMS<< std::endl;
 
     center_k_space_xml=h.encoding[0].encodingLimits.kspace_encoding_step_1->center+1;
 
@@ -1722,7 +1698,9 @@ void GenericReconSMSBase::apply_ghost_correction_with_arma_STK6(hoNDArray< std::
 //TODO à déplacer dans slice grappa
 void GenericReconSMSBase::do_fft_for_ref_scan(hoNDArray< std::complex<float> >& data)
 {
+    std::cout << "do_fft_for_ref_scan je passe ici "<<std::endl;
     hoNDFFT<float>::instance()->fft(&data,0);
+    std::cout << "do_fft_for_ref_scan je passe ici fin "<<std::endl;
 }
 
 
@@ -1900,7 +1878,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
         if (use_gpu==true)
         {
 
-            std::cout << " coucou uisn gpu fft"<<std::endl;
+            std::cout << " coucou using gpu ifft"<<std::endl;
 
             unsigned int dim_to_transform=0;
 
@@ -2062,7 +2040,49 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
 
     //std::cout << " tempo_hoND ok --------------------------------------------------------------------------"<< std::endl;
 
+    if (use_gpu==true)
+    {
+
+        std::cout << " coucou uing gpu fft"<<std::endl;
+
+        unsigned int dim_to_transform=0;
+
+        if (perform_timing.value()) { gt_timer_local_.start("gpuExample::fft cpu time");}
+
+        boost::shared_ptr<GPUTimer> process_timer;
+        process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::fft gpu time") );
+
+        hoNDArray<float_complext>* host =
+                reinterpret_cast< hoNDArray<float_complext>* >(&data);
+
+        cuNDArray<float_complext> device_d(host);
+
+        cuNDFFT<float>::instance()->fft(&device_d, dim_to_transform);
+
+        device_d.to_host(host);
+
+        // boost::shared_ptr< hoNDArray<float_complext  > >  host_result = device_d.to_host();
+
+        // hoNDArray<std::complex<float>> *host_result_cast=reinterpret_cast<hoNDArray<std::complex<float> >*>(host_result.get());
+
+        // unsigned int number_of_elements=host_result_cast->get_number_of_elements();
+
+        // memcpy(data.get_data_ptr() , host_result_cast->get_data_ptr(), sizeof(std::complex<float>)*number_of_elements);
+
+         process_timer.reset();
+
+         gt_timer_local_.stop();
+
+
+    }
+    else
+    {
+    if (perform_timing.value()) { gt_timer_local_.start("cpuExample::ifft cpu time");}
+
     hoNDFFT<float>::instance()->fft(&data,0);
+
+    if (perform_timing.value()) { gt_timer_local_.stop();}
+    }
 }
 
 

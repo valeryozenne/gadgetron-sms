@@ -36,110 +36,112 @@ int GenericReconSMSPostGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
 
 
     // for every encoding space, prepare the recon_bit_->rbit_[e].ref_
-    size_t e, n, s, slc;
-    for (e = 0; e < recon_bit_->rbit_.size(); e++)
+    //size_t e, n, s, slc;
+    //for (e = 0; e < recon_bit_->rbit_.size(); e++)
+    //{
+    size_t e=0;
+
+    auto & rbit = recon_bit_->rbit_[e];
+    std::stringstream os;
+    os << "_encoding_" << e;
+
+    if (rbit.ref_)
     {
-        auto & rbit = recon_bit_->rbit_[e];
-        std::stringstream os;
-        os << "_encoding_" << e;
+        // std::cout << " je suis la structure qui contient les données acs" << std::endl;
 
-        if (recon_bit_->rbit_[e].ref_)
+        hoNDArray< std::complex<float> >& ref_8D = rbit.ref_->data_;
+
+        size_t RO = ref_8D.get_size(0);
+        size_t E1 = ref_8D.get_size(1);
+        size_t E2 = ref_8D.get_size(2);
+        size_t CHA = ref_8D.get_size(3);
+        size_t MB = ref_8D.get_size(4);
+        size_t STK = ref_8D.get_size(5);
+        size_t N = ref_8D.get_size(6);
+        size_t S = ref_8D.get_size(7);
+
+        //GDEBUG_STREAM("GenericReconSMSPostGadget - incoming data array ref : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
+
+        hoNDArray< std::complex<float> > ref_7D;
+
+        ref_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
+
+        post_process_ref_data(ref_8D, ref_7D  ,e);
+
+        m1->getObjectPtr()->rbit_[e].ref_->data_ = ref_7D;
+
+        if (!debug_folder_full_path_.empty())
         {
-            // std::cout << " je suis la structure qui contient les données acs" << std::endl;
+            save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(ref_7D, "FID_REF_fin", os.str());
+        }
 
-            hoNDArray< std::complex<float> >& ref_8D = recon_bit_->rbit_[e].ref_->data_;
+    }
 
-            size_t RO = ref_8D.get_size(0);
-            size_t E1 = ref_8D.get_size(1);
-            size_t E2 = ref_8D.get_size(2);
-            size_t CHA = ref_8D.get_size(3);
-            size_t MB = ref_8D.get_size(4);
-            size_t STK = ref_8D.get_size(5);
-            size_t N = ref_8D.get_size(6);
-            size_t S = ref_8D.get_size(7);
+    if (rbit.data_.data_.get_number_of_elements() > 0)
+    {
 
-            //GDEBUG_STREAM("GenericReconSMSPostGadget - incoming data array ref : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
+        bool is_single_band=false;
+        bool is_first_repetition=detect_first_repetition(rbit);
+        if (is_first_repetition==true) {  is_single_band=detect_single_band_data(rbit);    }
 
-            hoNDArray< std::complex<float> > ref_7D;
+        show_size(rbit.data_.data_, "GenericReconSMSPostGadget - incoming data array data");
 
-            ref_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
+        hoNDArray< std::complex<float> >& data_8D = rbit.data_.data_;
+        //hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit_->rbit_[e].data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
 
-            post_process_ref_data(ref_8D, ref_7D  ,e);
+        size_t RO = data_8D.get_size(0);
+        size_t E1 = data_8D.get_size(1);
+        size_t E2 = data_8D.get_size(2);
+        size_t CHA = data_8D.get_size(3);
+        size_t MB = data_8D.get_size(4);
+        size_t STK = data_8D.get_size(5);
+        size_t N = data_8D.get_size(6);
+        size_t S = data_8D.get_size(7);
 
-            m1->getObjectPtr()->rbit_[e].ref_->data_ = ref_7D;
+        if (is_single_band==true)  //presence de single band
+        {
+            headers_buffered=rbit.data_.headers_;
+
+            hoNDArray< std::complex<float> > data_7D;
+
+            data_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
+
+            define_usefull_parameters_simple_version(rbit, e);
+
+            post_process_sb_data(data_8D, data_7D , rbit.data_.headers_ ,e);
+
+            m1->getObjectPtr()->rbit_[e].data_.data_ = data_7D;
 
             if (!debug_folder_full_path_.empty())
             {
-                save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(ref_7D, "FID_REF_fin", os.str());
+                save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(rbit.data_.data_, "FID_SB_fin", os.str());
             }
 
         }
-
-        if (recon_bit_->rbit_[e].data_.data_.get_number_of_elements() > 0)
+        else
         {
 
-            bool is_single_band=false;
-            bool is_first_repetition=detect_first_repetition(recon_bit_->rbit_[e]);
-            if (is_first_repetition==true) {  is_single_band=detect_single_band_data(recon_bit_->rbit_[e]);    }
+            hoNDArray< std::complex<float> > data_7D;
 
-            show_size(recon_bit_->rbit_[e].data_.data_, "GenericReconSMSPostGadget - incoming data array data");
+            data_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
 
-            hoNDArray< std::complex<float> >& data_8D = recon_bit_->rbit_[e].data_.data_;
-            //hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit_->rbit_[e].data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
+            define_usefull_parameters_simple_version(rbit, e);
 
-            size_t RO = data_8D.get_size(0);
-            size_t E1 = data_8D.get_size(1);
-            size_t E2 = data_8D.get_size(2);
-            size_t CHA = data_8D.get_size(3);
-            size_t MB = data_8D.get_size(4);
-            size_t STK = data_8D.get_size(5);
-            size_t N = data_8D.get_size(6);
-            size_t S = data_8D.get_size(7);
+            post_process_mb_data(data_8D, data_7D , rbit.data_.headers_, e);
 
-            if (is_single_band==true)  //presence de single band
+            m1->getObjectPtr()->rbit_[e].data_.data_ = data_7D;
+
+            //set_idx(headers_buffered,  recon_bit_->rbit_[e].data_.headers_(2, 2, 0, 0, 0).idx.repetition , 0);
+
+            rbit.data_.headers_=headers_buffered;
+
+            if (!debug_folder_full_path_.empty())
             {
-                headers_buffered=recon_bit_->rbit_[e].data_.headers_;
-
-                hoNDArray< std::complex<float> > data_7D;
-
-                data_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
-
-                define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
-
-                post_process_sb_data(data_8D, data_7D , recon_bit_->rbit_[e].data_.headers_ ,e);
-
-                m1->getObjectPtr()->rbit_[e].data_.data_ = data_7D;
-
-                if (!debug_folder_full_path_.empty())
-                {
-                    save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(m1->getObjectPtr()->rbit_[e].data_.data_, "FID_SB_fin", os.str());
-                }
-
-            }
-            else
-            {
-
-                hoNDArray< std::complex<float> > data_7D;
-
-                data_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
-
-                define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
-
-                post_process_mb_data(data_8D, data_7D , recon_bit_->rbit_[e].data_.headers_, e);
-
-                m1->getObjectPtr()->rbit_[e].data_.data_ = data_7D;
-
-                //set_idx(headers_buffered,  recon_bit_->rbit_[e].data_.headers_(2, 2, 0, 0, 0).idx.repetition , 0);
-
-                recon_bit_->rbit_[e].data_.headers_=headers_buffered;
-
-                if (!debug_folder_full_path_.empty())
-                {
-                    save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(m1->getObjectPtr()->rbit_[e].data_.data_, "FID_MB_fin", os.str());
-                }
+                save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(rbit.data_.data_, "FID_MB_fin", os.str());
             }
         }
     }
+    // }
 
     if (perform_timing.value()) { gt_timer_.stop(); }
 

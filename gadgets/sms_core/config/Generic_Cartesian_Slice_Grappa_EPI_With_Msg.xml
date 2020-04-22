@@ -42,12 +42,12 @@
     <classname>WriteSingleBandFlagsGadget</classname>
     </gadget>
 
-<!--
+
     <gadget>
         <name>GiveReadoutInformationGadget</name>
         <dll>gadgetron_smscore</dll>
         <classname>GiveReadoutInformationGadget</classname>        
-    </gadget> -->
+    </gadget> 
 
     <!-- EPI correction -->
     <gadget>

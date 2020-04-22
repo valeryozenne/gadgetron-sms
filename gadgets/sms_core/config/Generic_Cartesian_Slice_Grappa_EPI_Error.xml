@@ -43,11 +43,11 @@
     </gadget>
 
 
-    <gadget>
+    <!--<gadget>
         <name>GiveReadoutInformationGadget</name>
         <dll>gadgetron_smscore</dll>
         <classname>GiveReadoutInformationGadget</classname>        
-    </gadget> 
+    </gadget> -->
 
     <!-- EPI correction -->
     <gadget>
@@ -56,10 +56,10 @@
         <classname>EPIReconXGadget</classname>
     </gadget>
 
-    <gadget>
-        <name>EPICorr</name>
+   <gadget>
+        <name>EPICorrSMS</name>
         <dll>gadgetron_epi</dll>
-        <classname>EPICorrGadget</classname>
+        <classname>EPICorrSMSGadget</classname>
     </gadget>
 
     <gadget>
@@ -106,6 +106,17 @@
         <dll>gadgetron_smscore</dll>
         <classname>GenericReconSplitSMSGadget</classname>        
     </gadget>  
+
+<gadget>
+    <name>SMSPrepGadget</name>
+    <dll>gadgetron_smscore</dll>
+    <classname>GenericReconSMSPrepGadget</classname>   
+    <property><name>debug_folder</name><value></value></property>
+    <property><name>perform_timing</name><value>true</value></property>
+    <property><name>verbose</name><value>true</value></property>
+    <property><name>use_omp</name><value>false</value></property>
+    </gadget>
+
 
 
  <gadget>
