@@ -64,8 +64,8 @@ int GenericReconCartesianSliceGrappav3Gadget::process(Gadgetron::GadgetContainer
                      << num_encoding_spaces_);
     }
 
-
-    for (size_t e = 0; e < recon_bit_->rbit_.size(); e++) {
+    size_t e=0;
+    //for (size_t e = 0; e < recon_bit_->rbit_.size(); e++) {
         std::stringstream os;
         os << "_encoding_" << e;
 
@@ -134,7 +134,7 @@ int GenericReconCartesianSliceGrappav3Gadget::process(Gadgetron::GadgetContainer
 
             }
         }
-    }
+   // }
 
     if (perform_timing.value()) { gt_timer_.stop();  }
 

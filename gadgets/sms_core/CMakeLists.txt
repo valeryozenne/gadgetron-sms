@@ -31,6 +31,8 @@ add_library(gadgetron_smscore SHARED
     MultiplyMessageContainerGadget.cpp
     MessageContainerNumberGadget.h
     MultiplyMessageContainerGadget.h
+    GenericReconSplitSimpleSMSGadget.h
+    GenericReconSplitSimpleSMSGadget.cpp
     
   )
 

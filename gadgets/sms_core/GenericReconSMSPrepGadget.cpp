@@ -34,19 +34,53 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
         GWARN_STREAM("Incoming recon_bit has more encoding spaces than the protocol : " << recon_bit_->rbit_.size() << " instead of " << num_encoding_spaces_);
     }
 
-    // for every encoding space, prepare the recon_bit_->rbit_[e].ref_
-    size_t e, n, s, slc;
-    for (e = 0; e < recon_bit_->rbit_.size(); e++)
+    size_t e=0;
+
+    auto & rbit = recon_bit_->rbit_[e];
+    std::stringstream os;
+    os << "_encoding_" << e;
+
+
+    if (rbit.ref_)
     {
-        auto & rbit = recon_bit_->rbit_[e];
-        std::stringstream os;
-        os << "_encoding_" << e;
+        std::cout << " je suis la structure qui contient les données acs" << std::endl;
 
-        if (recon_bit_->rbit_[e].ref_)
-        {
-            std::cout << " je suis la structure qui contient les données acs" << std::endl;
+        hoNDArray< std::complex<float> >& data = rbit.ref_->data_;
 
-            hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].ref_->data_;
+        size_t RO = data.get_size(0);
+        size_t E1 = data.get_size(1);
+        size_t E2 = data.get_size(2);
+        size_t CHA = data.get_size(3);
+        size_t N = data.get_size(4);
+        size_t S = data.get_size(5);
+        size_t SLC = data.get_size(6);
+
+        GDEBUG_STREAM("GenericSMSPrepGadget - incoming data array ref : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
+
+        ref_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
+
+        pre_process_ref_data(data, ref_8D,  e);
+
+        rbit.ref_->data_ = ref_8D;
+
+        std::cout << "fin calcul acs"<< std::endl;
+
+    }
+
+    if (rbit.data_.data_.get_number_of_elements() > 0)
+    {
+        std::cout << " je suis la structure qui contient les données single band et/ou multiband" << std::endl;
+        GDEBUG("GenericSMSPrepGadget - |--------------------------------------------------------------------------|\n");
+
+        bool is_single_band=false;
+
+        bool is_first_repetition=detect_first_repetition(rbit);
+
+        if (is_first_repetition==true) {
+
+            is_single_band=detect_single_band_data(rbit);
+
+            hoNDArray< std::complex<float> >& data = rbit.data_.data_;
 
             size_t RO = data.get_size(0);
             size_t E1 = data.get_size(1);
@@ -56,75 +90,40 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
             size_t S = data.get_size(5);
             size_t SLC = data.get_size(6);
 
-            GDEBUG_STREAM("GenericSMSPrepGadget - incoming data array ref : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
-
-            ref_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
-
-            pre_process_ref_data(data, ref_8D,  e);
-
-            recon_bit_->rbit_[e].ref_->data_ = ref_8D;
-
-            std::cout << "fin calcul acs"<< std::endl;
-
+            //TODO this initiailisation should be done somewhere else but it must be done once at the first repetition
+            sb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
+            mb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
         }
 
-        if (recon_bit_->rbit_[e].data_.data_.get_number_of_elements() > 0)
+        //TODO mettre recon_bit_->rbit_[e] a la place de data + header ici !
+        //TODO on pourrait faire aussi un recon object qui contient, est-ce vraiement utile ? A discuter
+        hoNDArray< std::complex<float> >& data = rbit.data_.data_;
+        hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =rbit.data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
+
+        // create to new hoNDArray [8D] for the sb and mb data
+
+        if (is_single_band==true)
         {
-            std::cout << " je suis la structure qui contient les données single band et/ou multiband" << std::endl;
-            GDEBUG("GenericSMSPrepGadget - |--------------------------------------------------------------------------|\n");
-
-            bool is_single_band=false;
-
-            bool is_first_repetition=detect_first_repetition(recon_bit_->rbit_[e]);
-
-            if (is_first_repetition==true) {
-
-                is_single_band=detect_single_band_data(recon_bit_->rbit_[e]);
-
-                hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
-
-                size_t RO = data.get_size(0);
-                size_t E1 = data.get_size(1);
-                size_t E2 = data.get_size(2);
-                size_t CHA = data.get_size(3);
-                size_t N = data.get_size(4);
-                size_t S = data.get_size(5);
-                size_t SLC = data.get_size(6);
-
-                //TODO this initiailisation should be done somewhere else but it must be done once at the first repetition
-                sb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
-                mb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
-            }
-
-            //TODO mettre recon_bit_->rbit_[e] a la place de data + header ici !
-            //TODO on pourrait faire aussi un recon object qui contient, est-ce vraiement utile ? A discuter
-            hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
-            hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit_->rbit_[e].data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
-
-            // create to new hoNDArray [8D] for the sb and mb data
-
-            if (is_single_band==true)
-            {
-                define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
-                //TODO mettre recon_bit_->rbit_[e] a la place de data + header et ici !
-                pre_process_sb_data(data, sb_8D, headers_, e);
-                recon_bit_->rbit_[e].data_.data_ = sb_8D;
-            }
-            else
-            {
-                // only mb data
-                //then apply standard proccesing on mb
-                define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
-                pre_process_mb_data(data, mb_8D, headers_ , e);
-                recon_bit_->rbit_[e].data_.data_ = mb_8D;
-
-            }
+            define_usefull_parameters_simple_version(rbit, e);
+            //TODO mettre recon_bit_->rbit_[e] a la place de data + header et ici !
+            pre_process_sb_data(data, sb_8D, headers_, e);
+            rbit.data_.data_ = sb_8D;
         }
         else
         {
-            GDEBUG("GenericSMSPrepGadget - |recon_bit_->rbit_[e].data_.data_.get_number_of_elements() =0 --|\n");
+            // only mb data
+            //then apply standard proccesing on mb
+            define_usefull_parameters_simple_version(rbit, e);
+            pre_process_mb_data(data, mb_8D, headers_ , e);
+            rbit.data_.data_ = mb_8D;
+
         }
     }
+    else
+    {
+        GDEBUG("GenericSMSPrepGadget - |recon_bit_->rbit_[e].data_.data_.get_number_of_elements() =0 --|\n");
+    }
+    //}
 
     if (perform_timing.value()) { gt_timer_.stop(); }
 
@@ -150,14 +149,13 @@ void GenericReconSMSPrepGadget::pre_process_ref_data(hoNDArray< std::complex<flo
 
     reorganize_sb_data_to_8D(ref, ref_8D, e);
 
-
     std::cout<< " 1)" << std::endl;
 
     // fait dans SMSBAse car contient la lib KLT et FFT
     // ici ce n'est pas le cas
     do_fft_for_ref_scan(ref_8D);
 
-     std::cout<< " 2)" << std::endl;
+    std::cout<< " 2)" << std::endl;
 
 }
 
@@ -169,12 +167,16 @@ void GenericReconSMSPrepGadget::pre_process_sb_data(hoNDArray< std::complex<floa
     // 1) to reorganize the slices in the stack of slices according the to the slice acceleration
     // 2) to apply (or not depending of the sequence implementation) a blip caipi shift along the y
     // 3) to apply the averaged epi ghost correction
-
+    std::cout << "pre_process_sb_data 0"<< std::endl;
     reorganize_sb_data_to_8D(sb, sb_8D, e);
 
+    std::cout << "pre_process_sb_data 1"<< std::endl;
     apply_averaged_epi_ghost_correction_sb(sb_8D, h_sb, e);
 
+    std::cout << "pre_process_sb_data 2"<< std::endl;
     apply_blip_caipi_shift_sb(sb_8D, h_sb,  e);
+
+    std::cout << "pre_process_sb_data 3"<< std::endl;
 
 }
 
