@@ -33,7 +33,8 @@ add_library(gadgetron_smscore SHARED
     MultiplyMessageContainerGadget.h
     GenericReconSplitSimpleSMSGadget.h
     GenericReconSplitSimpleSMSGadget.cpp
-    
+    GenericReconCartesianReceiveEpiMsgGadget.h
+	GenericReconCartesianReceiveEpiMsgGadget.cpp
   )
 
 set_target_properties(gadgetron_smscore PROPERTIES VERSION ${GADGETRON_VERSION_STRING} SOVERSION ${GADGETRON_SOVERSION})
@@ -73,6 +74,7 @@ install (FILES  gadgetron_smscore_export.h
                 #EmptyGadget.h
                 #GenericReconSplitSMSGadget.h
                 #GenericReconSplitSMSGadget.cpp
+				GenericReconCartesianReceiveEpiMsgGadget.h
                 DESTINATION ${GADGETRON_INSTALL_INCLUDE_PATH} COMPONENT main)
 
 add_subdirectory(config)
