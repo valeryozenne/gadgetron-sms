@@ -11,6 +11,7 @@ add_library(gadgetron_epi SHARED
   FFTXGadget.h FFTXGadget.cpp
   CutXGadget.h CutXGadget.cpp
   OneEncodingGadget.h OneEncodingGadget.cpp
+  EPICorrSendEpiMsgGadget.h EPICorrSendEpiMsgGadget.cpp
   epi.xml
   epi_gtplus_grappa.xml
 )
@@ -35,6 +36,7 @@ install(FILES
   EPIPackNavigatorGadget.h
   FFTXGadget.h
   gadgetron_epi_export.h
+  EPICorrSendEpiMsgGadget.h
   DESTINATION ${GADGETRON_INSTALL_INCLUDE_PATH} COMPONENT main)
 
 install(TARGETS gadgetron_epi
