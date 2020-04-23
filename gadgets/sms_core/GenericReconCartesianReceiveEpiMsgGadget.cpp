@@ -34,21 +34,6 @@ namespace Gadgetron {
         return 0;
     }
 
-    /*int EPICorrSendEPIMsgGadget::process(
-            GadgetContainerMessage<ISMRMRD::AcquisitionHeader> *m1,
-            GadgetContainerMessage<hoNDArray<std::complex<float> > > *m2) {
-
-        GadgetContainerMessage<t_EPICorrection> *messageEPI = new GadgetContainerMessage<t_EPICorrection>();
-
-        this->next()->putq(m1);
-        this->next()->putq(messageEPI);
-
-    }*/
-
-    /*int GenericReconCartesianReceiveEpiMsgGadget::process(
-            GadgetContainerMessage<IsmrmrdReconData> *m1,
-            GadgetContainerMessage<t_EPICorrection> *m2) {*/
-
     int GenericReconCartesianReceiveEpiMsgGadget::process(
             Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1) {
 
