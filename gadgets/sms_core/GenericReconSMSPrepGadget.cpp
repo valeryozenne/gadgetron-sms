@@ -42,11 +42,11 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
         std::stringstream os;
         os << "_encoding_" << e;
 
-        if (recon_bit_->rbit_[e].ref_)
+        if (rbit.ref_)
         {
             // std::cout << " je suis la structure qui contient les données acs" << std::endl;
 
-            hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].ref_->data_;
+            hoNDArray< std::complex<float> >& data = rbit.ref_->data_;
 
             size_t RO = data.get_size(0);
             size_t E1 = data.get_size(1);
@@ -62,24 +62,24 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
 
             pre_process_ref_data(data, ref_8D,  e);
 
-            recon_bit_->rbit_[e].ref_->data_ = ref_8D;
+            rbit.ref_->data_ = ref_8D;
 
         }
 
-        if (recon_bit_->rbit_[e].data_.data_.get_number_of_elements() > 0)
+        if (rbit.data_.data_.get_number_of_elements() > 0)
         {
             // std::cout << " je suis la structure qui contient les données single band et/ou multiband" << std::endl;
             //GDEBUG("GenericSMSPrepGadget - |--------------------------------------------------------------------------|\n");
 
             bool is_single_band=false;
 
-            bool is_first_repetition=detect_first_repetition(recon_bit_->rbit_[e]);
+            bool is_first_repetition=detect_first_repetition(rbit);
 
             if (is_first_repetition==true) {
 
-                is_single_band=detect_single_band_data(recon_bit_->rbit_[e]);
+                is_single_band=detect_single_band_data(rbit);
 
-                hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
+                hoNDArray< std::complex<float> >& data = rbit.data_.data_;
 
                 size_t RO = data.get_size(0);
                 size_t E1 = data.get_size(1);
@@ -96,25 +96,25 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
 
             //TODO mettre recon_bit_->rbit_[e] a la place de data + header ici !
             //TODO on pourrait faire aussi un recon object qui contient, est-ce vraiement utile ? A discuter
-            hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
-            hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit_->rbit_[e].data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
+            hoNDArray< std::complex<float> >& data = rbit.data_.data_;
+            hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =rbit.data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
 
             // create to new hoNDArray [8D] for the sb and mb data
 
             if (is_single_band==true)
             {
-                define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
+                define_usefull_parameters_simple_version(rbit, e);
                 //TODO mettre recon_bit_->rbit_[e] a la place de data + header et ici !
                 pre_process_sb_data(data, sb_8D, headers_, e);
-                recon_bit_->rbit_[e].data_.data_ = sb_8D;
+                rbit.data_.data_ = sb_8D;
             }
             else
             {
                 // only mb data
                 //then apply standard proccesing on mb
-                define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
+                define_usefull_parameters_simple_version(rbit, e);
                 pre_process_mb_data(data, mb_8D, headers_ , e);
-                recon_bit_->rbit_[e].data_.data_ = mb_8D;
+                rbit.data_.data_ = mb_8D;
 
             }
         }

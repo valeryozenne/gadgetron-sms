@@ -357,7 +357,7 @@ void GenericReconCartesianSliceGrappavgpuGadget::im2col_gpu(hoNDArray<std::compl
 
                                 cuNDArray<float_complext> device_data(host_data);
 
-                                compute_im2col_2D(device_data , device_data_out ,  blocks_RO, blocks_E1,  grappa_kSize_RO, grappa_kSize_E1);
+                                prepare_im2col_2D(device_data , device_data_out ,  blocks_RO, blocks_E1,  grappa_kSize_RO, grappa_kSize_E1);
 
                                 device_data_out.to_host(host_data_out);
 
@@ -427,7 +427,7 @@ void GenericReconCartesianSliceGrappavgpuGadget::im2col_gpu(hoNDArray<std::compl
 
                     cuNDArray<float_complext> device_data(host_data);
 
-                    compute_im2col_5D(device_data , device_data_out ,  blocks_RO, blocks_E1,  grappa_kSize_RO, grappa_kSize_E1);
+                    prepare_im2col_5D(device_data , device_data_out ,  blocks_RO, blocks_E1,  grappa_kSize_RO, grappa_kSize_E1);
 
                     device_data_out.to_host(host_data_out);
 

@@ -63,51 +63,68 @@ estimate_feasibility( const cuNDArray<complext<REAL> >& data_in, int target_coil
 template<class REAL> bool
 estimate_feasibility_no_STK( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& data_out, const size_t acc , const size_t startE1, const size_t endE1, const size_t reduceE1)
 {
-   boost::shared_ptr<GPUTimer> process_timer;
-   process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::remove_encoding_no_STK local") );
-   remove_encoding_no_STK( &data_out, &data_in ,  acc , startE1,  endE1, reduceE1);
-   process_timer.reset();
+    boost::shared_ptr<GPUTimer> process_timer;
+    process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::remove_encoding_no_STK local") );
+    remove_encoding_no_STK( &data_out, &data_in ,  acc , startE1,  endE1, reduceE1);
+    process_timer.reset();
 
-   return true;
+    return true;
 }
 
 
 template<class REAL> bool
 estimate_feasibility_with_STK( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& data_out, const size_t acc , const size_t startE1, const size_t endE1, const size_t reduceE1)
 {
-   boost::shared_ptr<GPUTimer> process_timer;
-   process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::remove_encoding_with_STK local") );
-   remove_encoding_with_STK( &data_out, &data_in ,  acc , startE1,  endE1, reduceE1);
-   process_timer.reset();
+    boost::shared_ptr<GPUTimer> process_timer;
+    process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::remove_encoding_with_STK local") );
+    remove_encoding_with_STK( &data_out, &data_in ,  acc , startE1,  endE1, reduceE1);
+    process_timer.reset();
 
-   return true;
+    return true;
 }
 
 
 template<class REAL> bool
-compute_im2col_2D( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& data_out, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1)
+prepare_im2col_2D( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& data_out, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1)
 {
-   boost::shared_ptr<GPUTimer> process_timer;
-   process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::compute_im2col_gpu 2D local") );
-   compute_im2col_2D( &data_out, &data_in ,  blocks_RO , blocks_E1,  grappa_kSize_RO, grappa_kSize_E1);
-   process_timer.reset();
+    boost::shared_ptr<GPUTimer> process_timer;
+    process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::compute_im2col_gpu 2D local") );
+    compute_im2col_2D( &data_out, &data_in ,  blocks_RO , blocks_E1,  grappa_kSize_RO, grappa_kSize_E1);
+    process_timer.reset();
 
-   return true;
+    return true;
 }
 
 template<class REAL> bool
-compute_im2col_5D( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& data_out, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1)
+prepare_im2col_5D( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& data_out, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1)
 {
-   boost::shared_ptr<GPUTimer> process_timer;
-   process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::compute_im2col_gpu 5D local") );
-   compute_im2col_5D( &data_out, &data_in ,  blocks_RO , blocks_E1,  grappa_kSize_RO, grappa_kSize_E1);
-   process_timer.reset();
+    boost::shared_ptr<GPUTimer> process_timer;
+    process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::compute_im2col_gpu 5D local") );
+    compute_im2col_5D( &data_out, &data_in ,  blocks_RO , blocks_E1,  grappa_kSize_RO, grappa_kSize_E1);
+    process_timer.reset();
 
-   return true;
+    return true;
 }
 
-template EXPORTGPUPMRI bool compute_im2col_2D( cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , const size_t , const size_t , const size_t , const size_t );
-template EXPORTGPUPMRI bool compute_im2col_5D( cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , const size_t , const size_t , const size_t , const size_t );
+
+
+
+
+
+template<class REAL> bool
+prepare_EPI_corr_5D( bool undo, bool optimal,   cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& pos, cuNDArray<complext<REAL> >& neg ,cuNDArray<complext<REAL> >& pos_mean, cuNDArray<complext<REAL> >& neg_mean, cuNDArray<int >& reverse_line)
+{
+    boost::shared_ptr<GPUTimer> process_timer;
+    process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::compute_EPI_corr_5D 5D local") );
+    compute_EPI_coor_5D(undo, optimal,  &data_in, &pos, &neg, &pos_mean, &neg_mean, &reverse_line);
+    process_timer.reset();
+
+    return true;
+}
+
+template EXPORTGPUPMRI bool prepare_im2col_2D( cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , const size_t , const size_t , const size_t , const size_t );
+template EXPORTGPUPMRI bool prepare_im2col_5D( cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , const size_t , const size_t , const size_t , const size_t );
+template EXPORTGPUPMRI bool prepare_EPI_corr_5D(bool, bool,  cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , cuNDArray<complext<float> >&  ,cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , cuNDArray<int >& );
 
 template EXPORTGPUPMRI  cuNDArray<complext<float>> estimate_feasibility<float,2>(const cuNDArray<complext<float> >&, int);
 //template EXPORTGPUPMRI  cuNDArray<complext<float>> estimate_feasibility<float>( cuNDArray<complext<float> >&);
@@ -126,7 +143,7 @@ remove_encoding_kernel_no_STK( T *out,  T *in, unsigned int RO, unsigned int E1,
     unsigned int mb =  (blockIdx.y- cha) / CHA  ;
 
     //unsigned int stk = (blockIdx.y)/(CHA*MB);
-   // unsigned int mb = (blockIdx.y - stk*CHA*MB)/CHA;
+    // unsigned int mb = (blockIdx.y - stk*CHA*MB)/CHA;
     //unsigned int cha = (blockIdx.y - stk*CHA*MB)%CHA;
 
     if (ro < RO && cha < CHA &&  mb <  MB )
@@ -256,7 +273,7 @@ void remove_encoding_with_STK( cuNDArray<T> *data_out, cuNDArray<T> *data_in , c
     dim3 gridDim(int(RO/warp_size)+1, CHA*MB*STK  );
 
     std::cout << "warp_size :"<<  warp_size << std::endl;
-     std::cout << "int(RO/warp_size)+1 :"<<  int(RO/warp_size)+1 << std::endl;
+    std::cout << "int(RO/warp_size)+1 :"<<  int(RO/warp_size)+1 << std::endl;
     std::cout << "CHA*MB*STK :"<<  CHA*MB*STK << std::endl;
 
     // Invoke kernel
@@ -277,40 +294,40 @@ im2col_2D_kernel( T *output,  T *input,  size_t block_RO,  size_t block_E1,  siz
 
 
     //input
-         int ro=blockIdx.x  + threadIdx.x;
-         int e1=blockIdx.y  + threadIdx.y;
+    int ro=blockIdx.x  + threadIdx.x;
+    int e1=blockIdx.y  + threadIdx.y;
 
-         int RO=block_RO+ grappa_kSize_RO-1;
-         int E1=block_E1+ grappa_kSize_E1-1;
+    int RO=block_RO+ grappa_kSize_RO-1;
+    int E1=block_E1+ grappa_kSize_E1-1;
 
-         int index_offset_image=ro + e1 *RO;
+    int index_offset_image=ro + e1 *RO;
 
-         //output
-         //colIdx = ke1 + kro * grappa_kSize_E1
-         int colIdx = threadIdx.y + grappa_kSize_E1*threadIdx.x;
+    //output
+    //colIdx = ke1 + kro * grappa_kSize_E1
+    int colIdx = threadIdx.y + grappa_kSize_E1*threadIdx.x;
 
-         // rowIdx = e1 + ro * blocks_E1
-         int rowIdx = blockIdx.y + blockIdx.x*block_E1;
+    // rowIdx = e1 + ro * blocks_E1
+    int rowIdx = blockIdx.y + blockIdx.x*block_E1;
 
-         //output[rowIdx, colIdx]
-         int index_offset_kernel= rowIdx + colIdx* block_RO * block_E1;
+    //output[rowIdx, colIdx]
+    int index_offset_kernel= rowIdx + colIdx* block_RO * block_E1;
 
-         int maximum_size_image= RO*E1;
-         int maximum_size_kernel= block_RO*block_E1*grappa_kSize_RO*grappa_kSize_E1;
+    int maximum_size_image= RO*E1;
+    int maximum_size_kernel= block_RO*block_E1*grappa_kSize_RO*grappa_kSize_E1;
 
-         if ( index_offset_image < maximum_size_image && index_offset_kernel < maximum_size_kernel )
-         {
-         //(" %d %d -> %d / %d   |  %d %d -> %d /  %d  || %d  %d  ->  %d /%d  \\n",  threadIdx.x, threadIdx.y, rowIdx ,  kro*ke1 , blockIdx.x, blockIdx.y , colIdx , ro_cut *e1_cut  , kernel_x, kernel_y , index_offset_image , maximum_size_image);
+    if ( index_offset_image < maximum_size_image && index_offset_kernel < maximum_size_kernel )
+    {
+        //(" %d %d -> %d / %d   |  %d %d -> %d /  %d  || %d  %d  ->  %d /%d  \\n",  threadIdx.x, threadIdx.y, rowIdx ,  kro*ke1 , blockIdx.x, blockIdx.y , colIdx , ro_cut *e1_cut  , kernel_x, kernel_y , index_offset_image , maximum_size_image);
 
-         //if (blockIdx.x==123 && blockIdx.y==66)
-         //{
-         //printf(" %d %d -> %d / %d   |  %d %d -> %d /  %d  || %d  %d  ->  %d  /%d \\n",  threadIdx.x, threadIdx.y, rowIdx ,  kro*ke1 , blockIdx.x, blockIdx.y , colIdx , ro_cut *e1_cut  , kernel_x, kernel_y , index_offset_image , maximum_size_image);
-         //}
+        //if (blockIdx.x==123 && blockIdx.y==66)
+        //{
+        //printf(" %d %d -> %d / %d   |  %d %d -> %d /  %d  || %d  %d  ->  %d  /%d \\n",  threadIdx.x, threadIdx.y, rowIdx ,  kro*ke1 , blockIdx.x, blockIdx.y , colIdx , ro_cut *e1_cut  , kernel_x, kernel_y , index_offset_image , maximum_size_image);
+        //}
 
-         output[index_offset_kernel] = input[index_offset_image];
-         //}
+        output[index_offset_kernel] = input[index_offset_image];
+        //}
 
-         }
+    }
 
 
 
@@ -347,8 +364,6 @@ void compute_im2col_2D( cuNDArray<T> *data_out, cuNDArray<T> *data_in , const si
     std::cout << "grappa_kSize_RO :"<<  grappa_kSize_RO << "grappa_kSize_E1 :"<<  grappa_kSize_E1  << std::endl;
     std::cout << "blocks_RO :"<<  blocks_RO << "blocks_E1 :"<<  blocks_E1  << std::endl;
 
-
-
     //std::cout << "blockDim :"<<  warp_size << std::endl;
     //std::cout << "RO%warp_size :"<<  int(RO/warp_size)+1 << std::endl;
 
@@ -367,33 +382,33 @@ im2col_5D_kernel( T *output,  T *input, size_t CHA, size_t MB,  size_t block_RO,
 {
 
     //input
-        int ro=blockIdx.x  + threadIdx.x;
-        int e1=blockIdx.y  + threadIdx.y;
+    int ro=blockIdx.x  + threadIdx.x;
+    int e1=blockIdx.y  + threadIdx.y;
 
-        int stk = (blockIdx.z)/(CHA*MB);
-        int mb = (blockIdx.z - stk*CHA*MB)/CHA;
-        int cha = (blockIdx.z - stk*CHA*MB)%CHA;
+    int stk = (blockIdx.z)/(CHA*MB);
+    int mb = (blockIdx.z - stk*CHA*MB)/CHA;
+    int cha = (blockIdx.z - stk*CHA*MB)%CHA;
 
-        int RO=block_RO+ grappa_kSize_RO-1;
-        int E1=block_E1+ grappa_kSize_E1-1;
+    int RO=block_RO+ grappa_kSize_RO-1;
+    int E1=block_E1+ grappa_kSize_E1-1;
 
-        int index_offset_image=ro + e1 *RO;
+    int index_offset_image=ro + e1 *RO;
 
 
-        //colIdx = ke1 + kro * grappa_kSize_E1
-        int colIdx = threadIdx.y + grappa_kSize_E1*threadIdx.x;
+    //colIdx = ke1 + kro * grappa_kSize_E1
+    int colIdx = threadIdx.y + grappa_kSize_E1*threadIdx.x;
 
-        // rowIdx = e1 + ro * blocks_E1
-        int rowIdx = blockIdx.y + blockIdx.x*block_E1;
+    // rowIdx = e1 + ro * blocks_E1
+    int rowIdx = blockIdx.y + blockIdx.x*block_E1;
 
-        //output[rowIdx, colIdx]
-        int index_offset_kernel= rowIdx + colIdx* block_RO * block_E1;
+    //output[rowIdx, colIdx]
+    int index_offset_kernel= rowIdx + colIdx* block_RO * block_E1;
 
-        int maximum_size_image= RO*E1;
-        int maximum_size_kernel= block_RO*block_E1*grappa_kSize_RO*grappa_kSize_E1;
+    int maximum_size_image= RO*E1;
+    int maximum_size_kernel= block_RO*block_E1*grappa_kSize_RO*grappa_kSize_E1;
 
-        if ( index_offset_image < maximum_size_image && index_offset_kernel < maximum_size_kernel )
-        {
+    if ( index_offset_image < maximum_size_image && index_offset_kernel < maximum_size_kernel )
+    {
         //(" %d %d -> %d / %d   |  %d %d -> %d /  %d  || %d  %d  ->  %d /%d  \\n",  threadIdx.x, threadIdx.y, rowIdx ,  kro*ke1 , blockIdx.x, blockIdx.y , colIdx , ro_cut *e1_cut  , kernel_x, kernel_y , index_offset_image , maximum_size_image);
 
         int indice_cha_in =  cha *  maximum_size_image  +   mb * maximum_size_image *CHA +   stk * maximum_size_image*CHA*MB   ;
@@ -401,11 +416,10 @@ im2col_5D_kernel( T *output,  T *input, size_t CHA, size_t MB,  size_t block_RO,
 
 
         output[index_offset_kernel+ indice_cha_out] = input[index_offset_image + indice_cha_in];
-        }
+    }
 
 
 }
-
 
 
 template<class T> static
@@ -450,6 +464,275 @@ void compute_im2col_5D( cuNDArray<T> *data_out, cuNDArray<T> *data_in , const si
     //assemble_D_kernel<T><<< gridDim, blockDim >>>( data_out->get_data_ptr(), data_in->get_data_ptr(), RO, E1, N, CHA, ks*ks, halfKs );
     CHECK_FOR_CUDA_ERROR();
 }
+
+
+
+
+
+template<class T> __global__ static void
+matrix_apply_EPI_optimal (T *input,  T *epi_nav_pos_STK,T *epi_nav_neg_STK , T *epi_nav_pos_STK_mean , T *epi_nav_neg_STK_mean, int *reverse_line, size_t CHA, size_t MB, size_t start_E1_, size_t end_E1_, size_t RO, size_t E1)
+{
+
+   //int ro=blockIdx.x  + threadIdx.x;
+   //int e1=blockIdx.y  + threadIdx.y;
+
+   int ro = blockIdx.x * blockDim.x + threadIdx.x;
+   int e1 = blockIdx.y * blockDim.y + threadIdx.y;
+
+   int a = (blockIdx.z)/(CHA*MB);
+   int mb = (blockIdx.z - a*CHA*MB)/CHA;
+   int cha = (blockIdx.z - a*CHA*MB)%CHA;
+
+   if ( e1 >= start_E1_ && e1 <=end_E1_ && ro >=0 && ro< RO)
+   {
+
+   //printf(" %d %d  %d \\n",threadIdx.x, blockIdx.x,   ro) ;
+
+       int index_epi_nav = ro  + mb * RO+ a * RO* MB;
+
+       int index_epi_nav_mean = ro +  a * RO;
+
+       int index_voxel = ro + e1*RO +  cha*RO*E1 + mb*RO*E1*CHA + a * RO*E1*CHA*MB;
+
+       T correction_pos_hoND;
+       T correction_neg_hoND;
+
+       /*if (optimal==true)
+       {
+           correction_pos_hoND=epi_nav_pos_STK[index_epi_nav];
+           correction_neg_hoND=epi_nav_neg_STK[index_epi_nav] ;
+       }
+       else
+       {
+           correction_pos_hoND=epi_nav_pos_STK_mean[index_epi_nav_mean];
+           correction_neg_hoND=epi_nav_neg_STK_mean[index_epi_nav_mean] ;
+       }
+
+
+       if (undo==true)
+       {
+           correction_pos_hoND=epi_nav_pos_STK[index_epi_nav]/epi_nav_pos_STK_mean[index_epi_nav_mean];
+           correction_neg_hoND=epi_nav_neg_STK[index_epi_nav]/epi_nav_neg_STK_mean[index_epi_nav_mean];
+       }*/
+
+       correction_pos_hoND=epi_nav_pos_STK[index_epi_nav];
+       correction_neg_hoND=epi_nav_neg_STK[index_epi_nav] ;
+
+       //correction_pos_hoND=1;
+       //correction_neg_hoND=1;
+
+       if (reverse_line[e1]==1)
+       {
+           input[index_voxel]*=correction_neg_hoND;
+       }
+       else
+       {
+           input[index_voxel]*=correction_pos_hoND;
+       }
+
+   }
+
+}
+
+template<class T> __global__ static void
+matrix_apply_EPI_mean (T *input,  T *epi_nav_pos_STK,T *epi_nav_neg_STK , T *epi_nav_pos_STK_mean , T *epi_nav_neg_STK_mean, int *reverse_line, size_t CHA, size_t MB, size_t start_E1_, size_t end_E1_, size_t RO, size_t E1)
+{
+
+   //int ro=blockIdx.x  + threadIdx.x;
+   //int e1=blockIdx.y  + threadIdx.y;
+
+   int ro = blockIdx.x * blockDim.x + threadIdx.x;
+   int e1 = blockIdx.y * blockDim.y + threadIdx.y;
+
+   int a = (blockIdx.z)/(CHA*MB);
+   int mb = (blockIdx.z - a*CHA*MB)/CHA;
+   int cha = (blockIdx.z - a*CHA*MB)%CHA;
+
+   if ( e1 >= start_E1_ && e1 <=end_E1_ && ro >=0 && ro< RO)
+   {
+
+   //printf(" %d %d  %d \\n",threadIdx.x, blockIdx.x,   ro) ;
+
+       int index_epi_nav = ro  + mb * RO+ a * RO* MB;
+
+       int index_epi_nav_mean = ro +  a * RO;
+
+       int index_voxel = ro + e1*RO +  cha*RO*E1 + mb*RO*E1*CHA + a * RO*E1*CHA*MB;
+
+       T correction_pos_hoND;
+       T correction_neg_hoND;
+
+       /*if (optimal==true)
+       {
+           correction_pos_hoND=epi_nav_pos_STK[index_epi_nav];
+           correction_neg_hoND=epi_nav_neg_STK[index_epi_nav] ;
+       }
+       else
+       {
+           correction_pos_hoND=epi_nav_pos_STK_mean[index_epi_nav_mean];
+           correction_neg_hoND=epi_nav_neg_STK_mean[index_epi_nav_mean] ;
+       }
+
+
+       if (undo==true)
+       {
+           correction_pos_hoND=epi_nav_pos_STK[index_epi_nav]/epi_nav_pos_STK_mean[index_epi_nav_mean];
+           correction_neg_hoND=epi_nav_neg_STK[index_epi_nav]/epi_nav_neg_STK_mean[index_epi_nav_mean];
+       }*/
+
+       correction_pos_hoND=epi_nav_pos_STK_mean[index_epi_nav_mean];
+       correction_neg_hoND=epi_nav_neg_STK_mean[index_epi_nav_mean] ;
+
+       //correction_pos_hoND=1;
+       //correction_neg_hoND=1;
+
+       if (reverse_line[e1]==1)
+       {
+           input[index_voxel]*=correction_neg_hoND;
+       }
+       else
+       {
+           input[index_voxel]*=correction_pos_hoND;
+       }
+
+   }
+
+}
+
+
+template<class T> __global__ static void
+matrix_apply_EPI_undo (T *input,  T *epi_nav_pos_STK,T *epi_nav_neg_STK , T *epi_nav_pos_STK_mean , T *epi_nav_neg_STK_mean, int *reverse_line, size_t CHA, size_t MB, size_t start_E1_, size_t end_E1_, size_t RO, size_t E1)
+{
+
+   //int ro=blockIdx.x  + threadIdx.x;
+   //int e1=blockIdx.y  + threadIdx.y;
+
+   int ro = blockIdx.x * blockDim.x + threadIdx.x;
+   int e1 = blockIdx.y * blockDim.y + threadIdx.y;
+
+   int a = (blockIdx.z)/(CHA*MB);
+   int mb = (blockIdx.z - a*CHA*MB)/CHA;
+   int cha = (blockIdx.z - a*CHA*MB)%CHA;
+
+   if ( e1 >= start_E1_ && e1 <=end_E1_ && ro >=0 && ro< RO)
+   {
+
+   //printf(" %d %d  %d \\n",threadIdx.x, blockIdx.x,   ro) ;
+
+       int index_epi_nav = ro  + mb * RO+ a * RO* MB;
+
+       int index_epi_nav_mean = ro +  a * RO;
+
+       int index_voxel = ro + e1*RO +  cha*RO*E1 + mb*RO*E1*CHA + a * RO*E1*CHA*MB;
+
+       T correction_pos_hoND;
+       T correction_neg_hoND;
+
+       /*if (optimal==true)
+       {
+           correction_pos_hoND=epi_nav_pos_STK[index_epi_nav];
+           correction_neg_hoND=epi_nav_neg_STK[index_epi_nav] ;
+       }
+       else
+       {
+           correction_pos_hoND=epi_nav_pos_STK_mean[index_epi_nav_mean];
+           correction_neg_hoND=epi_nav_neg_STK_mean[index_epi_nav_mean] ;
+       }
+
+
+       if (undo==true)
+       {
+           correction_pos_hoND=epi_nav_pos_STK[index_epi_nav]/epi_nav_pos_STK_mean[index_epi_nav_mean];
+           correction_neg_hoND=epi_nav_neg_STK[index_epi_nav]/epi_nav_neg_STK_mean[index_epi_nav_mean];
+       }*/
+
+       correction_pos_hoND=epi_nav_pos_STK[index_epi_nav]/epi_nav_pos_STK_mean[index_epi_nav_mean];
+       correction_neg_hoND=epi_nav_neg_STK[index_epi_nav]/epi_nav_neg_STK_mean[index_epi_nav_mean];
+
+       //correction_pos_hoND=1;
+       //correction_neg_hoND=1;
+
+       if (reverse_line[e1]==1)
+       {
+           input[index_voxel]*=correction_neg_hoND;
+       }
+       else
+       {
+           input[index_voxel]*=correction_pos_hoND;
+       }
+
+   }
+
+}
+
+
+
+template<class T> static
+void compute_EPI_coor_5D( bool undo, bool optimal, cuNDArray<T> *data_in, cuNDArray<T> *pos, cuNDArray<T> *neg, cuNDArray<T> *pos_mean, cuNDArray<T> *neg_mean, cuNDArray<int> *reverse_line)
+{
+
+    // Setup block/grid dimensions
+    int cur_device = cudaDeviceManager::Instance()->getCurrentDevice();
+    int warp_size = cudaDeviceManager::Instance()->warp_size(cur_device);
+    int max_blockdim = cudaDeviceManager::Instance()->max_blockdim(cur_device);
+    size_t shared_mem_per_block = cudaDeviceManager::Instance()->shared_mem_per_block(cur_device);
+
+    //std::cout << "GPU cur_device :"<<  cur_device << std::endl;
+    //std::cout << "GPU  warp_size :"<<  warp_size << std::endl;
+    //std::cout << "GPU max_blockdim :"<<  max_blockdim << std::endl;
+    //std::cout << "GPU shared_mem_per_block :"<<  shared_mem_per_block << std::endl;
+
+    size_t NDim = data_in->get_number_of_dimensions();
+
+    unsigned int RO = data_in->get_size(0);
+    unsigned int E1 = data_in->get_size(1);
+    unsigned int CHA = data_in->get_size(2);
+    unsigned int MB = data_in->get_size(3);
+    unsigned int STK = data_in->get_size(4);
+
+    dim3 blockDim(32, 32,1);
+
+    unsigned int blocks_RO=(unsigned int) std::ceil(RO/blockDim.x);
+    unsigned int blocks_E1=(unsigned int) std::ceil(RO/blockDim.y);
+
+    dim3 gridDim(blocks_RO, blocks_E1 , CHA*MB*STK );
+
+
+    //std::cout << "maxThreadsPerBlock :"<<  32 << "maxThreadsPerBlock :"<<  32  << std::endl;
+    //std::cout << "blocks_RO :  "<<  blocks_RO << "  blocks_E1 :  "<<  blocks_E1<< "  CHA*MB*STK :  "<<  CHA*MB*STK   << std::endl;
+
+    unsigned int start_E1_ = 50;
+    unsigned int end_E1_ = 90;
+
+    //bool* myGlobalBoolVarPtr_undo;
+    //myGlobalBoolVarPtr_undo=&undo;
+    //cudaMalloc(&myGlobalBoolVarPtr_undo, sizeof(bool));
+
+    //std::cout << "blockDim :"<<  warp_size << std::endl;
+    //std::cout << "RO%warp_size :"<<  int(RO/warp_size)+1 << std::endl;
+
+    // Invoke kernel
+    if (undo==true)
+    {
+    matrix_apply_EPI_undo<T><<< gridDim, blockDim >>>( data_in->get_data_ptr(),  pos->get_data_ptr() , neg->get_data_ptr() , pos_mean->get_data_ptr() , neg_mean->get_data_ptr(), reverse_line->get_data_ptr(),  CHA,  MB,  start_E1_,  end_E1_,  RO,  E1);
+    }
+    else
+    {
+        if (optimal==true)
+        {
+           matrix_apply_EPI_optimal<T><<< gridDim, blockDim >>>( data_in->get_data_ptr(),  pos->get_data_ptr() , neg->get_data_ptr() , pos_mean->get_data_ptr() , neg_mean->get_data_ptr(), reverse_line->get_data_ptr(),  CHA,  MB,  start_E1_,  end_E1_,  RO,  E1);
+
+        }
+        else
+        {
+            matrix_apply_EPI_mean<T><<< gridDim, blockDim >>>( data_in->get_data_ptr(),  pos->get_data_ptr() , neg->get_data_ptr() , pos_mean->get_data_ptr() , neg_mean->get_data_ptr(), reverse_line->get_data_ptr(),  CHA,  MB,  start_E1_,  end_E1_,  RO,  E1);
+        }
+    }
+    //rss_normalize_kernel<T><<< gridDim, blockDim >>>( in_out->get_data_ptr(), stride, number_of_batches, number_of_elements );
+    //assemble_D_kernel<T><<< gridDim, blockDim >>>( data_out->get_data_ptr(), data_in->get_data_ptr(), RO, E1, N, CHA, ks*ks, halfKs );
+    CHECK_FOR_CUDA_ERROR();
+}
+
 
 /*
 

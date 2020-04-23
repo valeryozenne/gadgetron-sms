@@ -130,7 +130,17 @@ namespace Gadgetron {
         hoNDArray< std::complex<float> > tempo_hoND;
         hoNDArray< std::complex<float> > tempo_1D_hoND;
 
+        /*hoNDArray<float_complext>* host_epi_nav_pos_STK_;
+        cuNDArray<float_complext> device_epi_nav_pos_STK_;
 
+        hoNDArray<float_complext>* host_epi_nav_neg_STK_ ;
+        cuNDArray<float_complext> device_epi_nav_neg_STK_;
+
+        hoNDArray<float_complext>* host_epi_nav_pos_STK_mean_;
+        cuNDArray<float_complext> device_epi_nav_pos_STK_mean_;
+
+        hoNDArray<float_complext>* host_epi_nav_neg_STK_mean_;
+        cuNDArray<float_complext> device_epi_nav_neg_STK_mean_;*/
 
 
         // --------------------------------------------------
@@ -166,6 +176,8 @@ namespace Gadgetron {
 
         virtual void save_4D_8D_kspace(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
+        virtual void save_4D_data(hoNDArray<float >& input, std::string name, std::string encoding_number);
+
         virtual void show_size(hoNDArray< std::complex<float> >& input, std::string name);
 
         virtual void load_epi_data();
@@ -181,6 +193,8 @@ namespace Gadgetron {
         virtual void apply_ghost_correction_with_STK6_old(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo , bool optimal);
 
         virtual void apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal, bool ifft , std::string msg);
+
+        virtual void apply_ghost_correction_with_STK6_gpu(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , bool ifft , std::string msg);
 
         virtual void apply_ghost_correction_with_STK6_open(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal, bool ifft , std::string msg);
 

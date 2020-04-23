@@ -177,13 +177,80 @@ void GenericReconSMSPostGadget::post_process_sb_data(hoNDArray< std::complex<flo
     if (!debug_folder_full_path_.empty())
     {
         save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_SB4D_fin_caipi", os.str());
+
     }
 
     load_epi_data();
 
     prepare_epi_data(e, data_8D.get_size(1),  data_8D.get_size(2) ,  data_8D.get_size(3) );
 
-    apply_ghost_correction_with_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true, "POST SB" );
+    if (!debug_folder_full_path_.empty())
+    {
+        save_4D_data(epi_nav_neg_STK_, "epi_nav_neg_STK", os.str());
+        save_4D_data(epi_nav_pos_STK_, "epi_nav_pos_STK", os.str());
+
+        save_4D_data(epi_nav_neg_STK_mean_, "epi_nav_neg_STK_mean", os.str());
+        save_4D_data(epi_nav_pos_STK_mean_, "epi_nav_pos_STK_mean", os.str());
+
+        size_t E1 = data_8D.get_size(1);
+
+        hoNDArray<float> reverse_line;
+        reverse_line.create(E1);
+        reverse_line.fill(0);
+
+        //std::cout<< " start_E1_ "<<  start_E1_ << std::endl;
+        //std::cout<< " end_E1_ "<<  end_E1_ << std::endl;
+
+        for (size_t e1 = start_E1_; e1 <= end_E1_; e1+=acceFactorSMSE1_[e])
+        {
+            ISMRMRD::AcquisitionHeader& curr_header = headers(e1, 0, 0, 0, 0);  //5D, fixed order [E1, E2, N, S, LOC]
+            if (curr_header.isFlagSet(ISMRMRD::ISMRMRD_ACQ_IS_REVERSE)) {
+                reverse_line(e1)=1;                
+            }
+            else
+            {
+                reverse_line(e1)=0;
+            }
+
+            //std::cout << e1 << " "<< reverse_line(e1) << std::endl;
+        }
+        //std::cout << reverse_line << std::endl;
+        save_4D_data(reverse_line, "reverse_line", os.str());
+
+    }
+
+
+    hoNDArray< std::complex<float> > data_compare(data_8D);
+
+    if (!debug_folder_full_path_.empty())
+    {
+        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_SB4D_stk6_avant_cpu", os.str());
+        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_compare, "FID_SB4D_stk6_avant_gpu", os.str());
+    }
+
+    if (use_gpu.value()==true)
+    {
+        if (perform_timing.value()) { gt_timer_local_.start("gpuExample::stk6 gpu time");}
+        apply_ghost_correction_with_STK6_gpu(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true, "POST SB" );
+        if (perform_timing.value()) { gt_timer_local_.stop();}
+    }
+    else
+    {
+        if (perform_timing.value()) { gt_timer_local_.start("cpuExample::stk6 cpu time");}
+        apply_ghost_correction_with_STK6(data_compare, headers ,  acceFactorSMSE1_[e], true , false, true, "POST SB" );
+        if (perform_timing.value()) { gt_timer_local_.stop();}
+    }
+
+    //
+
+    if (!debug_folder_full_path_.empty())
+    {
+        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_SB4D_fin_epi", os.str());
+
+        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_SB4D_stk6_apres_cpu", os.str());
+        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_compare, "FID_SB4D_stk6_apres_gpu", os.str());
+    }
+
 
 
     if(use_omp.value()==true)
@@ -216,7 +283,19 @@ void GenericReconSMSPostGadget::post_process_mb_data(hoNDArray< std::complex<flo
         save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_MB4D_fin_caipi", os.str());
     }
 
-    apply_ghost_correction_with_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true,  "POST MB");
+
+    if (use_gpu.value()==true)
+    {
+        if (perform_timing.value()) { gt_timer_local_.start("gpuExample::stk6 gpu time");}
+        apply_ghost_correction_with_STK6_gpu(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true, "POST MB" );
+        if (perform_timing.value()) { gt_timer_local_.stop();}
+    }
+    else
+    {
+        if (perform_timing.value()) { gt_timer_local_.start("gpuExample::stk6 cpu time");}
+        apply_ghost_correction_with_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true,  "POST MB");
+        if (perform_timing.value()) { gt_timer_local_.stop();}
+    }
 
     if(use_omp.value()==true)
     {

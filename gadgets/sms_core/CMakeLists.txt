@@ -116,6 +116,7 @@ set( gadgetron_smscore_config_files
     config/Generic_Cartesian_Slice_Grappa_EPI_v5.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_v6.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_vgpu.xml
+    config/Generic_Cartesian_Slice_Grappa_EPI_vgpu_Postcpu.xml
 )
 
 add_library(gadgetron_smscore SHARED 
@@ -140,7 +141,6 @@ target_link_libraries(gadgetron_smscore
     gadgetron_toolbox_image_analyze_io
     gadgetron_toolbox_denoise
     gadgetron_toolbox_hostutils
-
     ${ISMRMRD_LIBRARIES} 
     ${FFTW3_LIBRARIES} 
     optimized ${ACE_LIBRARIES} debug ${ACE_DEBUG_LIBRARY} 
