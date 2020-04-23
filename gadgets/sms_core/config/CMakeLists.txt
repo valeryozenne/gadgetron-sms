@@ -8,6 +8,7 @@ if (ARMADILLO_FOUND)
     Generic_Cartesian_Slice_Grappa_EPI.xml
     Generic_Cartesian_Slice_Grappa_EPI_Error.xml
     Generic_Cartesian_Slice_Grappa_EPI_v5.xml
+	Generic_Cartesian_Slice_Grappa_EPI_With_Msg.xml
     DESTINATION ${GADGETRON_INSTALL_CONFIG_PATH} COMPONENT main
     )
 elseif (ARMADILLO_FOUND)

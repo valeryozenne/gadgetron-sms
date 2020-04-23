@@ -43,11 +43,11 @@
     </gadget>
 
 
-    <gadget>
+    <!--<gadget>
         <name>GiveReadoutInformationGadget</name>
         <dll>gadgetron_smscore</dll>
         <classname>GiveReadoutInformationGadget</classname>        
-    </gadget> 
+    </gadget> -->
 
     <!-- EPI correction -->
     <gadget>
@@ -60,6 +60,12 @@
         <name>EPICorr</name>
         <dll>gadgetron_epi</dll>
         <classname>EPICorrGadget</classname>
+    </gadget>
+
+    <gadget>
+        <name>EPICorrSendEPIMsg</name>
+        <dll>gadgetron_epi</dll>
+        <classname>EPICorrSendEPIMsgGadget</classname>
     </gadget>
 
     <gadget>
@@ -93,6 +99,11 @@
         <property><name>ignore_segment</name><value>true</value></property>
     </gadget>
 
+    <gadget>
+        <name>GenericReconCartesianReceiveEpiMsg</name>
+        <dll>gadgetron_smscore</dll>
+        <classname>GenericReconCartesianReceiveEpiMsgGadget</classname>
+    </gadget>
 <!--
     <gadget>
         <name>GenericReconSMSBase</name>
