@@ -39,6 +39,8 @@ prepare_im2col_5D( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL>
 template<class REAL> EXPORTGPUPMRI bool
 prepare_EPI_corr_5D(  bool undo, bool optimal, cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& pos, cuNDArray<complext<REAL> >& neg ,cuNDArray<complext<REAL> >& pos_mean, cuNDArray<complext<REAL> >& neg_mean, cuNDArray<int >& reverse_line);
 
+template<class REAL> EXPORTGPUPMRI bool
+prepare_gpu_unmix(   cuNDArray<complext<REAL> >& in, cuNDArray<complext<REAL> >& kernel, cuNDArray<complext<REAL> >& out );
 
 /**
    * \brief Estimate b1 map (coil sensitivities) of single or double precision using the NIH Souheil method

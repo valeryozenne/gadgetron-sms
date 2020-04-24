@@ -130,17 +130,15 @@ namespace Gadgetron {
         hoNDArray< std::complex<float> > tempo_hoND;
         hoNDArray< std::complex<float> > tempo_1D_hoND;
 
-        /*hoNDArray<float_complext>* host_epi_nav_pos_STK_;
-        cuNDArray<float_complext> device_epi_nav_pos_STK_;
 
-        hoNDArray<float_complext>* host_epi_nav_neg_STK_ ;
-        cuNDArray<float_complext> device_epi_nav_neg_STK_;
 
-        hoNDArray<float_complext>* host_epi_nav_pos_STK_mean_;
-        cuNDArray<float_complext> device_epi_nav_pos_STK_mean_;
+        cuNDArray<float_complext> device_epi_nav_pos_STK_test ;
+        cuNDArray<float_complext> device_epi_nav_neg_STK_test ;
+        cuNDArray<float_complext> device_epi_nav_pos_STK_mean_test ;
+        cuNDArray<float_complext> device_epi_nav_neg_STK_mean_test ;
 
-        hoNDArray<float_complext>* host_epi_nav_neg_STK_mean_;
-        cuNDArray<float_complext> device_epi_nav_neg_STK_mean_;*/
+        cuNDArray<float_complext> device_d_epi_sb;
+        cuNDArray<float_complext> device_d_epi_mb;
 
 
         // --------------------------------------------------

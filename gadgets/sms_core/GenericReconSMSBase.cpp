@@ -1298,6 +1298,55 @@ void GenericReconSMSBase::prepare_epi_data(size_t e, size_t E1, size_t E2, size_
     tempo_hoND.create(RO, E1, E2, CHA);
     tempo_1D_hoND.create(RO);
 
+   // example
+
+    // memory allocation
+    //device_epi_nav_pos_STK_test.create(RO, MB_factor, lNumberOfStacks_);
+    device_epi_nav_neg_STK_test.create(RO, MB_factor, lNumberOfStacks_);
+
+    device_epi_nav_pos_STK_mean_test.create(RO,  lNumberOfStacks_);
+    device_epi_nav_neg_STK_mean_test.create(RO,  lNumberOfStacks_);
+
+    device_epi_nav_pos_STK_test= reinterpret_cast< hoNDArray<float_complext> & >(epi_nav_pos_STK_);
+
+    // reintrepret
+  //  hoNDArray<float_complext>* host_epi_nav_pos_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_);
+    hoNDArray<float_complext>* host_epi_nav_neg_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_neg_STK_);
+    hoNDArray<float_complext>* host_epi_nav_pos_STK_mean_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_mean_);
+    hoNDArray<float_complext>* host_epi_nav_neg_STK_mean_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_neg_STK_mean_);
+
+    //cudaMemcpyHostToDevice
+  /*  if(cudaMemcpy(device_epi_nav_pos_STK_test.get_data_ptr(),
+               host_epi_nav_pos_STK_->get_data_ptr(),
+               RO*MB_factor*lNumberOfStacks_*sizeof(std::complex<float>),
+               cudaMemcpyHostToDevice)!= cudaSuccess )   {
+            GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}*/
+
+    if(cudaMemcpy(device_epi_nav_neg_STK_test.get_data_ptr(),
+               host_epi_nav_neg_STK_->get_data_ptr(),
+               RO*MB_factor*lNumberOfStacks_*sizeof(std::complex<float>),
+               cudaMemcpyHostToDevice)!= cudaSuccess )   {
+            GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}
+
+    if(cudaMemcpy(device_epi_nav_neg_STK_mean_test.get_data_ptr(),
+               host_epi_nav_neg_STK_mean_->get_data_ptr(),
+               RO*lNumberOfStacks_*sizeof(std::complex<float>),
+               cudaMemcpyHostToDevice)!= cudaSuccess )   {
+            GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}
+
+    if(cudaMemcpy(device_epi_nav_pos_STK_mean_test.get_data_ptr(),
+               host_epi_nav_pos_STK_mean_->get_data_ptr(),
+               RO*lNumberOfStacks_*sizeof(std::complex<float>),
+               cudaMemcpyHostToDevice)!= cudaSuccess )   {
+            GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}
+
+
+            cudaError_t err = cudaGetLastError();
+            if( err != cudaSuccess ){
+          GDEBUG("Unable to copy result from device to host: %s\n", cudaGetErrorString(err));}
+
+
+
 }
 
 
@@ -1941,12 +1990,12 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_gpu(hoNDArray< std::c
     }
 
 
-    boost::shared_ptr<GPUTimer> process_timer;
-    process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::ifft gpu time") );
+    //boost::shared_ptr<GPUTimer> process_timer;
+    //process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::ifft gpu time") );
 
     cuNDArray<int> device_reverse_line_(reverse_line);
 
-    hoNDArray<float_complext>* host_epi_nav_pos_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_);
+  /*  hoNDArray<float_complext>* host_epi_nav_pos_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_);
     cuNDArray<float_complext> device_epi_nav_pos_STK_(host_epi_nav_pos_STK_);
 
     hoNDArray<float_complext>* host_epi_nav_neg_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_neg_STK_);
@@ -1957,7 +2006,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_gpu(hoNDArray< std::c
 
     hoNDArray<float_complext>* host_epi_nav_neg_STK_mean_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_neg_STK_mean_);
     cuNDArray<float_complext> device_epi_nav_neg_STK_mean_(host_epi_nav_neg_STK_mean_);
-
+*/
 
     hoNDArray<std::complex<float> > input;
     input.create(RO,E1,CHA,MB,STK);
@@ -1965,7 +2014,6 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_gpu(hoNDArray< std::c
     for (size_t s = 0; s < S; s++)    {
 
         for (size_t n = 0; n < N; n++)  {
-
 
             std::complex<float> * in = &(data(0, 0, 0, 0, 0, 0, n,s));
             std::complex<float> * out = &(input(0, 0,  0, 0, 0 ));
@@ -1975,24 +2023,25 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_gpu(hoNDArray< std::c
 
             hoNDArray<float_complext>* host = reinterpret_cast< hoNDArray<float_complext>* >(&input);
 
-            cuNDArray<float_complext> device_d(host);          
+            //device_d= reinterpret_cast< hoNDArray<float_complext>& >input;
+
+            cuNDArray<float_complext> device_d(host);
 
             if (ifft)
             {
             cuNDFFT<float>::instance()->ifft(&device_d, dim_to_transform);
             }
 
-            prepare_EPI_corr_5D(  undo,  optimal , device_d , device_epi_nav_pos_STK_ , device_epi_nav_neg_STK_, device_epi_nav_pos_STK_mean_, device_epi_nav_neg_STK_mean_, device_reverse_line_);
+            prepare_EPI_corr_5D(  undo,  optimal , device_d , device_epi_nav_pos_STK_test , device_epi_nav_neg_STK_test, device_epi_nav_pos_STK_mean_test, device_epi_nav_neg_STK_mean_test, device_reverse_line_);
 
             cuNDFFT<float>::instance()->fft(&device_d, dim_to_transform);
 
             device_d.to_host(host);
 
-            process_timer.reset();
+            //process_timer.reset();
 
             memcpy(in , host->get_data_ptr(), sizeof(std::complex<float>)*RO*E1*CHA*MB*STK);
             //memcpy(in , out, sizeof(std::complex<float>)*RO*E1*CHA*MB*STK);
-
 
         }
     }

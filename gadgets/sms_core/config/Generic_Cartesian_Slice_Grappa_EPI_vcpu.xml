@@ -78,6 +78,8 @@
         <property><name>ignore_segment</name><value>true</value></property>
     </gadget>
 
+
+
 <!--
     <gadget>
         <name>CheckSize</name>
@@ -116,7 +118,8 @@
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
-    <property><name>use_omp</name><value>true</value></property>
+    <property><name>use_omp</name><value>false</value></property>
+    <property><name>use_gpu</name><value>false</value></property>
     </gadget>
 
 
@@ -155,13 +158,17 @@
 -->
 
     <gadget>
-    <name>SliceGrappav3Gadget</name>
+
+    <name>SliceGrappavgpuGadget</name>
     <dll>gadgetron_smscore</dll>
-    <classname>GenericReconCartesianSliceGrappav3Gadget</classname>
+    <classname>GenericReconCartesianSliceGrappavgpuGadget</classname>
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
+    <property><name>use_omp</name><value>false</value></property>
+    <property><name>use_gpu</name><value>false</value></property>
 
+    <property><name>use_gpu</name><value>true</value></property>
     <property><name>use_omp</name><value>true</value></property>
     <property><name>calib_fast</name><value>true</value></property>
     <property><name>grappa_kSize_RO</name><value>5</value></property>
@@ -181,7 +188,8 @@
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
-    <property><name>use_omp</name><value>true</value></property>
+    <property><name>use_omp</name><value>false</value></property>
+    <property><name>use_gpu</name><value>false</value></property>
     </gadget>
 
 

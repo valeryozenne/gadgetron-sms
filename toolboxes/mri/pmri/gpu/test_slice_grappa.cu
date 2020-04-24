@@ -11,6 +11,8 @@
 #include "GPUTimer.h"
 #include <iostream>
 #include <cmath>
+#include "CUBLASContextProvider.h"
+#include <cublas_v2.h>
 
 using namespace std;
 
@@ -114,10 +116,22 @@ prepare_im2col_5D( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL>
 template<class REAL> bool
 prepare_EPI_corr_5D( bool undo, bool optimal,   cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& pos, cuNDArray<complext<REAL> >& neg ,cuNDArray<complext<REAL> >& pos_mean, cuNDArray<complext<REAL> >& neg_mean, cuNDArray<int >& reverse_line)
 {
-    boost::shared_ptr<GPUTimer> process_timer;
-    process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::compute_EPI_corr_5D 5D local") );
+    //boost::shared_ptr<GPUTimer> process_timer;
+    //process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::compute_EPI_corr_5D 5D local") );
     compute_EPI_coor_5D(undo, optimal,  &data_in, &pos, &neg, &pos_mean, &neg_mean, &reverse_line);
-    process_timer.reset();
+    //process_timer.reset();
+
+    return true;
+}
+
+
+template<class REAL> bool
+prepare_gpu_unmix(   cuNDArray<complext<REAL> >& in, cuNDArray<complext<REAL> >& kernel, cuNDArray<complext<REAL> >& out )
+{
+    //boost::shared_ptr<GPUTimer> process_timer;
+    //process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::prepare_gpu_unmix  local") );
+    compute_gpu_unmix(&in,  &kernel, &out );
+    //process_timer.reset();
 
     return true;
 }
@@ -125,6 +139,8 @@ prepare_EPI_corr_5D( bool undo, bool optimal,   cuNDArray<complext<REAL> >& data
 template EXPORTGPUPMRI bool prepare_im2col_2D( cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , const size_t , const size_t , const size_t , const size_t );
 template EXPORTGPUPMRI bool prepare_im2col_5D( cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , const size_t , const size_t , const size_t , const size_t );
 template EXPORTGPUPMRI bool prepare_EPI_corr_5D(bool, bool,  cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , cuNDArray<complext<float> >&  ,cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , cuNDArray<int >& );
+template EXPORTGPUPMRI bool prepare_gpu_unmix(  cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , cuNDArray<complext<float> >&  );
+
 
 template EXPORTGPUPMRI  cuNDArray<complext<float>> estimate_feasibility<float,2>(const cuNDArray<complext<float> >&, int);
 //template EXPORTGPUPMRI  cuNDArray<complext<float>> estimate_feasibility<float>( cuNDArray<complext<float> >&);
@@ -146,7 +162,7 @@ remove_encoding_kernel_no_STK( T *out,  T *in, unsigned int RO, unsigned int E1,
     // unsigned int mb = (blockIdx.y - stk*CHA*MB)/CHA;
     //unsigned int cha = (blockIdx.y - stk*CHA*MB)%CHA;
 
-    if (ro < RO && cha < CHA &&  mb <  MB )
+    if (ro>=0 && ro < RO && cha < CHA &&  mb <  MB )
     {
         unsigned int indice_cha_in =  cha * RO * E1 +   mb * RO*E1*CHA  ;
         unsigned int indice_cha_out = cha * RO *reduceE1 +   mb * RO*reduceE1*CHA  ;
@@ -189,11 +205,15 @@ void remove_encoding_no_STK( cuNDArray<T> *data_out, cuNDArray<T> *data_in , con
     unsigned int CHA = data_in->get_size(2);
     unsigned int MB = data_in->get_size(3);
 
-    dim3 blockDim(warp_size, 1);
-    dim3 gridDim(int(RO/warp_size)+1, CHA*MB  );
 
-    //std::cout << "blockDim :"<<  warp_size << std::endl;
-    //std::cout << "RO%warp_size :"<<  int(RO/warp_size)+1 << std::endl;
+    dim3 blockDim(warp_size, 1);
+
+    unsigned int blocks_RO=(unsigned int) std::ceil(RO/blockDim.x);
+
+    dim3 gridDim(blocks_RO, CHA*MB  );
+
+    std::cout << "blockDim :"<<  warp_size << std::endl;
+    std::cout << "blocks_RO :"<<  blocks_RO << std::endl;
 
     // Invoke kernel
     remove_encoding_kernel_no_STK<T><<< gridDim, blockDim >>>( data_out->get_data_ptr(), data_in->get_data_ptr(),   RO,  E1,  CHA,  MB,  acc , startE1,  endE1, reduceE1);
@@ -270,10 +290,12 @@ void remove_encoding_with_STK( cuNDArray<T> *data_out, cuNDArray<T> *data_in , c
     unsigned int STK = data_in->get_size(4);
 
     dim3 blockDim(warp_size, 1);
-    dim3 gridDim(int(RO/warp_size)+1, CHA*MB*STK  );
+     unsigned int blocks_RO=(unsigned int) std::ceil(RO/blockDim.x);
+
+    dim3 gridDim(blocks_RO, CHA*MB*STK  );
 
     std::cout << "warp_size :"<<  warp_size << std::endl;
-    std::cout << "int(RO/warp_size)+1 :"<<  int(RO/warp_size)+1 << std::endl;
+    std::cout << "blocks_RO :"<<  blocks_RO << std::endl;
     std::cout << "CHA*MB*STK :"<<  CHA*MB*STK << std::endl;
 
     // Invoke kernel
@@ -732,6 +754,126 @@ void compute_EPI_coor_5D( bool undo, bool optimal, cuNDArray<T> *data_in, cuNDAr
     //assemble_D_kernel<T><<< gridDim, blockDim >>>( data_out->get_data_ptr(), data_in->get_data_ptr(), RO, E1, N, CHA, ks*ks, halfKs );
     CHECK_FOR_CUDA_ERROR();
 }
+
+
+
+
+
+
+template<class T> static
+void compute_gpu_unmix( cuNDArray<T> *data_in, cuNDArray<T> *kernel, cuNDArray<T> * data_out)
+{
+
+    // Setup block/grid dimensions
+    int cur_device = cudaDeviceManager::Instance()->getCurrentDevice();
+    int warp_size = cudaDeviceManager::Instance()->warp_size(cur_device);
+    int max_blockdim = cudaDeviceManager::Instance()->max_blockdim(cur_device);
+    size_t shared_mem_per_block = cudaDeviceManager::Instance()->shared_mem_per_block(cur_device);
+
+    //std::cout << "GPU cur_device :"<<  cur_device << std::endl;
+    //std::cout << "GPU  warp_size :"<<  warp_size << std::endl;
+    //std::cout << "GPU max_blockdim :"<<  max_blockdim << std::endl;
+    //std::cout << "GPU shared_mem_per_block :"<<  shared_mem_per_block << std::endl;
+
+    size_t NDim = data_in->get_number_of_dimensions();
+
+    int in_dim0 = data_in->get_size(0);
+    int in_dim1 = data_in->get_size(1);
+
+    int ker_dim0 = kernel->get_size(0);
+    int ker_dim1 = kernel->get_size(1);
+
+    int out_dim0 = data_out->get_size(0);
+    int out_dim1 = data_out->get_size(1);
+
+   // std::cout << "in_dim0 :"<<  in_dim0 << "  in_dim1 :"<<  in_dim1  << std::endl;
+    //std::cout << "ker_dim0 :"<<  ker_dim0 << "  ker_dim1 :"<<  ker_dim1  << std::endl;
+    //std::cout << "out_dim0 :"<<  out_dim0 << "  out_dim1 :"<<  out_dim1  << std::endl;
+
+    cublasHandle_t handle = *CUBLASContextProvider::instance()->getCublasHandle();
+
+    cublasStatus_t stat;
+
+    //complext<float>  alpha = complext<float>(1);
+    //complext<float>  beta = complext<float>(0);
+
+
+
+    /*cublasStatus_t cublasCgemmEx(cublasHandle_t handle,
+                                  cublasOperation_t transa,
+                                  cublasOperation_t transb,
+                                  int m,
+                                  int n,
+                                  int k,
+                                  const cuComplex *alpha,
+                                  const void      *A,
+                                  cudaDataType_t  Atype,
+                                  int lda,
+                                  const void      *B,
+                                  cudaDataType_t  Btype,
+                                  int ldb,
+                                  const cuComplex *beta,
+                                  void            *C,
+                                  cudaDataType_t  Ctype,
+                                  int ldc)*/
+
+    //m  	number of rows of matrix op(A) and C.
+    //n     number of columns of matrix op(B) and C.
+    //k     number of columns of op(A) and rows of op(B).
+
+    //  in_dim0 :8308  in_dim1 :200
+    //  ker_dim0 :200  ker_dim1 :8
+    //  out_dim0 :8308  out_dim1 :8
+
+
+
+    int m=in_dim0; // 8308
+    int n=ker_dim1;  //8
+    int k=in_dim1;  // 200
+
+    float_complext alpha(1.0f);
+    float_complext beta(0.0f);
+
+    stat = cublasCgemm( handle, CUBLAS_OP_N, CUBLAS_OP_N,
+                        m,n,k,
+                        (cuFloatComplex*) &alpha,
+                        (cuFloatComplex*) data_in->get_data_ptr(), m ,
+                        (cuFloatComplex*) kernel->get_data_ptr(),  k ,
+                        (cuFloatComplex*) &beta,
+                        (cuFloatComplex*) data_out->get_data_ptr(), m );
+
+
+    if (stat != CUBLAS_STATUS_SUCCESS) {
+      std::cerr << "slicegrappa : Failed to form  product using cublas gemm" << std::endl;
+      std::cerr << "---- cublas error code " << stat << std::endl;
+
+    }
+
+
+
+
+
+
+
+    //dim3 blockDim(32, 32,1);
+
+    //unsigned int blocks_RO=(unsigned int) std::ceil(RO/blockDim.x);
+    //unsigned int blocks_E1=(unsigned int) std::ceil(RO/blockDim.y);
+
+    //dim3 gridDim(blocks_RO, blocks_E1 , CHA*MB*STK );
+
+
+    //std::cout << "maxThreadsPerBlock :"<<  32 << "maxThreadsPerBlock :"<<  32  << std::endl;
+    //std::cout << "blocks_RO :  "<<  blocks_RO << "  blocks_E1 :  "<<  blocks_E1<< "  CHA*MB*STK :  "<<  CHA*MB*STK   << std::endl;
+
+
+
+
+    //rss_normalize_kernel<T><<< gridDim, blockDim >>>( in_out->get_data_ptr(), stride, number_of_batches, number_of_elements );
+    //assemble_D_kernel<T><<< gridDim, blockDim >>>( data_out->get_data_ptr(), data_in->get_data_ptr(), RO, E1, N, CHA, ks*ks, halfKs );
+    CHECK_FOR_CUDA_ERROR();
+}
+
 
 
 /*

@@ -205,7 +205,7 @@ void GenericReconSMSPostGadget::post_process_sb_data(hoNDArray< std::complex<flo
         {
             ISMRMRD::AcquisitionHeader& curr_header = headers(e1, 0, 0, 0, 0);  //5D, fixed order [E1, E2, N, S, LOC]
             if (curr_header.isFlagSet(ISMRMRD::ISMRMRD_ACQ_IS_REVERSE)) {
-                reverse_line(e1)=1;                
+                reverse_line(e1)=1;
             }
             else
             {
@@ -220,35 +220,43 @@ void GenericReconSMSPostGadget::post_process_sb_data(hoNDArray< std::complex<flo
     }
 
 
-    hoNDArray< std::complex<float> > data_compare(data_8D);
-
     if (!debug_folder_full_path_.empty())
     {
         save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_SB4D_stk6_avant_cpu", os.str());
-        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_compare, "FID_SB4D_stk6_avant_gpu", os.str());
+        //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_compare, "FID_SB4D_stk6_avant_gpu", os.str());
     }
 
     if (use_gpu.value()==true)
     {
-        if (perform_timing.value()) { gt_timer_local_.start("gpuExample::stk6 gpu time");}
-        apply_ghost_correction_with_STK6_gpu(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true, "POST SB" );
+        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 gpu time Post SB ");}
+        apply_ghost_correction_with_STK6_gpu(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true, "Post SB" );
         if (perform_timing.value()) { gt_timer_local_.stop();}
     }
     else
     {
-        if (perform_timing.value()) { gt_timer_local_.start("cpuExample::stk6 cpu time");}
-        apply_ghost_correction_with_STK6(data_compare, headers ,  acceFactorSMSE1_[e], true , false, true, "POST SB" );
-        if (perform_timing.value()) { gt_timer_local_.stop();}
-    }
+        if (use_omp.value()==true)
+        {
+            if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 openmp time Post SB ");}
+            apply_ghost_correction_with_STK6_open(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true, "Post SB" );
+            if (perform_timing.value()) { gt_timer_local_.stop();}
+        }
+        else
+        {
 
+            if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 cpu time Post SB ");}
+            apply_ghost_correction_with_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true, "Post SB" );
+            if (perform_timing.value()) { gt_timer_local_.stop();}
+
+        }
+    }
     //
 
     if (!debug_folder_full_path_.empty())
     {
         save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_SB4D_fin_epi", os.str());
 
-        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_SB4D_stk6_apres_cpu", os.str());
-        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_compare, "FID_SB4D_stk6_apres_gpu", os.str());
+        // save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_8D, "FID_SB4D_stk6_apres_cpu", os.str());
+        //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data_compare, "FID_SB4D_stk6_apres_gpu", os.str());
     }
 
 
@@ -286,16 +294,26 @@ void GenericReconSMSPostGadget::post_process_mb_data(hoNDArray< std::complex<flo
 
     if (use_gpu.value()==true)
     {
-        if (perform_timing.value()) { gt_timer_local_.start("gpuExample::stk6 gpu time");}
+        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 gpu time Post MB ");}
         apply_ghost_correction_with_STK6_gpu(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true, "POST MB" );
         if (perform_timing.value()) { gt_timer_local_.stop();}
     }
     else
     {
-        if (perform_timing.value()) { gt_timer_local_.start("gpuExample::stk6 cpu time");}
-        apply_ghost_correction_with_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true,  "POST MB");
-        if (perform_timing.value()) { gt_timer_local_.stop();}
+        if (use_omp.value()==true)
+        {
+            if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 openmp time Post MB ");}
+            apply_ghost_correction_with_STK6_open(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true,  "POST MB");
+            if (perform_timing.value()) { gt_timer_local_.stop();}
+        }
+        else
+        {
+            if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 cpu time Post MB ");}
+            apply_ghost_correction_with_STK6(data_8D, headers ,  acceFactorSMSE1_[e], true , false, true,  "POST MB");
+            if (perform_timing.value()) { gt_timer_local_.stop();}
+        }
     }
+
 
     if(use_omp.value()==true)
     {
