@@ -26,7 +26,7 @@ public:
     ~GenericReconSplitSimpleSMSGadget();
 
     GADGET_PROPERTY(use_omp, bool, "Whether to use omp acceleration", false);
-    GADGET_PROPERTY(debug_folder_benoit, std::string, "Whether to use omp acceleration", "/tmp/gadgetron");
+    //GADGET_PROPERTY(debug_folder, std::string, "To use std::copy or memcpy", "/tmp/gadgetron");
 
     /// ------------------------------------------------------------------------------------
     /// parameters to control the reconstruction

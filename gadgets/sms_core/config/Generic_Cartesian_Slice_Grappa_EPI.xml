@@ -104,6 +104,7 @@
         <name>GenericReconSplitSimpleSMSGadget</name>
         <dll>gadgetron_smscore</dll>
         <classname>GenericReconSplitSimpleSMSGadget</classname>
+        <property><name>debug_folder</name><value>Split</value></property>
     </gadget> 
 
 

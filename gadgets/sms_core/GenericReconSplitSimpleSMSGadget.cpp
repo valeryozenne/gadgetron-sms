@@ -40,30 +40,27 @@ int GenericReconSplitSimpleSMSGadget::process(Gadgetron::GadgetContainerMessage<
         GWARN_STREAM("Incoming recon_bit has more encoding spaces than the protocol : " << recon_bit_->rbit_.size() << " instead of " << num_encoding_spaces_);
     }
 
-
-    size_t e, n, s, slc;
-
-   
-
+    size_t e;
 
 	e = 0;    
     auto & rbit = recon_bit_->rbit_[e];
     std::stringstream os;
     os << "_encoding_" << e;
-     if (rbit.data_.data_.get_number_of_elements() > 0)
+
+    hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
+    hoNDArray< ISMRMRD::AcquisitionHeader > headers_ = recon_bit_->rbit_[e].data_.headers_;
+
+    size_t RO = data.get_size(0);
+    size_t E1 = data.get_size(1);
+    size_t E2 = data.get_size(2);
+    size_t CHA = data.get_size(3);
+    size_t N = data.get_size(4);
+    size_t S = data.get_size(5);
+    size_t SLC = data.get_size(6);
+
+    if (rbit.data_.data_.get_number_of_elements() > 0)
     {
         // std::cout << " je suis la structure qui contient les données multi band" << std::endl;
-
-        hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
-        hoNDArray< ISMRMRD::AcquisitionHeader > headers_ = recon_bit_->rbit_[e].data_.headers_;
-
-        size_t RO = data.get_size(0);
-        size_t E1 = data.get_size(1);
-        size_t E2 = data.get_size(2);
-        size_t CHA = data.get_size(3);
-        size_t N = data.get_size(4);
-        size_t S = data.get_size(5);
-        size_t SLC = data.get_size(6);
 
         GDEBUG_STREAM("GenericCheckSplitSizeGadget - incoming data array data: [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
 
@@ -93,17 +90,6 @@ int GenericReconSplitSimpleSMSGadget::process(Gadgetron::GadgetContainerMessage<
     {
         std::cout<< " il faut diviser les données "<< std::endl;
 
-        hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[0].data_.data_;
-        hoNDArray< ISMRMRD::AcquisitionHeader > headers_ = recon_bit_->rbit_[0].data_.headers_;
-
-        size_t RO = data.get_size(0);
-        size_t E1 = data.get_size(1);
-        size_t E2 = data.get_size(2);
-        size_t CHA = data.get_size(3);
-        size_t N = data.get_size(4);
-        size_t S = data.get_size(5);
-        size_t SLC = data.get_size(6);
-
         size_t new_N=1;
 
         GDEBUG_STREAM("SLC size in process() : " << SLC);
@@ -120,32 +106,42 @@ int GenericReconSplitSimpleSMSGadget::process(Gadgetron::GadgetContainerMessage<
         headers_sb_std_copy.create(E1, E2, new_N, S , SLC );
         sb_std_copy.create(RO, E1, E2, CHA, new_N, S , SLC );
 
+        if (!debug_folder_full_path_.empty())
+        {
+            GDEBUG("Using data from memcpy\n");
+            gt_exporter_.export_array_complex(data, debug_folder.value() + "donnee_avant_extract");
+            extract_sb_and_mb_from_data_memcpy(recon_bit_->rbit_[0], sb, mb, headers_sb, headers_mb);
+            compareData(data, sb, mb);
+            gt_exporter_.export_array_complex(sb, debug_folder.value() + "donnee_sb_apres_extract_memcpy");
+            gt_exporter_.export_array_complex(mb, debug_folder.value() + "donnee_mb_apres_extract_memcpy");
+        }
+        else
+        {
+            GDEBUG("Using data from std::copy\n");
+            gt_exporter_.export_array_complex(data, debug_folder.value() + "donnee_avant_extract");
+            extract_sb_and_mb_from_data_std_cpy( recon_bit_->rbit_[0], sb_std_copy,  mb_std_copy, headers_sb_std_copy,  headers_mb_std_copy);
+            compareData(data, sb_std_copy, mb_std_copy);
+            gt_exporter_.export_array_complex(sb_std_copy, debug_folder.value() + "donnee_sb_apres_extract_std_copy");
+            gt_exporter_.export_array_complex(mb_std_copy, debug_folder.value() + "donnee_mb_apres_extract_std_copy");
+        }
         
-
-        GDEBUG("Exporting data\n");
-        gt_exporter_.export_array_complex(m1->getObjectPtr()->rbit_[0].data_.data_,
-                                                      debug_folder.value() + "donnee_avant_extract");
-
-        extract_sb_and_mb_from_data_memcpy( recon_bit_->rbit_[0], sb,  mb, headers_sb,  headers_mb);
-
         
         //Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m2 = new GadgetContainerMessage< IsmrmrdReconData >();
         //*m2->getObjectPtr() = *m1->getObjectPtr();
         Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m2 = m1->duplicate();
         
-        gt_exporter_.export_array_complex(sb, debug_folder.value() + "donnee_sb_apres_extract_memcpy");
+        //gt_exporter_.export_array_complex(sb, debug_folder.value() + "donnee_sb_apres_extract_memcpy");
 
-        gt_exporter_.export_array_complex(mb, debug_folder.value() + "donnee_mb_apres_extract_memcpy");
+        //gt_exporter_.export_array_complex(mb, debug_folder.value() + "donnee_mb_apres_extract_memcpy");
 
-        extract_sb_and_mb_from_data_std_cpy( recon_bit_->rbit_[0], sb_std_copy,  mb_std_copy, headers_sb_std_copy,  headers_mb_std_copy);
+        //extract_sb_and_mb_from_data_std_cpy( recon_bit_->rbit_[0], sb_std_copy,  mb_std_copy, headers_sb_std_copy,  headers_mb_std_copy);
 
-        gt_exporter_.export_array_complex(sb, debug_folder.value() + "donnee_sb_apres_extract_std_copy");
-        gt_exporter_.export_array_complex(mb, debug_folder.value() + "donnee_mb_apres_extract_std_copy");
+        
 
         
 //std::arg(val) + boost::math::constants::pi<float>();
         
-       compareData(data, sb, mb);
+       //compareData(data, sb, mb);
 
         m1->getObjectPtr()->rbit_[0].data_.data_=sb;
         m1->getObjectPtr()->rbit_[0].data_.headers_=headers_sb;
