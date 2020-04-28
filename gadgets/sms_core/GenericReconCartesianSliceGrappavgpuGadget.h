@@ -115,6 +115,7 @@ namespace Gadgetron {
         /// image sending
         GADGET_PROPERTY(blocking, bool, "Whether to do blocking reco", false);
         GADGET_PROPERTY(dual, bool, "Whether to dual dual", false);
+        GADGET_PROPERTY(use_slice_grappa_gpu, bool, "Whether to slice_grappa on the gpu", false);
 
         /// ------------------------------------------------------------------------------------
         /// Grappa parameters

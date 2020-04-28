@@ -111,14 +111,12 @@ prepare_im2col_5D( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL>
 
 
 
-
-
 template<class REAL> bool
-prepare_EPI_corr_5D( bool undo, bool optimal,   cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& pos, cuNDArray<complext<REAL> >& neg ,cuNDArray<complext<REAL> >& pos_mean, cuNDArray<complext<REAL> >& neg_mean, cuNDArray<int >& reverse_line)
+prepare_EPI_corr_5D( bool undo, bool optimal,   cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& pos, cuNDArray<complext<REAL> >& neg ,cuNDArray<complext<REAL> >& pos_mean, cuNDArray<complext<REAL> >& neg_mean, cuNDArray<int >& reverse_line, const size_t start_E1_, const size_t end_E1_)
 {
     //boost::shared_ptr<GPUTimer> process_timer;
     //process_timer = boost::shared_ptr<GPUTimer>( new GPUTimer("gpuExample::compute_EPI_corr_5D 5D local") );
-    compute_EPI_coor_5D(undo, optimal,  &data_in, &pos, &neg, &pos_mean, &neg_mean, &reverse_line);
+    compute_EPI_coor_5D(undo, optimal,  &data_in, &pos, &neg, &pos_mean, &neg_mean, &reverse_line, start_E1_, end_E1_);
     //process_timer.reset();
 
     return true;
@@ -138,7 +136,7 @@ prepare_gpu_unmix(   cuNDArray<complext<REAL> >& in, cuNDArray<complext<REAL> >&
 
 template EXPORTGPUPMRI bool prepare_im2col_2D( cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , const size_t , const size_t , const size_t , const size_t );
 template EXPORTGPUPMRI bool prepare_im2col_5D( cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , const size_t , const size_t , const size_t , const size_t );
-template EXPORTGPUPMRI bool prepare_EPI_corr_5D(bool, bool,  cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , cuNDArray<complext<float> >&  ,cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , cuNDArray<int >& );
+template EXPORTGPUPMRI bool prepare_EPI_corr_5D(bool, bool,  cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , cuNDArray<complext<float> >&  ,cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , cuNDArray<int >& , const size_t start_E1_, const size_t end_E1_);
 template EXPORTGPUPMRI bool prepare_gpu_unmix(  cuNDArray<complext<float> >& , cuNDArray<complext<float> >& , cuNDArray<complext<float> >&  );
 
 
@@ -382,9 +380,8 @@ void compute_im2col_2D( cuNDArray<T> *data_out, cuNDArray<T> *data_in , const si
     dim3 blockDim(grappa_kSize_RO, grappa_kSize_E1);
     dim3 gridDim(blocks_RO, blocks_E1  );
 
-
-    std::cout << "grappa_kSize_RO :"<<  grappa_kSize_RO << "grappa_kSize_E1 :"<<  grappa_kSize_E1  << std::endl;
-    std::cout << "blocks_RO :"<<  blocks_RO << "blocks_E1 :"<<  blocks_E1  << std::endl;
+    //std::cout << "grappa_kSize_RO :"<<  grappa_kSize_RO << "grappa_kSize_E1 :"<<  grappa_kSize_E1  << std::endl;
+    //std::cout << "blocks_RO :"<<  blocks_RO << "blocks_E1 :"<<  blocks_E1  << std::endl;
 
     //std::cout << "blockDim :"<<  warp_size << std::endl;
     //std::cout << "RO%warp_size :"<<  int(RO/warp_size)+1 << std::endl;
@@ -474,8 +471,6 @@ void compute_im2col_5D( cuNDArray<T> *data_out, cuNDArray<T> *data_in , const si
 
     std::cout << "grappa_kSize_RO :"<<  grappa_kSize_RO << "grappa_kSize_E1 :"<<  grappa_kSize_E1  << std::endl;
     std::cout << "blocks_RO :"<<  blocks_RO << "blocks_E1 :"<<  blocks_E1<< "CHA*MB*STK :"<<  CHA*MB*STK   << std::endl;
-
-
 
     //std::cout << "blockDim :"<<  warp_size << std::endl;
     //std::cout << "RO%warp_size :"<<  int(RO/warp_size)+1 << std::endl;
@@ -690,7 +685,7 @@ matrix_apply_EPI_undo (T *input,  T *epi_nav_pos_STK,T *epi_nav_neg_STK , T *epi
 
 
 template<class T> static
-void compute_EPI_coor_5D( bool undo, bool optimal, cuNDArray<T> *data_in, cuNDArray<T> *pos, cuNDArray<T> *neg, cuNDArray<T> *pos_mean, cuNDArray<T> *neg_mean, cuNDArray<int> *reverse_line)
+void compute_EPI_coor_5D( bool undo, bool optimal, cuNDArray<T> *data_in, cuNDArray<T> *pos, cuNDArray<T> *neg, cuNDArray<T> *pos_mean, cuNDArray<T> *neg_mean, cuNDArray<int> *reverse_line , const size_t start_E1_, const size_t end_E1_)
 {
 
     // Setup block/grid dimensions
@@ -723,8 +718,8 @@ void compute_EPI_coor_5D( bool undo, bool optimal, cuNDArray<T> *data_in, cuNDAr
     //std::cout << "maxThreadsPerBlock :"<<  32 << "maxThreadsPerBlock :"<<  32  << std::endl;
     //std::cout << "blocks_RO :  "<<  blocks_RO << "  blocks_E1 :  "<<  blocks_E1<< "  CHA*MB*STK :  "<<  CHA*MB*STK   << std::endl;
 
-    unsigned int start_E1_ = 50;
-    unsigned int end_E1_ = 90;
+    //unsigned int start_E1_ = 50;
+    //unsigned int end_E1_ = 90;
 
     //bool* myGlobalBoolVarPtr_undo;
     //myGlobalBoolVarPtr_undo=&undo;

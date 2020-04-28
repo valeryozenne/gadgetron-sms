@@ -2032,7 +2032,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_gpu(hoNDArray< std::c
             cuNDFFT<float>::instance()->ifft(&device_d, dim_to_transform);
             }
 
-            prepare_EPI_corr_5D(  undo,  optimal , device_d , device_epi_nav_pos_STK_test , device_epi_nav_neg_STK_test, device_epi_nav_pos_STK_mean_test, device_epi_nav_neg_STK_mean_test, device_reverse_line_);
+            prepare_EPI_corr_5D(  undo,  optimal , device_d , device_epi_nav_pos_STK_test , device_epi_nav_neg_STK_test, device_epi_nav_pos_STK_mean_test, device_epi_nav_neg_STK_mean_test, device_reverse_line_, start_E1_,  end_E1_);
 
             cuNDFFT<float>::instance()->fft(&device_d, dim_to_transform);
 

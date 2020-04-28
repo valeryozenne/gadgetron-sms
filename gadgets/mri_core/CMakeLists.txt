@@ -217,6 +217,8 @@ set( gadgetron_mricore_config_files
     config/isalive.xml
     config/gtquery.xml
     config/Generic_Cartesian_FFT.xml
+    config/Generic_Cartesian_MP2RAGE.xml
+    config/Generic_Cartesian_MP2RAGE_python.xml
     config/Generic_Cartesian_FFT_EPI.xml
     config/Generic_Cartesian_FFT_EPI_python.xml
     config/Generic_Cartesian_Grappa.xml
