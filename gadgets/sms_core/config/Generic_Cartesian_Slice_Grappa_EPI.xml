@@ -93,28 +93,25 @@
         <property><name>ignore_segment</name><value>true</value></property>
     </gadget>
 
-<!--
-    <gadget>
+
+    <!--<gadget>
         <name>GenericReconSMSBase</name>
         <dll>gadgetron_smscore</dll>
         <classname>GenericReconSMSBase</classname>        
-    </gadget> -->
+    </gadget>-->
 
-
-  
-<!--
    <gadget>
-        <name>GenericReconSplitSMSGadget</name>
+        <name>GenericReconSplitSimpleSMSGadget</name>
         <dll>gadgetron_smscore</dll>
-        <classname>GenericReconSplitSMSGadget</classname>        
-    </gadget>  -->
+        <classname>GenericReconSplitSimpleSMSGadget</classname>
+    </gadget> 
 
 
-    <gadget>
+    <!--<gadget>
         <name>GenericReconCheckSizeGadget</name>
         <dll>gadgetron_smscore</dll>
         <classname>GenericReconCheckSizeGadget</classname>        
-    </gadget> 
+    </gadget>--> 
 
 
 

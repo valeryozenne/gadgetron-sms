@@ -26,6 +26,7 @@ public:
     ~GenericReconSplitSimpleSMSGadget();
 
     GADGET_PROPERTY(use_omp, bool, "Whether to use omp acceleration", false);
+    GADGET_PROPERTY(debug_folder_benoit, std::string, "Whether to use omp acceleration", "/tmp/gadgetron");
 
     /// ------------------------------------------------------------------------------------
     /// parameters to control the reconstruction
@@ -41,14 +42,19 @@ protected:
     // default interface function
     virtual int process_config(ACE_Message_Block* mb);
     virtual int process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1);
-    virtual void extract_sb_and_mb_from_data(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
+    virtual void extract_sb_and_mb_from_data_memcpy(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
+    void extract_sb_and_mb_from_data_std_cpy(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
     virtual void extract_sb_and_mb_from_data_open(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
 
     hoNDArray< ISMRMRD::AcquisitionHeader > headers_sb;
     hoNDArray< ISMRMRD::AcquisitionHeader > headers_mb;
+    hoNDArray< ISMRMRD::AcquisitionHeader > headers_mb_std_copy;
+    hoNDArray< ISMRMRD::AcquisitionHeader > headers_sb_std_copy;
 
     hoNDArray< std::complex<float> > sb;
     hoNDArray< std::complex<float> > mb;
+    hoNDArray< std::complex<float> > sb_std_copy;
+    hoNDArray< std::complex<float> > mb_std_copy;
 
     bool is_first_repetition;
 

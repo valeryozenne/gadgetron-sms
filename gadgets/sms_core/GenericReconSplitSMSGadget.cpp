@@ -22,7 +22,7 @@ int GenericReconSplitSMSGadget::process_config(ACE_Message_Block* mb)
     return GADGET_OK;
 }
 
-int GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1)
+int Gadgetron::GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1)
 {
     if (perform_timing.value()) { gt_timer_.start("GenericReconSplitSMSGadget::process"); }
 
@@ -213,6 +213,7 @@ void GenericReconSplitSMSGadget::extract_sb_and_mb_from_data(IsmrmrdReconBit &re
             for (n = 0; n < N; n++)
             {
                 std::complex<float> * in = &(data(0, 0, 0, 0, n, s, slc));
+                //GDEBUG_stream("data: " << data);
                 std::complex<float> * out_sb = &(sb(0, 0, 0, 0, 0, s, slc));
                 std::complex<float> * out_mb = &(mb(0, 0, 0, 0, 0, s, slc));
 

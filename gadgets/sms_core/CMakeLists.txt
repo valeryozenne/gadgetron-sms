@@ -76,7 +76,7 @@ install (FILES  gadgetron_smscore_export.h
                 EmptyGadget.cpp
                 EmptyGadget.h
                 GenericReconSplitSMSGadget.h
-                GenericReconSplitSMSGadget.cpp
+                GenericReconSplitSimpleSMSGadget.h
 				GenericReconCartesianReceiveEpiMsgGadget.h
                 DESTINATION ${GADGETRON_INSTALL_INCLUDE_PATH} COMPONENT main)
 
