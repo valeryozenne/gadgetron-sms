@@ -145,55 +145,7 @@ int GenericReconSplitSimpleSMSGadget::process(Gadgetron::GadgetContainerMessage<
         
 //std::arg(val) + boost::math::constants::pi<float>();
         
-        float error_abs = 0.0, error_angle = 0.0;
-        
-        size_t start_E1_SB(0), end_E1_SB(0);
-
-        auto t = Gadgetron::detect_sampled_region_E1(data);
-        start_E1_SB = std::get<0>(t);
-        end_E1_SB = std::get<1>(t);
-
-        GDEBUG_STREAM("start_E1_SB: " << start_E1_SB << ", end_E1_SB: " << end_E1_SB << std::endl);
-
-        
-        for (slc = 0; slc < SLC; slc++)
-        {
-            for (s = 0; s < S; s++)
-            {
-                for (n = 0; n < N; n++)
-                {
-                    for (size_t cha = 0; cha < CHA; cha++)
-                    {
-                        for (size_t e2 = 0; e2 < E2; e2++)
-                        {
-                            for (size_t e1 = 0; e1 < E1; e1++)
-                            {
-                                for (size_t r0 = 0; r0 < RO; r0++)
-                                {
-                                    if (n == 0)
-                                    {
-                                        if (cha == 0 && e2 == 0 && r0 == RO / 2 && e1 == start_E1_SB)
-                                            GDEBUG("data: %4.15f, sb: %4.15f\n", data(r0, e1, e2, cha, n, s, slc), mb(r0, e1, e2, cha, n, s, slc));
-                                        error_abs += abs(data(r0, e1, e2, cha, n, s, slc)) - abs(mb(r0, e1, e2, cha, n, s, slc));
-                                        error_angle += arg(data(r0, e1, e2, cha, n, s, slc)) - arg(mb(r0, e1, e2, cha, n, s, slc));
-                                    }   
-                                    else
-                                    {
-                                        if (cha == 0 && e2 == 0 && r0 == RO / 2 && e1 == start_E1_SB)
-                                            GDEBUG("data: %4.15f, mb: %4.15f\n", data(r0, e1, e2, cha, n, s, slc), sb(r0, e1, e2, cha, n - 1, s, slc));
-                                        error_abs += abs(data(r0, e1, e2, cha, n, s, slc)) - abs(sb(r0, e1, e2, cha, n - 1, s, slc));
-                                        error_angle += arg(data(r0, e1, e2, cha, n, s, slc)) - arg(sb(r0, e1, e2, cha, n - 1, s, slc));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-
-        GDEBUG("Error abs: %4.9f, error angle: %4.9f\n", error_abs, error_angle);
+       compareData(data, sb, mb);
 
         m1->getObjectPtr()->rbit_[0].data_.data_=sb;
         m1->getObjectPtr()->rbit_[0].data_.headers_=headers_sb;
@@ -469,6 +421,68 @@ void GenericReconSplitSimpleSMSGadget::extract_sb_and_mb_from_data_open(IsmrmrdR
 
 }
 
+void GenericReconSplitSimpleSMSGadget::compareData(hoNDArray< std::complex<float> > &data, hoNDArray< std::complex<float> > &sb, hoNDArray< std::complex<float> > &mb)
+{
+     float error_abs = 0.0, error_angle = 0.0;
+        
+        size_t RO = data.get_size(0);
+        size_t E1 = data.get_size(1);
+        size_t E2 = data.get_size(2);
+        size_t CHA = data.get_size(3);
+        size_t N = data.get_size(4);
+        size_t S = data.get_size(5);
+        size_t SLC = data.get_size(6);
+
+        size_t start_E1_SB(0), end_E1_SB(0);
+
+
+
+        auto t = Gadgetron::detect_sampled_region_E1(data);
+        start_E1_SB = std::get<0>(t);
+        end_E1_SB = std::get<1>(t);
+
+        GDEBUG_STREAM("start_E1_SB: " << start_E1_SB << ", end_E1_SB: " << end_E1_SB << std::endl);
+
+        
+        for (size_t slc = 0; slc < SLC; slc++)
+        {
+            for (size_t s = 0; s < S; s++)
+            {
+                for (size_t n = 0; n < N; n++)
+                {
+                    for (size_t cha = 0; cha < CHA; cha++)
+                    {
+                        for (size_t e2 = 0; e2 < E2; e2++)
+                        {
+                            for (size_t e1 = 0; e1 < E1; e1++)
+                            {
+                                for (size_t r0 = 0; r0 < RO; r0++)
+                                {
+                                    if (n == 0)
+                                    {
+                                        if (cha == 0 && e2 == 0 && r0 == RO / 2 && e1 == start_E1_SB)
+                                            GDEBUG("data: %4.15f, sb: %4.15f\n", data(r0, e1, e2, cha, n, s, slc), mb(r0, e1, e2, cha, n, s, slc));
+                                        error_abs += abs(data(r0, e1, e2, cha, n, s, slc)) - abs(mb(r0, e1, e2, cha, n, s, slc));
+                                        error_angle += arg(data(r0, e1, e2, cha, n, s, slc)) - arg(mb(r0, e1, e2, cha, n, s, slc));
+                                    }   
+                                    else
+                                    {
+                                        if (cha == 0 && e2 == 0 && r0 == RO / 2 && e1 == start_E1_SB)
+                                            GDEBUG("data: %4.15f, mb: %4.15f\n", data(r0, e1, e2, cha, n, s, slc), sb(r0, e1, e2, cha, n - 1, s, slc));
+                                        error_abs += abs(data(r0, e1, e2, cha, n, s, slc)) - abs(sb(r0, e1, e2, cha, n - 1, s, slc));
+                                        error_angle += arg(data(r0, e1, e2, cha, n, s, slc)) - arg(sb(r0, e1, e2, cha, n - 1, s, slc));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+
+        GDEBUG("Error abs: %4.9f, error angle: %4.9f\n", error_abs, error_angle);
+}
 
 
 GADGET_FACTORY_DECLARE(GenericReconSplitSimpleSMSGadget)

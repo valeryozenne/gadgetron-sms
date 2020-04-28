@@ -45,7 +45,7 @@ protected:
     virtual void extract_sb_and_mb_from_data_memcpy(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
     void extract_sb_and_mb_from_data_std_cpy(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
     virtual void extract_sb_and_mb_from_data_open(IsmrmrdReconBit &recon_bit, hoNDArray< std::complex<float> >& sb, hoNDArray< std::complex<float> >& mb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_sb, hoNDArray< ISMRMRD::AcquisitionHeader > & h_mb);
-
+    void compareData(hoNDArray< std::complex<float> > &data, hoNDArray< std::complex<float> > &sb, hoNDArray< std::complex<float> > &mb);
     hoNDArray< ISMRMRD::AcquisitionHeader > headers_sb;
     hoNDArray< ISMRMRD::AcquisitionHeader > headers_mb;
     hoNDArray< ISMRMRD::AcquisitionHeader > headers_mb_std_copy;
