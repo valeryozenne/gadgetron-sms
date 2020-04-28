@@ -117,6 +117,7 @@ set( gadgetron_smscore_config_files
     config/Generic_Cartesian_Slice_Grappa_EPI_vopenmp.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_vgpu.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_vgpu_gold.xml
+    config/Generic_Cartesian_Slice_Grappa_EPI_vgpu_gold_error.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_vcpu.xml
 )
 

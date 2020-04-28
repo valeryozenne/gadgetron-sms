@@ -357,9 +357,6 @@ arma::ivec map_interleaved_acquisitions(int number_of_slices, bool no_reordering
     arma::ivec index(number_of_slices);
     index.zeros();
 
-
-
-
     if(no_reordering)
     {
         GDEBUG("CAUTION there is no reordering for single band images \n");

@@ -551,6 +551,12 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
 
     arma::fvec z_offset(SLC);
 
+    hoNDArray<float> debug_slice_tickness(1);
+    hoNDArray<float> debug_iso(3,SLC);
+    hoNDArray<float> debug_slice_dir(3,SLC);
+
+    debug_slice_tickness(0)=slice_thickness;
+
     for (s = 0; s < SLC; s++)
     {
         ISMRMRD::AcquisitionHeader& curr_header = headers_(start_E1, 0, 0, 0, s);
@@ -560,11 +566,17 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
             read_dir(j)=curr_header.read_dir[j];
             phase_dir(j)=curr_header.phase_dir[j];
             slice_dir(j)=curr_header.slice_dir[j];
-            //std::cout <<  curr_header.position[j]<< " "  <<  curr_header.read_dir[j] << " "  <<  curr_header.phase_dir[j]  << " "  <<  curr_header.slice_dir[j]  << std::endl;
+            std::cout <<  curr_header.position[j]<< " "  <<  curr_header.read_dir[j] << " "  <<  curr_header.phase_dir[j]  << " "  <<  curr_header.slice_dir[j]  << std::endl;
+            debug_iso(j,s)=shift_from_isocenter(j);
+            debug_slice_dir(j,s)=slice_dir(j);
         }
 
         z_offset(s) = dot(shift_from_isocenter,slice_dir);
     }
+
+    gt_exporter_.export_array(debug_iso, debug_folder_full_path_ + "shift_from_iso");
+    gt_exporter_.export_array(debug_slice_dir, debug_folder_full_path_ + "slice_dir");
+     gt_exporter_.export_array(debug_slice_tickness, debug_folder_full_path_ + "slice_thickness");
 
     //std::cout << z_offset <<std::endl;
     //std::cout << "   " <<z_offset.max()<< " " <<z_offset.min() << std::endl;
@@ -600,7 +612,7 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
 
     //index.print();
 
-    z_gap.set_size(1);
+    z_gap.set_size(MB-1);
 
     for (a = 0; a < 1; a++)
     {
@@ -2330,6 +2342,8 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
 
     long long m, a, n, s;
     long long index;
+
+    std::cout << "!!!!!!!!afmoqsmqklk!!!!!!!!!!!!!!!!!" << std::endl;
 
     std::complex<double> ii(0,1);
 

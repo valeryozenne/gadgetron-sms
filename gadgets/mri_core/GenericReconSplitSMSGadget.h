@@ -49,5 +49,7 @@ namespace Gadgetron {
         hoNDArray< std::complex<float> > sb;
         hoNDArray< std::complex<float> > mb;
 
+        bool is_first_repetition;
+
     };
 }

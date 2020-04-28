@@ -469,8 +469,8 @@ void compute_im2col_5D( cuNDArray<T> *data_out, cuNDArray<T> *data_in , const si
     dim3 gridDim(blocks_RO, blocks_E1 , CHA*MB*STK );
 
 
-    std::cout << "grappa_kSize_RO :"<<  grappa_kSize_RO << "grappa_kSize_E1 :"<<  grappa_kSize_E1  << std::endl;
-    std::cout << "blocks_RO :"<<  blocks_RO << "blocks_E1 :"<<  blocks_E1<< "CHA*MB*STK :"<<  CHA*MB*STK   << std::endl;
+    //std::cout << "grappa_kSize_RO :"<<  grappa_kSize_RO << "grappa_kSize_E1 :"<<  grappa_kSize_E1  << std::endl;
+    //std::cout << "blocks_RO :"<<  blocks_RO << "blocks_E1 :"<<  blocks_E1<< "CHA*MB*STK :"<<  CHA*MB*STK   << std::endl;
 
     //std::cout << "blockDim :"<<  warp_size << std::endl;
     //std::cout << "RO%warp_size :"<<  int(RO/warp_size)+1 << std::endl;

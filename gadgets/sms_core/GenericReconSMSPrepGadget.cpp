@@ -92,6 +92,7 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
                 //TODO this initiailisation should be done somewhere else but it must be done once at the first repetition
                 sb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
                 mb_8D.create(RO, E1, E2, CHA, MB_factor, lNumberOfStacks_ , N, S );
+                //TODO MB_factor devrait être à 1 mais cela doit être pratique pour le coil compression après
             }
 
             //TODO mettre recon_bit_->rbit_[e] a la place de data + header ici !
@@ -112,6 +113,17 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
             {
                 // only mb data
                 //then apply standard proccesing on mb
+
+                size_t RO = data.get_size(0);
+                size_t E1 = data.get_size(1);
+                size_t E2 = data.get_size(2);
+                size_t CHA = data.get_size(3);
+                size_t N = data.get_size(4);
+                size_t S = data.get_size(5);
+                size_t SLC = data.get_size(6);
+
+                GDEBUG_STREAM("GenericReconSMSPrepGadget - incoming data array mb : [RO E1 E2 CHA N S SLC  ] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
+
                 define_usefull_parameters_simple_version(rbit, e);
                 pre_process_mb_data(data, mb_8D, headers_ , e);
                 rbit.data_.data_ = mb_8D;
@@ -184,6 +196,8 @@ void GenericReconSMSPrepGadget::reorganize_sb_data_to_8D(hoNDArray< std::complex
     os << "_encoding_" << e;
     std::string suffix = os.str();
 
+    show_size(sb, "show size avant 7th_dim SB");
+
     if (!debug_folder_full_path_.empty())
     {
         save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(sb, "FID_SB4D", os.str());
@@ -217,6 +231,8 @@ void GenericReconSMSPrepGadget::reorganize_mb_data_to_8D(hoNDArray< std::complex
     os << "_encoding_" << e;
     std::string suffix = os.str();
 
+    show_size(mb, "show size avant 7th_dim MB");
+
     if (!debug_folder_full_path_.empty())
     {
         save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(mb, "FID_MB4D", os.str());
@@ -239,6 +255,8 @@ void GenericReconSMSPrepGadget::reorganize_mb_data_to_8D(hoNDArray< std::complex
     {
         save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(mb_8D, "FID_MB4D_remove", os.str());
     }
+
+    //std::cout << "ok reorganize_mb_data_to_8D" << std::endl;
 
 }
 
