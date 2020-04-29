@@ -104,15 +104,16 @@
         <name>GenericReconSplitSimpleSMSGadget</name>
         <dll>gadgetron_smscore</dll>
         <classname>GenericReconSplitSimpleSMSGadget</classname>
-        <property><name>debug_folder</name><value>Split</value></property>
+        <property><name>debug_folder</name><value>/tmp/gadgetron/</value></property>
+        <property><name>perform_timing</name><value>true</value></property>
     </gadget> 
 
 
-    <!--<gadget>
+    <gadget>
         <name>GenericReconCheckSizeGadget</name>
         <dll>gadgetron_smscore</dll>
         <classname>GenericReconCheckSizeGadget</classname>        
-    </gadget>--> 
+    </gadget>
 
 
 

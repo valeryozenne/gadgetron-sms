@@ -118,17 +118,39 @@ int GenericReconSplitSimpleSMSGadget::process(Gadgetron::GadgetContainerMessage<
 
             headers_sb.create(E1, E2, new_N, S , SLC );
             sb.create(RO, E1, E2, CHA, new_N, S , SLC );
+            gt_exporter_.export_array_complex(data, debug_folder.value() + "donnee_avant_extract");
+            if (perform_timing.value() == true)
+            {
+                gt_timer_local_.start("GenericReconSplitSimpleSMSGadget::extract_sb_and_mb_from_data_memcpy: ");
+            }
             extract_sb_and_mb_from_data_memcpy(recon_bit_->rbit_[0], sb, mb, headers_sb, headers_mb);
+            if (perform_timing.value() == true)
+            {
+                gt_timer_local_.stop();
+            }
             compareData(data, sb, mb);
             gt_exporter_.export_array_complex(sb, debug_folder.value() + "donnee_sb_apres_extract_memcpy");
             gt_exporter_.export_array_complex(mb, debug_folder.value() + "donnee_mb_apres_extract_memcpy");
         }
-        gt_exporter_.export_array_complex(data, debug_folder.value() + "donnee_avant_extract");
-        extract_sb_and_mb_from_data_std_cpy( recon_bit_->rbit_[0], sb_std_copy,  mb_std_copy, headers_sb_std_copy,  headers_mb_std_copy);
-        compareData(data, sb_std_copy, mb_std_copy);
-        gt_exporter_.export_array_complex(sb_std_copy, debug_folder.value() + "donnee_sb_apres_extract_std_copy");
-        gt_exporter_.export_array_complex(mb_std_copy, debug_folder.value() + "donnee_mb_apres_extract_std_copy");
         
+        if (perform_timing.value() == true)
+        {
+            gt_timer_local_.start("GenericReconSplitSimpleSMSGadget::extract_sb_and_mb_from_data_std_copy: ");
+        }
+        
+        extract_sb_and_mb_from_data_std_cpy( recon_bit_->rbit_[0], sb_std_copy,  mb_std_copy, headers_sb_std_copy,  headers_mb_std_copy);
+        
+        if (perform_timing.value() == true)
+        {
+            gt_timer_local_.stop();
+        }
+
+        if (!debug_folder_full_path_.empty())
+        {
+            compareData(data, sb_std_copy, mb_std_copy);
+            gt_exporter_.export_array_complex(sb_std_copy, debug_folder.value() + "donnee_sb_apres_extract_std_copy");
+            gt_exporter_.export_array_complex(mb_std_copy, debug_folder.value() + "donnee_mb_apres_extract_std_copy");
+        }
         
         //Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m2 = new GadgetContainerMessage< IsmrmrdReconData >();
         //*m2->getObjectPtr() = *m1->getObjectPtr();
@@ -241,6 +263,7 @@ void GenericReconSplitSimpleSMSGadget::extract_sb_and_mb_from_data_memcpy(Ismrmr
                 {
                     std::copy(in, in + RO*E1*E2*CHA, out_sb);
                     std::copy(in_h, in_h + E1*E2, out_h_sb);
+
                     //memcpy(out_sb , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
                     //memcpy(out_h_sb , in_h, sizeof(ISMRMRD::AcquisitionHeader)*E1*E2);
                 }
