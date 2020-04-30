@@ -15,6 +15,7 @@
             EPIReconXObject.h
             EPIReconXObjectFlat.h
             EPIReconXObjectTrapezoid.h
+			SMS_utils.h
             DESTINATION ${GADGETRON_INSTALL_INCLUDE_PATH} COMPONENT main)
 
     # install(TARGETS epi DESTINATION lib)

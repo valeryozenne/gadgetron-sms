@@ -43,6 +43,7 @@ set(gadgetron_mricore_header_files GadgetMRIHeaders.h
         SimpleReconGadget.h
         ImageSortGadget.h
         GenericReconBase.h
+        GenericReconBase_gadget1of2.h
         GenericReconGadget.h
         GenericReconCartesianFFTGadget.h
         GenericReconCartesianGrappaGadget.h
@@ -105,6 +106,7 @@ set(gadgetron_mricore_src_files
         SimpleReconGadget.cpp
         ImageSortGadget.cpp
         GenericReconBase.cpp
+        GenericReconBase_gadget1of2.cpp
         GenericReconGadget.cpp
         GenericReconCartesianFFTGadget.cpp
         GenericReconCartesianGrappaGadget.cpp

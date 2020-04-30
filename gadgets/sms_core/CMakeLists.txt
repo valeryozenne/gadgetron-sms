@@ -33,12 +33,14 @@ add_library(gadgetron_smscore SHARED
     MultiplyMessageContainerGadget.h
     GenericReconSplitSimpleSMSGadget.h
     GenericReconSplitSimpleSMSGadget.cpp
-    
+    GenericReconCartesianReceiveEpiMsgGadget.h
+	GenericReconCartesianReceiveEpiMsgGadget.cpp
   )
 
 set_target_properties(gadgetron_smscore PROPERTIES VERSION ${GADGETRON_VERSION_STRING} SOVERSION ${GADGETRON_SOVERSION})
 
 target_link_libraries(gadgetron_smscore
+  gadgetron_toolbox_epi
   gadgetron_core
   gadgetron_mricore
   gadgetron_toolbox_log
@@ -47,9 +49,11 @@ target_link_libraries(gadgetron_smscore
   gadgetron_toolbox_gpudwt
   gadgetron_toolbox_gpucore
   gadgetron_toolbox_gpusolvers
-  gadgetron_toolbox_gpuoperators)
+  gadgetron_toolbox_gpuoperators
+  gadgetron_toolbox_gpuparallelmri
+)
 
-target_link_libraries(gadgetron_smscore gadgetron_toolbox_gpuparallelmri)
+#target_link_libraries(gadgetron_smscore gadgetron_toolbox_gpuparallelmri)
 
 target_include_directories(gadgetron_smscore
         PUBLIC
@@ -65,14 +69,15 @@ install(TARGETS gadgetron_smscore
 )
 
 install (FILES  gadgetron_smscore_export.h 
-                #WriteSingleBandFlagsGadget.cpp
-                #WriteSingleBandFlagsGadget.h
-                #GenericReconSMSBase.h
-                #GenericReconSMSBase.cpp
-                #EmptyGadget.cpp
-                #EmptyGadget.h
-                #GenericReconSplitSMSGadget.h
-                #GenericReconSplitSMSGadget.cpp
+                WriteSingleBandFlagsGadget.cpp
+                WriteSingleBandFlagsGadget.h
+                GenericReconSMSBase.h
+                GenericReconSMSBase.cpp
+                EmptyGadget.cpp
+                EmptyGadget.h
+                GenericReconSplitSMSGadget.h
+                GenericReconSplitSimpleSMSGadget.h
+				GenericReconCartesianReceiveEpiMsgGadget.h
                 DESTINATION ${GADGETRON_INSTALL_INCLUDE_PATH} COMPONENT main)
 
 add_subdirectory(config)

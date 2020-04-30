@@ -9,6 +9,7 @@ add_subdirectory(cmr)
 add_subdirectory(epi)
 add_subdirectory(fatwater)
 add_subdirectory(T1)
+add_subdirectory(sms_core)
 
 if(BART_FOUND)
   add_subdirectory(bart)

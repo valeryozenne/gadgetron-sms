@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "GenericReconBase.h"
+#include "GenericReconBase_gadget1of2.h"
 #include "mri_core_slice_grappa.h"
 #include "mri_core_utility_interventional.h"
 #include "hoNDArray_utils.h"
@@ -18,12 +18,12 @@
 
 namespace Gadgetron {
 
-    class EXPORTGADGETSSMSCORE GenericReconSMSBase : public GenericReconDataBase
+    class EXPORTGADGETSSMSCORE GenericReconSMSBase : public GenericReconDataBase_gadget1of2
     {
     public:
         GADGET_DECLARE(GenericReconSMSBase);
 
-        typedef GenericReconDataBase BaseClass;
+        typedef GenericReconDataBase_gadget1of2 BaseClass;
         //typedef hoNDKLT< std::complex<float> > KLTType;
 
         GADGET_PROPERTY(use_omp, bool, "Whether to use omp acceleration", false);
