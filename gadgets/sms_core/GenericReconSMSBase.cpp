@@ -1314,7 +1314,7 @@ void GenericReconSMSBase::prepare_epi_data(size_t e, size_t E1, size_t E2, size_
     if (use_gpu.value()==true)
     {
 
-        std::cout<< "coucou allocation"<< std::endl;
+        std::cout<< " coucou allocation GPU problem"<< std::endl;
 
         // memory allocation
         //device_epi_nav_pos_STK_test.create(RO, MB_factor, lNumberOfStacks_);
