@@ -1,23 +1,23 @@
 
-#include "GenericReconBase_gadget1of2.h"
+#include "GenericReconSMSBase_gadget1of2.h"
 #include <boost/filesystem.hpp>
 
 namespace Gadgetron {
 
     template <typename T> 
-    GenericReconBase_gadget1of2<T>::GenericReconBase_gadget1of2() : num_encoding_spaces_(1), process_called_times_(0)
+    GenericReconSMSBase_gadget1of2<T>::GenericReconSMSBase_gadget1of2() : num_encoding_spaces_(1), process_called_times_(0)
     {
         gt_timer_.set_timing_in_destruction(false);
         gt_timer_local_.set_timing_in_destruction(false);
     }
 
     template <typename T> 
-    GenericReconBase_gadget1of2<T>::~GenericReconBase_gadget1of2()
+    GenericReconSMSBase_gadget1of2<T>::~GenericReconSMSBase_gadget1of2()
     {
     }
 
     template <typename T> 
-    int GenericReconBase_gadget1of2<T>::process_config(ACE_Message_Block* mb)
+    int GenericReconSMSBase_gadget1of2<T>::process_config(ACE_Message_Block* mb)
     {
         if (!debug_folder.value().empty())
         {
@@ -45,14 +45,14 @@ namespace Gadgetron {
     }
 
     template <typename T>
-    int GenericReconBase_gadget1of2<T>::process(GadgetContainerMessage<T>* m1)
+    int GenericReconSMSBase_gadget1of2<T>::process(GadgetContainerMessage<T>* m1)
     {
         return GADGET_OK;
     }
 
-    template class EXPORTGADGETSMRICORE GenericReconBase_gadget1of2<IsmrmrdReconData>;
-    template class EXPORTGADGETSMRICORE GenericReconBase_gadget1of2<IsmrmrdImageArray>;
-    template class EXPORTGADGETSMRICORE GenericReconBase_gadget1of2<ISMRMRD::ImageHeader>;
+    template class EXPORTGADGETSMRICORE GenericReconSMSBase_gadget1of2<IsmrmrdReconData>;
+    template class EXPORTGADGETSMRICORE GenericReconSMSBase_gadget1of2<IsmrmrdImageArray>;
+    template class EXPORTGADGETSMRICORE GenericReconSMSBase_gadget1of2<ISMRMRD::ImageHeader>;
 
     GenericReconKSpaceReadoutBase_gadget1of2::GenericReconKSpaceReadoutBase_gadget1of2() : BaseClass()
     {
