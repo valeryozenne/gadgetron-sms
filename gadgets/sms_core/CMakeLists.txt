@@ -19,8 +19,12 @@ add_library(gadgetron_smscore SHARED
     GenericReconSplitSMSGadget.cpp
     GenericReconCheckSizeGadget.cpp
     GenericReconCheckSizeGadget.h
+    GenericReconCartesianSliceGrappaGadget.cpp
+    GenericReconCartesianSliceGrappaGadget.h
     GenericReconCartesianSliceGrappav3Gadget.cpp
     GenericReconCartesianSliceGrappav3Gadget.h
+    GenericReconCartesianSliceGrappavgpuGadget.cpp
+    GenericReconCartesianSliceGrappavgpuGadget.h
     GenericReconSMSPrepGadget.cpp
     GenericReconSMSPrepGadget.h
     GenericReconSMSPostGadget.cpp
