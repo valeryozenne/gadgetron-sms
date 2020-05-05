@@ -9,6 +9,7 @@
 #include "EPICorrSMSGadget.h"
 #include "ismrmrd/xml.h"
 #include "hoNDArray_fileio.h"
+#include "SMS_utils.h"
 
 namespace Gadgetron {
 
@@ -491,7 +492,8 @@ void EPICorrSMSGadget::process_phase_correction_data(ISMRMRD::AcquisitionHeader 
             corrpos_no_exp_save_.col(hdr.idx.slice) = arma::cx_fvec(arma::zeros<arma::fvec>(Nx_), -0.5*tvec);
             corrneg_no_exp_save_.col(hdr.idx.slice) = arma::cx_fvec(arma::zeros<arma::fvec>(Nx_), +0.5*tvec);
 
-            fonction_qui_sauvegarde_sur_le_disk_les_corrections_par_coupes(hdr.idx.slice );
+            send_data_to_next_function(hdr.idx.slice);
+            //fonction_qui_sauvegarde_sur_le_disk_les_corrections_par_coupes(hdr.idx.slice );
          }
 
         // Increase the excitation number for this slice and set (to be used for the next shot)
@@ -786,7 +788,92 @@ void EPICorrSMSGadget::increase_no_repetitions(size_t delta_rep) {
 
 }
 
+void EPICorrSMSGadget::send_data_to_next_function(int slice)
+{
+    GDEBUG("STEP 2 : EPI correction : slice %d\n", slice);
 
+    ISMRMRD::AcquisitionHeader head;
+    int dim0, dim1;
+    hoNDArray<std::complex<float>> input;
+    GadgetContainerMessage<s_EPICorrection> m1, m2, m3, m4;
+
+    head.user_int[0] = 0;
+    head.idx.slice = slice;
+    dim0 = size(corrneg_, 0);
+    dim1 = size(corrneg_, 1);
+    input.create(dim0, dim1);
+    GDEBUG_STREAM("corrneg_size dim0: " << dim0 << ", dim1: " << dim1);
+    memcpy(input.get_data_ptr(), &corrneg_, dim0 * dim1);
+
+    m1.getObjectPtr()->hdr = head;
+    m1.getObjectPtr()->correction = input;
+
+    //------------------------------------------------
+    
+    head.user_int[0] = 1;
+
+    dim0 = size(corrpos_, 0);
+    dim1 = size(corrpos_, 1);
+    input.create(dim0, dim1);
+    GDEBUG_STREAM("corrpos_size dim0: " << dim0 << ", dim1: " << dim1);
+    memcpy(input.get_data_ptr(), &corrpos_, dim0 * dim1);
+
+    m2.getObjectPtr()->hdr = head;
+    m2.getObjectPtr()->correction = input;
+
+    //------------------------------------------------
+    
+    head.user_int[0] = 2;
+
+    dim0 = size(corrneg_no_exp_save_.col(slice), 0);
+    dim1 = size(corrneg_no_exp_save_.col(slice), 1);
+    input.create(dim0, dim1);
+    GDEBUG_STREAM("corrneg_no_exp_size dim0: " << dim0 << ", dim1: " << dim1);
+    memcpy(input.get_data_ptr(), &corrneg_no_exp_save_, dim0 * dim1);
+
+    m3.getObjectPtr()->hdr = head;
+    m3.getObjectPtr()->correction = input;
+
+    //----------------------------------------------------
+
+    head.user_int[0] = 3;
+
+    dim0 = size(corrpos_no_exp_save_.col(slice), 0);
+    dim1 = size(corrpos_no_exp_save_.col(slice), 1);
+    input.create(dim0, dim1);
+    GDEBUG_STREAM("corrpos_no_exp_size dim0: " << dim0 << ", dim1: " << dim1);
+    memcpy(input.get_data_ptr(), &corrpos_no_exp_save_, dim0 * dim1);
+
+    m4.getObjectPtr()->hdr = head;
+    m4.getObjectPtr()->correction = input;
+
+    //---------------------------------------------------
+
+    if (head.encoding_space_ref > 0) {
+        // It is enough to put the first one, since they are linked
+        if (this->next()->putq(&m1) == -1) {
+            m1.release();
+            GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+            return;
+        }
+        if (this->next()->putq(&m2) == -1) {
+            m2.release();
+            GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+            return;
+        }
+        if (this->next()->putq(&m3) == -1) {
+            m3.release();
+            GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+            return;
+        }
+        if (this->next()->putq(&m4) == -1) {
+            m4.release();
+            GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+            return;
+        }
+        return;
+    }
+}
 
 void EPICorrSMSGadget::fonction_qui_sauvegarde_sur_le_disk_les_corrections_par_coupes(int slice )
 {
