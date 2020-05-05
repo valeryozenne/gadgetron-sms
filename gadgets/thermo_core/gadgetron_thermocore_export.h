@@ -1,0 +1,14 @@
+#ifndef GADGETRONTHERMOCORE_EXPORT_H_
+#define GADGETRONTHERMOCORE_EXPORT_H_
+
+#if defined (WIN32)
+#if defined (__BUILD_GADGETRON_GADGET_THERMOCORE__)
+#define EXPORTGADGETSTHERMOCORE __declspec(dllexport)
+#else
+#define EXPORTGADGETSTHERMOCORE __declspec(dllimport)
+#endif
+#else
+#define EXPORTGADGETSTHERMOCORE
+#endif
+
+#endif /* GADGETRON_THERMOCORE_EXPORT_H_ */
