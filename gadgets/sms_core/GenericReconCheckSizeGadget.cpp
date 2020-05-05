@@ -50,7 +50,7 @@ namespace Gadgetron {
                 hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].ref_->data_;
                 hoNDArray< ISMRMRD::AcquisitionHeader > headers_ = recon_bit_->rbit_[e].ref_->headers_;
 
-                unsigned int rep_max=0;
+                unsigned int rep_max =0;
 
                 for (int ii=0; ii<headers_.get_number_of_elements(); ii++)
                 {
