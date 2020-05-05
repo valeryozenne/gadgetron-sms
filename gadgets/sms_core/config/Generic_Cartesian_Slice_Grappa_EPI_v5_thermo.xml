@@ -26,6 +26,8 @@
     <!-- Noise prewhitening -->
     <gadget><name>NoiseAdjust</name><dll>gadgetron_mricore</dll><classname>NoiseAdjustGadget</classname></gadget>
 
+    
+
     <gadget>
     <name>WriteSingleBandFlags</name>
      <dll>gadgetron_smscore</dll>
@@ -88,7 +90,7 @@
         <property><name>verbose</name><value>true</value></property>
     </gadget>
     -->
-<!--
+
     <gadget>
         <name>GenericReconSplitSimpleSMS</name>
         <dll>gadgetron_smscore</dll>
@@ -97,14 +99,17 @@
         <property><name>perform_timing</name><value>true</value></property>
         <property><name>verbose</name><value>true</value></property>
         <property><name>use_omp</name><value>false</value></property>
-    </gadget>-->
+    </gadget>
 
-
-  <gadget>
-        <name>GenericReconSplitSMSGadget</name>
+    <gadget>
+        <name>GenericReconCheckSizeGadget</name>
         <dll>gadgetron_smscore</dll>
-        <classname>GenericReconSplitSMSGadget</classname>        
-    </gadget> 
+        <classname>GenericReconCheckSizeGadget</classname>
+        <property><name>debug_folder</name><value></value></property>
+        <property><name>perform_timing</name><value>true</value></property>
+        <property><name>verbose</name><value>true</value></property>
+    </gadget>
+ 
 
     <gadget>
     <name>SMSPrepGadget</name>
@@ -116,16 +121,6 @@
     <property><name>use_omp</name><value>false</value></property>
     </gadget>
 
-
-
-    <gadget>
-        <name>GenericReconCheckSizeGadget</name>
-        <dll>gadgetron_smscore</dll>
-        <classname>GenericReconCheckSizeGadget</classname>
-        <property><name>debug_folder</name><value></value></property>
-        <property><name>perform_timing</name><value>true</value></property>
-        <property><name>verbose</name><value>true</value></property>
-    </gadget>
 
 <!-- Coil compression -->
 
@@ -335,12 +330,25 @@
     <property><name>scalingFactor_dedicated</name><value>100.0</value></property>
 </gadget>
 
+
+<!-- ImageArray to images -->
+<gadget>
+    <name>ThermoMapping</name>
+    <dll>gadgetron_thermocore</dll>
+    <classname>ThermoMappingGadget</classname>
+      <property><name>perform_timing</name><value>false</value></property>
+     <property><name>verbose</name><value>true</value></property>
+</gadget>
+
 <!-- ImageArray to images -->
 <gadget>
     <name>ImageArraySplit</name>
     <dll>gadgetron_mricore</dll>
     <classname>ImageArraySplitGadget</classname>
 </gadget>
+
+
+
 
 <!-- after recon processing -->
 <!--
