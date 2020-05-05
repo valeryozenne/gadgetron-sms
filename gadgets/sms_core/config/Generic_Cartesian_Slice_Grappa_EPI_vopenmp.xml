@@ -91,7 +91,7 @@
 
     <gadget>
         <name>GenericReconSplitSMS</name>
-        <dll>gadgetron_mricore</dll>
+        <dll>gadgetron_smscore</dll>
         <classname>GenericReconSplitSMSGadget</classname>
         <property><name>debug_folder</name><value></value></property>
         <property><name>perform_timing</name><value>true</value></property>
