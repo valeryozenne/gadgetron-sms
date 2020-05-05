@@ -1,4 +1,4 @@
-/** \file   GenericReconBase_gadget1of2.h
+/** \file   GenericReconSMSBase_gadget1of2.h
     \brief  This serves an optional base class gadget for the generic chain.
             Some common functionalities are implemented here and can be reused in specific recon gadgets.
             This gadget is instantiated for IsmrmrdReconData and IsmrmrdImageArray
@@ -27,15 +27,15 @@
 namespace Gadgetron {
 
     template <typename T> 
-    class EXPORTGADGETSMRICORE GenericReconBase_gadget1of2 : public Gadget1<T>
+    class EXPORTGADGETSMRICORE GenericReconSMSBase_gadget1of2 : public Gadget1<T>
     {
     public:
-        GADGET_DECLARE(GenericReconBase_gadget1of2);
+        GADGET_DECLARE(GenericReconSMSBase_gadget1of2);
 
         typedef Gadget1<T> BaseClass;
 
-        GenericReconBase_gadget1of2();
-        ~GenericReconBase_gadget1of2();
+        GenericReconSMSBase_gadget1of2();
+        ~GenericReconSMSBase_gadget1of2();
 
         /// ------------------------------------------------------------------------------------
         /// debug and timing
@@ -75,45 +75,45 @@ namespace Gadgetron {
         virtual int process(GadgetContainerMessage<T>* m1);
     };
 
-    class EXPORTGADGETSMRICORE GenericReconKSpaceReadoutBase_gadget1of2 :public GenericReconBase_gadget1of2 < ISMRMRD::AcquisitionHeader >
+    class EXPORTGADGETSMRICORE GenericReconKSpaceReadoutBase_gadget1of2 :public GenericReconSMSBase_gadget1of2 < ISMRMRD::AcquisitionHeader >
     {
     public:
         GADGET_DECLARE(GenericReconKSpaceReadoutBase_gadget1of2);
 
-        typedef GenericReconBase_gadget1of2 < ISMRMRD::AcquisitionHeader > BaseClass;
+        typedef GenericReconSMSBase_gadget1of2 < ISMRMRD::AcquisitionHeader > BaseClass;
 
         GenericReconKSpaceReadoutBase_gadget1of2();
         virtual ~GenericReconKSpaceReadoutBase_gadget1of2();
     };
 
-    class EXPORTGADGETSMRICORE GenericReconDataBase_gadget1of2 :public GenericReconBase_gadget1of2 < IsmrmrdReconData >
+    class EXPORTGADGETSMRICORE GenericReconDataBase_gadget1of2 :public GenericReconSMSBase_gadget1of2 < IsmrmrdReconData >
     {
     public:
         GADGET_DECLARE(GenericReconDataBase_gadget1of2);
 
-        typedef GenericReconBase_gadget1of2 < IsmrmrdReconData > BaseClass;
+        typedef GenericReconSMSBase_gadget1of2 < IsmrmrdReconData > BaseClass;
 
         GenericReconDataBase_gadget1of2();
         virtual ~GenericReconDataBase_gadget1of2();
     };
 
-    class EXPORTGADGETSMRICORE GenericReconImageBase_gadget1of2 :public GenericReconBase_gadget1of2 < IsmrmrdImageArray >
+    class EXPORTGADGETSMRICORE GenericReconImageBase_gadget1of2 :public GenericReconSMSBase_gadget1of2 < IsmrmrdImageArray >
     {
     public:
         GADGET_DECLARE(GenericReconImageBase_gadget1of2);
 
-        typedef GenericReconBase_gadget1of2 < IsmrmrdImageArray > BaseClass;
+        typedef GenericReconSMSBase_gadget1of2 < IsmrmrdImageArray > BaseClass;
 
         GenericReconImageBase_gadget1of2();
         virtual ~GenericReconImageBase_gadget1of2();
     };
 
-    class EXPORTGADGETSMRICORE GenericReconImageHeaderBase_gadget1of2 :public GenericReconBase_gadget1of2 < ISMRMRD::ImageHeader >
+    class EXPORTGADGETSMRICORE GenericReconImageHeaderBase_gadget1of2 :public GenericReconSMSBase_gadget1of2 < ISMRMRD::ImageHeader >
     {
     public:
         GADGET_DECLARE(GenericReconImageHeaderBase_gadget1of2);
 
-        typedef GenericReconBase_gadget1of2 < ISMRMRD::ImageHeader > BaseClass;
+        typedef GenericReconSMSBase_gadget1of2 < ISMRMRD::ImageHeader > BaseClass;
 
         GenericReconImageHeaderBase_gadget1of2();
         virtual ~GenericReconImageHeaderBase_gadget1of2();

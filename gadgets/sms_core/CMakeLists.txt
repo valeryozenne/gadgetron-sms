@@ -13,6 +13,8 @@ add_library(gadgetron_smscore SHARED
     EmptyGadget.h
     GenericReconSMSBase.h
     GenericReconSMSBase.cpp
+    GenericReconSMSBase_gadget1of2.h
+    GenericReconSMSBase_gadget1of2.cpp
     GiveReadoutInformationGadget.h
     GiveReadoutInformationGadget.cpp
     GenericReconSplitSMSGadget.h
