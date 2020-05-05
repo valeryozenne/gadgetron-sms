@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "GenericReconBase_gadget1of2.h"
+#include "GenericReconBase.h"
 #include "mri_core_slice_grappa.h"
 #include "mri_core_utility_interventional.h"
 #include "hoNDArray_utils.h"
@@ -18,12 +18,12 @@
 
 namespace Gadgetron {
 
-    class EXPORTGADGETSSMSCORE GenericReconSMSBase : public GenericReconDataBase_gadget1of2
+    class EXPORTGADGETSSMSCORE GenericReconSMSBase : public GenericReconDataBase
     {
     public:
         GADGET_DECLARE(GenericReconSMSBase);
 
-        typedef GenericReconDataBase_gadget1of2 BaseClass;
+        typedef GenericReconDataBase BaseClass;
         //typedef hoNDKLT< std::complex<float> > KLTType;
 
         GADGET_PROPERTY(use_omp, bool, "Whether to use omp acceleration", false);
@@ -133,6 +133,14 @@ namespace Gadgetron {
 
 
 
+        cuNDArray<float_complext> device_epi_nav_pos_STK_test ;
+        cuNDArray<float_complext> device_epi_nav_neg_STK_test ;
+        cuNDArray<float_complext> device_epi_nav_pos_STK_mean_test ;
+        cuNDArray<float_complext> device_epi_nav_neg_STK_mean_test ;
+
+        cuNDArray<float_complext> device_d_epi_sb;
+        cuNDArray<float_complext> device_d_epi_mb;
+
 
         // --------------------------------------------------
         // gadget functions
@@ -167,6 +175,8 @@ namespace Gadgetron {
 
         virtual void save_4D_8D_kspace(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
+        virtual void save_4D_data(hoNDArray<float >& input, std::string name, std::string encoding_number);
+
         virtual void show_size(hoNDArray< std::complex<float> >& input, std::string name);
 
         virtual void load_epi_data();
@@ -183,13 +193,15 @@ namespace Gadgetron {
 
         virtual void apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal, bool ifft , std::string msg);
 
+        virtual void apply_ghost_correction_with_STK6_gpu(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , bool ifft , std::string msg);
+
         virtual void apply_ghost_correction_with_STK6_open(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal, bool ifft , std::string msg);
 
         virtual void apply_ghost_correction_with_arma_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , std::string msg);
 
         virtual void apply_ghost_correction_with_STK7(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc , bool optimal);
 
-        //virtual void define_usefull_parameters(IsmrmrdReconBit &recon_bit, size_t e);
+        virtual void define_usefull_parameters(IsmrmrdReconBit &recon_bit, size_t e);
         virtual void define_usefull_parameters_simple_version(IsmrmrdReconBit &recon_bit, size_t e);
 
         virtual bool detect_first_repetition(IsmrmrdReconBit &recon_bit);

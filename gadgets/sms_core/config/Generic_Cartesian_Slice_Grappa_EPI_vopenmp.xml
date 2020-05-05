@@ -88,23 +88,26 @@
         <property><name>verbose</name><value>true</value></property>
     </gadget>
     -->
-<!--
+
     <gadget>
-        <name>GenericReconSplitSimpleSMS</name>
+        <name>GenericReconSplitSMS</name>
         <dll>gadgetron_smscore</dll>
-        <classname>GenericReconSplitSimpleSMSGadget</classname>
+        <classname>GenericReconSplitSMSGadget</classname>
         <property><name>debug_folder</name><value></value></property>
         <property><name>perform_timing</name><value>true</value></property>
         <property><name>verbose</name><value>true</value></property>
-        <property><name>use_omp</name><value>false</value></property>
-    </gadget>-->
-
-
-  <gadget>
-        <name>GenericReconSplitSMSGadget</name>
-        <dll>gadgetron_smscore</dll>
-        <classname>GenericReconSplitSMSGadget</classname>        
-    </gadget> 
+        <property><name>use_omp</name><value>true</value></property>
+    </gadget>
+<!--
+    <gadget>
+        <name>GenericReconSizeGadget</name>
+        <dll>gadgetron_mricore</dll>
+        <classname>GenericReconSizeGadget</classname>
+        <property><name>debug_folder</name><value></value></property>
+        <property><name>perform_timing</name><value>true</value></property>
+        <property><name>verbose</name><value>true</value></property>
+    </gadget>
+ -->
 
     <gadget>
     <name>SMSPrepGadget</name>
@@ -113,19 +116,10 @@
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
-    <property><name>use_omp</name><value>false</value></property>
+    <property><name>use_omp</name><value>true</value></property>
+    <property><name>use_gpu</name><value>false</value></property>
     </gadget>
 
-
-
-    <gadget>
-        <name>GenericReconCheckSizeGadget</name>
-        <dll>gadgetron_smscore</dll>
-        <classname>GenericReconCheckSizeGadget</classname>
-        <property><name>debug_folder</name><value></value></property>
-        <property><name>perform_timing</name><value>true</value></property>
-        <property><name>verbose</name><value>true</value></property>
-    </gadget>
 
 <!-- Coil compression -->
 
@@ -162,14 +156,16 @@
 -->
 
     <gadget>
-    <name>SliceGrappav3Gadget</name>
+    <name>GenericReconCartesianSliceGrappavgpu</name>
     <dll>gadgetron_smscore</dll>
-    <classname>GenericReconCartesianSliceGrappav3Gadget</classname>
+    <classname>GenericReconCartesianSliceGrappavgpuGadget</classname>
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
 
-    <property><name>use_omp</name><value>false</value></property>
+    <property><name>use_omp</name><value>true</value></property>
+    <property><name>use_gpu</name><value>false</value></property>
+
     <property><name>calib_fast</name><value>true</value></property>
     <property><name>grappa_kSize_RO</name><value>5</value></property>
     <property><name>grappa_kSize_E1</name><value>5</value></property>
@@ -188,7 +184,8 @@
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
-    <property><name>use_omp</name><value>false</value></property>
+    <property><name>use_omp</name><value>true</value></property>
+    <property><name>use_gpu</name><value>false</value></property>
     </gadget>
 
 
@@ -343,8 +340,7 @@
 </gadget>
 
 <!-- after recon processing -->
-<!--
-<gadget>
+<!--<gadget>
       <name>ExtractThermoI</name>
       <dll>gadgetron_mricore</dll>
       <classname>ExtractThermoIGadget</classname>
@@ -358,9 +354,7 @@
       </property>
 </gadget>-->
 
-
-<!-- after recon processing -->
-    <gadget>
+ <gadget>
         <name>ComplexToFloatAttrib</name>
         <dll>gadgetron_mricore</dll>
         <classname>ComplexToFloatGadget</classname>

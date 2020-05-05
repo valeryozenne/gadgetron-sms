@@ -118,6 +118,7 @@ int GenericReconSplitSimpleSMSGadget::process(Gadgetron::GadgetContainerMessage<
 
             headers_sb.create(E1, E2, new_N, S , SLC );
             sb.create(RO, E1, E2, CHA, new_N, S , SLC );
+
             gt_exporter_.export_array_complex(data, debug_folder.value() + "donnee_avant_extract");
             if (perform_timing.value() == true)
             {
@@ -152,9 +153,9 @@ int GenericReconSplitSimpleSMSGadget::process(Gadgetron::GadgetContainerMessage<
             gt_exporter_.export_array_complex(mb_std_copy, debug_folder.value() + "donnee_mb_apres_extract_std_copy");
         }
         
-        //Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m2 = new GadgetContainerMessage< IsmrmrdReconData >();
-        //*m2->getObjectPtr() = *m1->getObjectPtr();
-        Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m2 = m1->duplicate();
+        Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m2 = new GadgetContainerMessage< IsmrmrdReconData >();
+        *m2->getObjectPtr() = *m1->getObjectPtr();
+        //Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m2 = m1->duplicate();
         
         //gt_exporter_.export_array_complex(sb, debug_folder.value() + "donnee_sb_apres_extract_memcpy");
 
