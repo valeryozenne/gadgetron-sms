@@ -48,7 +48,7 @@ namespace Gadgetron {
         // map and map_sd: mapping result and its sd
         // para and para_sd: other parameters of mapping and its sd
         //virtual int perform_zerofilling(IsmrmrdImageArray& data, IsmrmrdImageArray& map);
-        virtual void perform_zerofilling(IsmrmrdImageArray& in, hoNDArray< std::complex<float> > & data_out);
+        virtual void perform_zerofilling(IsmrmrdImageArray& in, hoNDArray< std::complex<float> > & data_out, int scaling);
         //virtual void perform_zerofilling(IsmrmrdImageArray& in, IsmrmrdImageArray& out);
 
 

@@ -73,31 +73,15 @@ int ZeroFillingGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageAr
     size_t S = data->data_.get_size(5);
     size_t SLC = data->data_.get_size(6);
 
-
     size_t hN = headers_.get_size(0);
     size_t hS = headers_.get_size(1);
     size_t hSLC = headers_.get_size(2);
 
-    GDEBUG_STREAM(  " N :  "  << hN  <<" S: "<< hS <<" SLC: " << hSLC);
+    GDEBUG_STREAM(" N :  "  << hN  <<" S: "<< hS <<" SLC: " << hSLC);
 
     hoNDArray< std::complex<float> > data_out(RO*scaling, E1*scaling , E2, CHA, N, S, SLC);
 
-    perform_zerofilling(*data, data_out);
-
-    for (long long slc = 0; slc < hSLC; slc++)
-    {
-        for (long long s = 0; s < hS; s++)
-        {
-            for (long long n = 0; n < hN; n++)
-            {
-                headers_(n, s, slc).matrix_size[0]=headers_(n, s, slc).matrix_size[0]*scaling;
-                headers_(n, s, slc).matrix_size[1]=headers_(n, s, slc).matrix_size[1]*scaling;
-                GDEBUG_STREAM(  headers_(n, s, slc).matrix_size[0]<< " "<< headers_(n, s, slc).matrix_size[1] );
-            }
-        }
-    }
-
-    m1->getObjectPtr()->data_=data_out;
+    perform_zerofilling(*data, data_out, scaling);
 
 
     // print out data info
@@ -108,11 +92,42 @@ int ZeroFillingGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageAr
         data->data_.print(os);
         GDEBUG_STREAM(os.str());
 
-
-
         std::stringstream os2;
         data_out.print(os2);
         GDEBUG_STREAM(os2.str());
+    }
+
+    IsmrmrdImageArray map_sd;
+
+
+
+    map_sd.data_.create(RO*scaling, E1*scaling , E2, CHA, N, S, SLC);
+    Gadgetron::clear(map_sd.data_);
+    map_sd.data_=data_out;
+    map_sd.headers_.create(N, S, SLC);
+
+    for (long long slc = 0; slc < hSLC; slc++)
+    {
+        for (long long s = 0; s < hS; s++)
+        {
+            for (long long n = 0; n < hN; n++)
+            {
+
+                map_sd.headers_(0, s, slc) = headers_(0, s, slc);
+                map_sd.headers_(n, s, slc).matrix_size[0]=headers_(n, s, slc).matrix_size[0]*scaling;
+                map_sd.headers_(n, s, slc).matrix_size[1]=headers_(n, s, slc).matrix_size[1]*scaling;
+
+            }
+        }
+    }
+
+    Gadgetron::GadgetContainerMessage<IsmrmrdImageArray>* cm2 = new Gadgetron::GadgetContainerMessage<IsmrmrdImageArray>();
+    *(cm2->getObjectPtr()) = map_sd;
+
+    if (this->next()->putq(cm2) == -1)
+    {
+        GERROR("CmrParametricMappingGadget::process, passing sd map on to next gadget");
+        return GADGET_FAIL;
     }
 
 
@@ -126,29 +141,28 @@ int ZeroFillingGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageAr
     // rassemble les données
 
 
-
-
     // -------------------------------------------------------------
 
-    if (this->next()->putq(m1) == -1)
+    /*if (this->next()->putq(m1) == -1)
     {
         GERROR("ZeroFillingGadget::process, passing map on to next gadget");
         return GADGET_FAIL;
-    }
+    }*/
+
+    m1->release();
 
     if (perform_timing.value()) { gt_timer_local_.stop(); }
 
     return GADGET_OK;
 }
 
-void ZeroFillingGadget::perform_zerofilling(IsmrmrdImageArray& in, hoNDArray< std::complex<float> > & data_out)
+void ZeroFillingGadget::perform_zerofilling(IsmrmrdImageArray& in, hoNDArray< std::complex<float> > & data_out, int scaling)
 {
     try
     {
         if (perform_timing.value()) { gt_timer_.start("ZeroFillingGadget::perform_filling"); }
 
         GDEBUG_CONDITION_STREAM(verbose.value(), "ZeroFillingGadget::perform_zerofilling(...) starts ... ");
-
 
         size_t RO = in.data_.get_size(0);
         size_t E1 = in.data_.get_size(1);
@@ -160,8 +174,9 @@ void ZeroFillingGadget::perform_zerofilling(IsmrmrdImageArray& in, hoNDArray< st
 
         Gadgetron::hoNDFFT<float>::instance()->fft2c(in.data_);
 
-        unsigned int scaling=2;
-        unsigned int offset=int(RO/scaling);
+        unsigned int offset_ro=int(RO/scaling);
+        unsigned int offset_e1=int(E1/scaling);
+        GDEBUG("offset %d ", offset_ro, offset_e1);
 
         hoNDArray< std::complex<float> >  data_in(in.data_);
 
@@ -177,9 +192,8 @@ void ZeroFillingGadget::perform_zerofilling(IsmrmrdImageArray& in, hoNDArray< st
                         {
                             for (long long e1 = 0; e1 < E1; e1++)
                             {
-
                                 std::complex<float> * in = &(data_in(0, e1, e2, cha, n, s, slc));
-                                std::complex<float> * out = &(data_out(0, e1, e2, cha, n, s, slc));
+                                std::complex<float> * out = &(data_out(offset_ro, e1+offset_e1, e2, cha, n, s, slc));
                                 memcpy(out , in, sizeof(std::complex<float>)*RO);
 
                             }
