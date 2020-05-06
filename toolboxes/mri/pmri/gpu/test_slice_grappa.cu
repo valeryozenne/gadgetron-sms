@@ -712,7 +712,7 @@ void compute_EPI_coor_5D( bool undo, bool optimal, cuNDArray<T> *data_in, cuNDAr
     unsigned int blocks_RO=(unsigned int) std::ceil(RO/blockDim.x);
     unsigned int blocks_E1=(unsigned int) std::ceil(RO/blockDim.y);
 
-    dim3 gridDim(blocks_RO, blocks_E1 , CHA*MB*STK );
+    dim3 gridDim(blocks_RO, blocks_E1, CHA*MB*STK );
 
 
     //std::cout << "maxThreadsPerBlock :"<<  32 << "maxThreadsPerBlock :"<<  32  << std::endl;

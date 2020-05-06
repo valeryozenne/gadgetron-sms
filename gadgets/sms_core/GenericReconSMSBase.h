@@ -27,6 +27,7 @@ namespace Gadgetron {
 
         GADGET_PROPERTY(use_omp, bool, "Whether to use omp acceleration", false);
         GADGET_PROPERTY(use_gpu, bool, "Whether to use gpu acceleration", false);
+        GADGET_PROPERTY(test_value, int, "value", 1);
 
         GenericReconSMSBase();
         ~GenericReconSMSBase();
@@ -210,7 +211,7 @@ namespace Gadgetron {
 
         virtual void apply_relative_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
         virtual void apply_relative_phase_shift_test(hoNDArray< std::complex<float> >& data, bool is_positive );
-        virtual void apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
+        virtual void apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive, bool is_mb );
 
         virtual void get_header_and_position_and_gap(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > headers_);
 

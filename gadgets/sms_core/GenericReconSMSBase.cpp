@@ -576,7 +576,7 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
 
     gt_exporter_.export_array(debug_iso, debug_folder_full_path_ + "shift_from_iso");
     gt_exporter_.export_array(debug_slice_dir, debug_folder_full_path_ + "slice_dir");
-     gt_exporter_.export_array(debug_slice_tickness, debug_folder_full_path_ + "slice_thickness");
+    gt_exporter_.export_array(debug_slice_tickness, debug_folder_full_path_ + "slice_thickness");
 
     //std::cout << z_offset <<std::endl;
     //std::cout << "   " <<z_offset.max()<< " " <<z_offset.min() << std::endl;
@@ -1004,6 +1004,8 @@ void GenericReconSMSBase::load_epi_data()
         memcpy(out_pos_no_exp, &corrpos_no_exp(0) , sizeof(std::complex<float>)*dimensions_[0]);
     }
 
+
+
     CheckComplexNumberEqualInMatrix(epi_nav_neg_,corrneg_all_ );
     CheckComplexNumberEqualInMatrix(epi_nav_neg_no_exp_,corrneg_all_no_exp_ );
 
@@ -1310,7 +1312,7 @@ void GenericReconSMSBase::prepare_epi_data(size_t e, size_t E1, size_t E2, size_
     tempo_hoND.create(RO, E1, E2, CHA);
     tempo_1D_hoND.create(RO);
 
-   // example
+    // example
 
     // memory allocation
     //device_epi_nav_pos_STK_test.create(RO, MB_factor, lNumberOfStacks_);
@@ -1322,40 +1324,40 @@ void GenericReconSMSBase::prepare_epi_data(size_t e, size_t E1, size_t E2, size_
     device_epi_nav_pos_STK_test= reinterpret_cast< hoNDArray<float_complext> & >(epi_nav_pos_STK_);
 
     // reintrepret
-  //  hoNDArray<float_complext>* host_epi_nav_pos_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_);
+    //  hoNDArray<float_complext>* host_epi_nav_pos_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_);
     hoNDArray<float_complext>* host_epi_nav_neg_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_neg_STK_);
     hoNDArray<float_complext>* host_epi_nav_pos_STK_mean_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_mean_);
     hoNDArray<float_complext>* host_epi_nav_neg_STK_mean_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_neg_STK_mean_);
 
     //cudaMemcpyHostToDevice
-  /*  if(cudaMemcpy(device_epi_nav_pos_STK_test.get_data_ptr(),
+    /*  if(cudaMemcpy(device_epi_nav_pos_STK_test.get_data_ptr(),
                host_epi_nav_pos_STK_->get_data_ptr(),
                RO*MB_factor*lNumberOfStacks_*sizeof(std::complex<float>),
                cudaMemcpyHostToDevice)!= cudaSuccess )   {
             GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}*/
 
     if(cudaMemcpy(device_epi_nav_neg_STK_test.get_data_ptr(),
-               host_epi_nav_neg_STK_->get_data_ptr(),
-               RO*MB_factor*lNumberOfStacks_*sizeof(std::complex<float>),
-               cudaMemcpyHostToDevice)!= cudaSuccess )   {
-            GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}
+                  host_epi_nav_neg_STK_->get_data_ptr(),
+                  RO*MB_factor*lNumberOfStacks_*sizeof(std::complex<float>),
+                  cudaMemcpyHostToDevice)!= cudaSuccess )   {
+        GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}
 
     if(cudaMemcpy(device_epi_nav_neg_STK_mean_test.get_data_ptr(),
-               host_epi_nav_neg_STK_mean_->get_data_ptr(),
-               RO*lNumberOfStacks_*sizeof(std::complex<float>),
-               cudaMemcpyHostToDevice)!= cudaSuccess )   {
-            GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}
+                  host_epi_nav_neg_STK_mean_->get_data_ptr(),
+                  RO*lNumberOfStacks_*sizeof(std::complex<float>),
+                  cudaMemcpyHostToDevice)!= cudaSuccess )   {
+        GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}
 
     if(cudaMemcpy(device_epi_nav_pos_STK_mean_test.get_data_ptr(),
-               host_epi_nav_pos_STK_mean_->get_data_ptr(),
-               RO*lNumberOfStacks_*sizeof(std::complex<float>),
-               cudaMemcpyHostToDevice)!= cudaSuccess )   {
-            GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}
+                  host_epi_nav_pos_STK_mean_->get_data_ptr(),
+                  RO*lNumberOfStacks_*sizeof(std::complex<float>),
+                  cudaMemcpyHostToDevice)!= cudaSuccess )   {
+        GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}
 
 
-            cudaError_t err = cudaGetLastError();
-            if( err != cudaSuccess ){
-          GDEBUG("Unable to copy result from device to host: %s\n", cudaGetErrorString(err));}
+    cudaError_t err = cudaGetLastError();
+    if( err != cudaSuccess ){
+        GDEBUG("Unable to copy result from device to host: %s\n", cudaGetErrorString(err));}
 
 
 
@@ -2007,7 +2009,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_gpu(hoNDArray< std::c
 
     cuNDArray<int> device_reverse_line_(reverse_line);
 
-  /*  hoNDArray<float_complext>* host_epi_nav_pos_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_);
+    /*  hoNDArray<float_complext>* host_epi_nav_pos_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_);
     cuNDArray<float_complext> device_epi_nav_pos_STK_(host_epi_nav_pos_STK_);
 
     hoNDArray<float_complext>* host_epi_nav_neg_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_neg_STK_);
@@ -2041,7 +2043,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_gpu(hoNDArray< std::c
 
             if (ifft)
             {
-            cuNDFFT<float>::instance()->ifft(&device_d, dim_to_transform);
+                cuNDFFT<float>::instance()->ifft(&device_d, dim_to_transform);
             }
 
             prepare_EPI_corr_5D(  undo,  optimal , device_d , device_epi_nav_pos_STK_test , device_epi_nav_neg_STK_test, device_epi_nav_pos_STK_mean_test, device_epi_nav_neg_STK_mean_test, device_reverse_line_, start_E1_,  end_E1_);
@@ -2079,11 +2081,11 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::compl
     if (ifft==true)
     {
 
-            //if (perform_timing.value()) { gt_timer_local_.start("cpuExample::ifft cpu time");}
+        //if (perform_timing.value()) { gt_timer_local_.start("cpuExample::ifft cpu time");}
 
-            hoNDFFT<float>::instance()->ifft(&data,0);
+        hoNDFFT<float>::instance()->ifft(&data,0);
 
-            //if (perform_timing.value()) { gt_timer_local_.stop();}
+        //if (perform_timing.value()) { gt_timer_local_.stop();}
 
     }
 
@@ -2325,7 +2327,7 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK7(hoNDArray< std::compl
 
 
 
-void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive)
+void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive, bool is_mb)
 {    
 
     size_t RO=data.get_size(0);
@@ -2343,8 +2345,6 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
     long long m, a, n, s;
     long long index;
 
-    std::cout << "!!!!!!!!afmoqsmqklk!!!!!!!!!!!!!!!!!" << std::endl;
-
     std::complex<double> ii(0,1);
 
     int facteur;
@@ -2360,7 +2360,72 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
 
             index = MapSliceSMS(a,m);
 
-            std::complex<double> lala=  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
+            std::complex<double> lala =  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
+
+            /*std::complex<double> lala;
+            std::complex<float> lolo;
+
+            if (MB==3){
+
+                if (m==0)
+                {
+                    lala = exp(arma::datum::pi*2/1*facteur*ii);
+                    lolo = 1;
+                }
+                else if (m==1)
+                {
+                    if (is_positive==true)
+                    {
+                        lala= exp(arma::datum::pi*2/3*facteur*ii);
+
+                        if (is_mb==true)
+                        {
+                            lolo= exp(arma::datum::pi*-1*ii*z_offset_geo(index)/z_gap(0));
+                        }
+                        else
+                        {
+                            lolo=1;
+                        }
+                    }
+                    else
+                    {
+                        lala= exp(arma::datum::pi*2/3*facteur*ii);
+                        lolo=1;
+                    }
+                }
+                else if (m==2)
+                {
+                    if (is_positive==true)
+                    {
+                        lala= exp(arma::datum::pi*2/6*facteur*ii);
+
+                        if (is_mb==true)
+                        {
+                            lolo= exp(arma::datum::pi*-1*ii*z_offset_geo(index)/z_gap(0));
+                        }
+                        else
+                        {
+                            lolo=1;
+                        }
+                    }
+                    else
+                    {
+                        lala= exp(arma::datum::pi*2/6*facteur*ii);
+                        lolo=1;
+                    }
+
+                }
+            }
+            else
+            {
+
+                {    lala=  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
+                     lolo=1;
+                }
+            }*/
+
+
+
             std::complex<float>  lili=  static_cast< std::complex<float> >(lala) ;
 
             for (s = 0; s < S; s++)

@@ -326,7 +326,6 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
     recon_obj.unfolded_image_.create(voxels_number_per_image_, CHA, MB_factor, STK,  N, S);
     recon_obj.unfolded_image_permute_.create(blocks_RO_,blocks_E1_,CHA, MB_factor, STK,  N, S);
 
-
     gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::process unmix allocation  ");
 
     typedef std::complex<float> T;
@@ -384,7 +383,7 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
                                   cudaMemcpyHostToDevice)!= cudaSuccess )   {
                         GERROR_STREAM("Upload to device for device_kernel failed\n");}
 
-                    //ici on envoie des matrices 2D pour effectuer C= A*B
+                    //ici on envoie des matrices 2D pour effectuer C = A*B
                     prepare_gpu_unmix(device_mb, device_kernel, device_unfolded);
 
                     //[voxels_number_per_image_, CHA, MB_factor, STK,  N, S]

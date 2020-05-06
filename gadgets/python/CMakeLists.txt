@@ -40,6 +40,7 @@ set(gadgetron_python_config_files
                             config/python_image_array.xml
                             config/python_image_array_recon.xml
                             config/python_passthrough.xml
+                            config/python_passthrough_readout.xml
                             config/python_short.xml
                             config/python_tpat_snr_scale.xml 
                             config/Generic_Cartesian_Grappa_RealTimeCine_Python.xml 
@@ -58,6 +59,7 @@ set(gadgetron_python_gadgets_files
                             gadgets/IDEAL.py
                             gadgets/image_viewer.py
                             gadgets/passthrough.py
+                            gadgets/passthrough_readout.py
                             gadgets/pseudoreplicagather.py
                             gadgets/remove_2x_oversampling.py
                             gadgets/rms_coil_combine.py

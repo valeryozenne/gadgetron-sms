@@ -187,6 +187,7 @@
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
+    <property><name>test_value</name><value>2</value></property>
     <property><name>use_omp</name><value>true</value></property>
     <property><name>use_gpu</name><value>true</value></property>
     </gadget>
