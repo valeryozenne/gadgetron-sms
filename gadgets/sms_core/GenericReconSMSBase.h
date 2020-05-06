@@ -14,6 +14,7 @@
 #include "hoNDKLT.h"
 #include "hoArmadillo.h"
 #include "test_slice_grappa.h"
+#include "hoNDFFT.h"
 
 namespace Gadgetron {
 
@@ -212,6 +213,7 @@ namespace Gadgetron {
         virtual void apply_relative_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
         virtual void apply_relative_phase_shift_test(hoNDArray< std::complex<float> >& data, bool is_positive );
         virtual void apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive, bool is_mb );
+        //virtual void apply_absolute_phase_shift_MB2(hoNDArray< std::complex<float> >& data, bool is_positive );
 
         virtual void get_header_and_position_and_gap(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > headers_);
 

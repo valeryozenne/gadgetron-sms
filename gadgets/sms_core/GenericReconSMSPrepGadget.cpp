@@ -285,11 +285,11 @@ void GenericReconSMSPrepGadget::apply_blip_caipi_shift_sb(hoNDArray< std::comple
         if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_relative_phase_shift"); }
         if (MB_factor==2)
         {
-       apply_relative_phase_shift(sb_8D, false);
+            apply_relative_phase_shift(sb_8D, false);
         }
         else if (MB_factor==3)
         {
-        apply_relative_phase_shift(sb_8D, true);
+            apply_relative_phase_shift(sb_8D, true);
         }
         if (perform_timing.value()) { gt_timer_local_.stop(); }
 
@@ -305,7 +305,16 @@ void GenericReconSMSPrepGadget::apply_blip_caipi_shift_sb(hoNDArray< std::comple
         if (perform_timing.value()) { gt_timer_local_.stop(); }
 
         if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_absolute_phase_shift"); }
-        apply_absolute_phase_shift(sb_8D,false, false);
+
+        if (MB_factor==2)
+        {
+            apply_absolute_phase_shift(sb_8D,false, false);
+        }
+        else if (MB_factor==3)
+        {
+            apply_absolute_phase_shift(sb_8D,false, false);
+        }
+
         if (perform_timing.value()) { gt_timer_local_.stop(); }
 
         if (!debug_folder_full_path_.empty())
@@ -368,15 +377,15 @@ void GenericReconSMSPrepGadget::apply_averaged_epi_ghost_correction_sb(hoNDArray
     {
         if (use_omp.value())
         {
-        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 openmp time Prep SB "); }
-        apply_ghost_correction_with_STK6_open(sb_8D, headers_sb ,  acceFactorSMSE1_[e], false , false, false, "Prep SB");
-        if (perform_timing.value()) { gt_timer_local_.stop(); }
+            if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 openmp time Prep SB "); }
+            apply_ghost_correction_with_STK6_open(sb_8D, headers_sb ,  acceFactorSMSE1_[e], false , false, false, "Prep SB");
+            if (perform_timing.value()) { gt_timer_local_.stop(); }
         }
         else
         {
-        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 cpu time Prep SB "); }
-        apply_ghost_correction_with_STK6(sb_8D, headers_sb ,  acceFactorSMSE1_[e], false , false, false, "Prep SB");
-        if (perform_timing.value()) { gt_timer_local_.stop(); }
+            if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_ghost_correction_with_STK6 cpu time Prep SB "); }
+            apply_ghost_correction_with_STK6(sb_8D, headers_sb ,  acceFactorSMSE1_[e], false , false, false, "Prep SB");
+            if (perform_timing.value()) { gt_timer_local_.stop(); }
         }
     }
 

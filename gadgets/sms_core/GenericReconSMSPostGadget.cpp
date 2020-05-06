@@ -286,7 +286,7 @@ void GenericReconSMSPostGadget::post_process_mb_data(hoNDArray< std::complex<flo
 
     if (MB_factor==2)
     {
-        undo_blip_caipi_shift(data_8D, headers, e, true, true);
+        undo_blip_caipi_shift(data_8D, headers, e, false, true);
     }
     else if (MB_factor==3)
     {
@@ -394,7 +394,17 @@ void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<fl
         {
             // true means single band data
             get_header_and_position_and_gap(data, headers);
+
+            GDEBUG("MB_factor %d ",MB_factor);
+
+            if (MB_factor==2)
+            {
             apply_absolute_phase_shift(data, true, is_mb);
+            }
+            else if (MB_factor==3)
+            {
+            apply_absolute_phase_shift(data, true, is_mb);
+            }
 
             if (MB_factor==2)
             {
@@ -410,7 +420,7 @@ void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<fl
             // false means multiband data
             if (MB_factor==2)
             {
-                apply_relative_phase_shift(data, true);
+                apply_relative_phase_shift_test(data, true);
             }
             else if (MB_factor==3)
             {
