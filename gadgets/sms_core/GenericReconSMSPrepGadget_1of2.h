@@ -1,4 +1,4 @@
-/** \file   GenericReconSMSPrepGadget.h
+/** \file   GenericReconSMSPrepGadget_1of2.h
     \brief  This is the class gadget for both 2DT and 3DT cartesian reconstruction to convert the data into eigen channel, working on the IsmrmrdReconData.
             If incoming data has the ref, ref data will be used to compute KLT coefficients
     \author Hui Xue
@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "GenericReconSMSBase.h"
+#include "GenericReconSMSBase_gadget1of2.h"
 
 #include "hoNDArray_utils.h"
 #include "hoNDArray_elemwise.h"
@@ -14,15 +14,15 @@
 
 namespace Gadgetron {
 
-    class EXPORTGADGETSSMSCORE GenericReconSMSPrepGadget : public GenericReconSMSBase_gadget1of2
+    class EXPORTGADGETSSMSCORE GenericReconSMSPrepGadget_1of2 : public GenericReconSMSBase_gadget1of2
     {
     public:
-        GADGET_DECLARE(GenericReconSMSPrepGadget);
+        GADGET_DECLARE(GenericReconSMSPrepGadget_1of2);
 
         typedef GenericReconSMSBase_gadget1of2 BaseClass;
 
-        GenericReconSMSPrepGadget();
-        ~GenericReconSMSPrepGadget();
+        GenericReconSMSPrepGadget_1of2();
+        ~GenericReconSMSPrepGadget_1of2();
 
         /// ------------------------------------------------------------------------------------
         /// parameters to control the reconstruction
@@ -43,12 +43,22 @@ namespace Gadgetron {
         hoNDArray< std::complex<float> > sb_8D;
         hoNDArray< std::complex<float> > mb_8D;
 
+        // --------------------------------------------------       
+        // variable to verify if the number of messages sent is the same as the number of messages received
+        // --------------------------------------------------       
+
+        size_t process_called_times_epicorr;
+
+        
+
         // --------------------------------------------------
         // gadget functions
         // --------------------------------------------------
         // default interface function
         virtual int process_config(ACE_Message_Block* mb);
-        virtual int process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1);
+
+        virtual int process(Gadgetron::GadgetContainerMessage< s_EPICorrection >* m1);
+        virtual int process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m2);
 
         //main functions
         virtual void pre_process_ref_data(hoNDArray< std::complex<float> >& ref, hoNDArray< std::complex<float> >& ref_8D, size_t e);

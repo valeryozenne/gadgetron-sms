@@ -11,6 +11,8 @@ add_library(gadgetron_smscore SHARED
     WriteSingleBandFlagsGadget.h
     EmptyGadget.cpp
     EmptyGadget.h
+    GenericReconBase_gadget1of2.h
+    GenericReconBase_gadget1of2.cpp
     GenericReconSMSBase.h
     GenericReconSMSBase.cpp
     GenericReconSMSBase_gadget1of2.h
@@ -29,6 +31,10 @@ add_library(gadgetron_smscore SHARED
     GenericReconCartesianSliceGrappavgpuGadget.h
     GenericReconSMSPrepGadget.cpp
     GenericReconSMSPrepGadget.h
+    GenericReconSMSPrepGadget_1of2.cpp
+    GenericReconSMSPrepGadget_1of2.h
+    GenericReconSMSPostGadget_1of2.cpp
+    GenericReconSMSPostGadget_1of2.h
     GenericReconSMSPostGadget.cpp
     GenericReconSMSPostGadget.h
     GenericReconEigenChannelSMSGadget.cpp
