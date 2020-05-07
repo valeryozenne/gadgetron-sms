@@ -35,9 +35,11 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/apps/gadgetron
     ${CMAKE_SOURCE_DIR}/apps/matlab
     ${CMAKE_SOURCE_DIR}/gadgets/mri_core 
-    ${CMAKE_SOURCE_DIR}/gadgets/gtPlus 
+    ${CMAKE_SOURCE_DIR}/gadgets/gtPlus
 )
 
 #add_subdirectory(MRI)
 add_subdirectory(denoising)
 add_subdirectory(registration)
+add_subdirectory(examples)
+
