@@ -1,121 +1,225 @@
 /** \file   GenericReconSMSBase_gadget1of2.h
-    \brief  This serves an optional base class gadget for the generic chain.
-            Some common functionalities are implemented here and can be reused in specific recon gadgets.
-            This gadget is instantiated for IsmrmrdReconData and IsmrmrdImageArray
+    \brief  This is the class gadget for both 2DT and 3DT cartesian reconstruction to convert the data into eigen channel, working on the IsmrmrdReconData.
+            If incoming data has the ref, ref data will be used to compute KLT coefficients
     \author Hui Xue
 */
 
 #pragma once
 
-#include <complex>
-#include "gadgetron_mricore_export.h"
-#include "Gadget.h"
-#include "GadgetronTimer.h"
-
-#include "ismrmrd/ismrmrd.h"
-#include "ismrmrd/xml.h"
-#include "ismrmrd/meta.h"
-
-#include "mri_core_def.h"
-#include "mri_core_data.h"
-#include "mri_core_utility.h"
-
-#include "ImageIOAnalyze.h"
-
-#include "gadgetron_sha1.h"
+//#include "GenericReconBase.h"
+#include "mri_core_slice_grappa.h"
+#include "mri_core_utility_interventional.h"
+#include "hoNDArray_utils.h"
+#include "hoNDArray_elemwise.h"
+#include "hoNDKLT.h"
+#include "hoArmadillo.h"
+#include "test_slice_grappa.h"
+#include "gadgetron_smscore_export.h"
+#include "GenericReconBase_gadget1of2.h"
 
 namespace Gadgetron {
 
-    template <typename T> 
-    class EXPORTGADGETSMRICORE GenericReconSMSBase_gadget1of2 : public Gadget1<T>
+    class EXPORTGADGETSSMSCORE GenericReconSMSBase_gadget1of2 : public GenericReconDataBase_gadget1of2
     {
     public:
         GADGET_DECLARE(GenericReconSMSBase_gadget1of2);
 
-        typedef Gadget1<T> BaseClass;
+        typedef GenericReconDataBase_gadget1of2 BaseClass;
+        //typedef hoNDKLT< std::complex<float> > KLTType;
+
+        GADGET_PROPERTY(use_omp, bool, "Whether to use omp acceleration", false);
+        GADGET_PROPERTY(use_gpu, bool, "Whether to use gpu acceleration", false);
 
         GenericReconSMSBase_gadget1of2();
         ~GenericReconSMSBase_gadget1of2();
 
         /// ------------------------------------------------------------------------------------
-        /// debug and timing
-        GADGET_PROPERTY(verbose, bool, "Whether to print more information", false);
-        GADGET_PROPERTY(debug_folder, std::string, "If set, the debug output will be written out", "");
-        GADGET_PROPERTY(perform_timing, bool, "Whether to perform timing on some computational steps", false);
+        /// parameters to control the reconstruction
+        /// ------------------------------------------------------------------------------------
 
-        /// ms for every time tick
-        GADGET_PROPERTY(time_tick, float, "Time tick in ms", 2.5);
 
     protected:
 
-        // number of encoding spaces in the protocol
-        size_t num_encoding_spaces_;
-
-        // number of times the process function is called
-        size_t process_called_times_;
-
         // --------------------------------------------------
-        // variables for debug and timing
+        // variables for protocol
         // --------------------------------------------------
 
-        // clock for timing
-        Gadgetron::GadgetronTimer gt_timer_local_;
-        Gadgetron::GadgetronTimer gt_timer_;
+        // for every encoding space
+        // calibration mode
+        //std::vector<Gadgetron::ismrmrdCALIBMODE> calib_mode_;
 
-        // debug folder
-        std::string debug_folder_full_path_;
+        // --------------------------------------------------
+        // variable for recon
+        // --------------------------------------------------
 
-        // exporter
-        Gadgetron::ImageIOAnalyze gt_exporter_;
+        std::vector<size_t> dimensions_;
+
+
+        bool is_wip_sequence ;
+        bool is_cmrr_sequence ;
+
+        unsigned int MB_factor;
+        int Blipped_CAIPI;
+
+        unsigned int lNumberOfStacks_;
+        unsigned int lNumberOfSlices_;
+        unsigned int lNumberOfChannels_;
+
+        // acceleration factor for E1 and E2
+        std::vector<double> acceFactorSMSE1_;
+        std::vector<double> acceFactorSMSE2_;
+
+        // ordre des coupes
+        arma::imat MapSliceSMS;
+        arma::ivec order_of_acquisition_sb;
+        arma::ivec order_of_acquisition_mb;
+
+        arma::uvec indice_mb;
+        arma::uvec indice_sb;
+        arma::uvec indice_slice_mb;
+
+        unsigned int center_k_space_xml;
+        unsigned int center_k_space_E1;
+
+        //
+        size_t reduced_E1_;
+        size_t start_E1_;
+        size_t end_E1_;
+
+
+        float slice_thickness;
+
+        arma::cx_fmat corrneg_all_;
+        arma::cx_fmat corrpos_all_;
+
+        arma::cx_fmat corrneg_all_no_exp_;
+        arma::cx_fmat corrpos_all_no_exp_;
+
+        arma::cx_fmat corrneg_all_STK_mean_;
+        arma::cx_fmat corrpos_all_STK_mean_;
+
+        arma::cx_fcube corrneg_all_STK_;
+        arma::cx_fcube corrpos_all_STK_;
+
+        arma::cx_fcube corrneg_all_no_exp_STK_;
+        arma::cx_fcube corrpos_all_no_exp_STK_;
+
+        arma::cx_fmat corrneg_all_no_exp_STK_mean_;
+        arma::cx_fmat corrpos_all_no_exp_STK_mean_;
+
+        hoNDArray<std::complex<float>> epi_nav_neg_;
+        hoNDArray<std::complex<float>> epi_nav_pos_;
+
+        hoNDArray<std::complex<float>> epi_nav_neg_no_exp_;
+        hoNDArray<std::complex<float>> epi_nav_pos_no_exp_;
+
+        hoNDArray< std::complex<float> > epi_nav_neg_STK_;
+        hoNDArray< std::complex<float> > epi_nav_pos_STK_;
+
+        hoNDArray<std::complex<float>> epi_nav_neg_no_exp_STK_;
+        hoNDArray<std::complex<float>> epi_nav_pos_no_exp_STK_;
+
+        hoNDArray< std::complex<float> > epi_nav_neg_STK_mean_;
+        hoNDArray< std::complex<float> > epi_nav_pos_STK_mean_;
+
+        hoNDArray<std::complex<float>> epi_nav_neg_no_exp_STK_mean_;
+        hoNDArray<std::complex<float>> epi_nav_pos_no_exp_STK_mean_;
+
+        //prepare epi and correction epi
+        hoNDArray< std::complex<float> > correction_pos_hoND;
+        hoNDArray< std::complex<float> > correction_neg_hoND;
+        hoNDArray< std::complex<float> > phase_shift;
+        hoNDArray< std::complex<float> > tempo_hoND;
+        hoNDArray< std::complex<float> > tempo_1D_hoND;
+
+
+
+        cuNDArray<float_complext> device_epi_nav_pos_STK_test ;
+        cuNDArray<float_complext> device_epi_nav_neg_STK_test ;
+        cuNDArray<float_complext> device_epi_nav_pos_STK_mean_test ;
+        cuNDArray<float_complext> device_epi_nav_neg_STK_mean_test ;
+
+        cuNDArray<float_complext> device_d_epi_sb;
+        cuNDArray<float_complext> device_d_epi_mb;
+
 
         // --------------------------------------------------
         // gadget functions
         // --------------------------------------------------
+        // default interface function
         virtual int process_config(ACE_Message_Block* mb);
-        virtual int process(GadgetContainerMessage<T>* m1);
-    };
+        virtual int process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1);
 
-    class EXPORTGADGETSMRICORE GenericReconKSpaceReadoutBase_gadget1of2 :public GenericReconSMSBase_gadget1of2 < ISMRMRD::AcquisitionHeader >
-    {
-    public:
-        GADGET_DECLARE(GenericReconKSpaceReadoutBase_gadget1of2);
+        virtual arma::ivec map_interleaved_acquisitions(int number_of_slices, bool no_reordering );
+        virtual arma::imat get_map_slice_single_band(int MB_factor, int lNumberOfStacks, arma::ivec order_of_acquisition_mb, bool no_reordering);
 
-        typedef GenericReconSMSBase_gadget1of2 < ISMRMRD::AcquisitionHeader > BaseClass;
+        arma::vec z_offset_geo;
+        arma::vec z_gap;
 
-        GenericReconKSpaceReadoutBase_gadget1of2();
-        virtual ~GenericReconKSpaceReadoutBase_gadget1of2();
-    };
+        virtual void reorganize_arma_nav(arma::cx_fmat &data, arma::uvec indice);
 
-    class EXPORTGADGETSMRICORE GenericReconDataBase_gadget1of2 :public GenericReconSMSBase_gadget1of2 < IsmrmrdReconData >
-    {
-    public:
-        GADGET_DECLARE(GenericReconDataBase_gadget1of2);
+        virtual void compute_mean_epi_arma_nav(arma::cx_fcube &input,  arma::cx_fmat& output_no_exp,  arma::cx_fmat& output);
 
-        typedef GenericReconSMSBase_gadget1of2 < IsmrmrdReconData > BaseClass;
+        virtual void create_stacks_of_arma_nav(arma::cx_fmat &data, arma::cx_fcube &new_stack);
 
-        GenericReconDataBase_gadget1of2();
-        virtual ~GenericReconDataBase_gadget1of2();
-    };
+        virtual void save_4D_data(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
-    class EXPORTGADGETSMRICORE GenericReconImageBase_gadget1of2 :public GenericReconSMSBase_gadget1of2 < IsmrmrdImageArray >
-    {
-    public:
-        GADGET_DECLARE(GenericReconImageBase_gadget1of2);
+        virtual void save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
-        typedef GenericReconSMSBase_gadget1of2 < IsmrmrdImageArray > BaseClass;
+        virtual void save_4D_with_STK_5(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
-        GenericReconImageBase_gadget1of2();
-        virtual ~GenericReconImageBase_gadget1of2();
-    };
+        virtual void save_4D_with_STK_6(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
-    class EXPORTGADGETSMRICORE GenericReconImageHeaderBase_gadget1of2 :public GenericReconSMSBase_gadget1of2 < ISMRMRD::ImageHeader >
-    {
-    public:
-        GADGET_DECLARE(GenericReconImageHeaderBase_gadget1of2);
+        virtual void save_4D_with_STK_7(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
-        typedef GenericReconSMSBase_gadget1of2 < ISMRMRD::ImageHeader > BaseClass;
+        virtual void save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
-        GenericReconImageHeaderBase_gadget1of2();
-        virtual ~GenericReconImageHeaderBase_gadget1of2();
+        virtual void save_4D_8D_kspace(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
+
+        virtual void save_4D_data(hoNDArray<float >& input, std::string name, std::string encoding_number);
+
+        virtual void show_size(hoNDArray< std::complex<float> >& input, std::string name);
+
+        virtual void load_epi_data();
+
+        virtual void compute_mean_epi_nav(hoNDArray< std::complex<float> >& input,  hoNDArray< std::complex<float> >& output_no_exp ,  hoNDArray< std::complex<float> >& output );
+
+        virtual void create_stacks_of_nav(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack);
+
+        virtual void reorganize_nav(hoNDArray< std::complex<float> >& data, arma::uvec indice);
+
+        virtual void prepare_epi_data(size_t e, size_t E1, size_t E2, size_t CHA );
+
+        virtual void apply_ghost_correction_with_STK6_old(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo , bool optimal);
+
+        virtual void apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal, bool ifft , std::string msg);
+
+        virtual void apply_ghost_correction_with_STK6_gpu(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , bool ifft , std::string msg);
+
+        virtual void apply_ghost_correction_with_STK6_open(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal, bool ifft , std::string msg);
+
+        virtual void apply_ghost_correction_with_arma_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , std::string msg);
+
+        virtual void apply_ghost_correction_with_STK7(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc , bool optimal);
+
+        virtual void define_usefull_parameters(IsmrmrdReconBit &recon_bit, size_t e);
+        virtual void define_usefull_parameters_simple_version(IsmrmrdReconBit &recon_bit, size_t e);
+
+        virtual bool detect_first_repetition(IsmrmrdReconBit &recon_bit);
+        virtual bool detect_single_band_data(IsmrmrdReconBit &recon_bit);
+
+        virtual int get_reduced_E1_size(size_t start_E1 , size_t end_E1, size_t acc );
+
+        virtual void apply_relative_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
+        virtual void apply_relative_phase_shift_test(hoNDArray< std::complex<float> >& data, bool is_positive );
+        virtual void apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
+
+        virtual void get_header_and_position_and_gap(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > headers_);
+
+        virtual int CheckComplexNumberEqualInVector(hoNDArray< std::complex<float> >& input , arma::cx_fvec  input_arma);
+        virtual int CheckComplexNumberEqualInMatrix(hoNDArray< std::complex<float> >& input , arma::cx_fmat  input_arma);
+        virtual int CheckComplexNumberEqualInCube(hoNDArray< std::complex<float> >& input , arma::cx_fcube  input_arma);
+
+        virtual void do_fft_for_ref_scan(hoNDArray< std::complex<float> >& data);
     };
 }

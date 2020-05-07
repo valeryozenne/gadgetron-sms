@@ -22,6 +22,23 @@ int GenericReconSMSPrepGadget_1of2::process_config(ACE_Message_Block* mb)
     return GADGET_OK;
 }
 
+int GenericReconSMSPrepGadget_1of2::process(Gadgetron::GadgetContainerMessage<s_EPICorrection> *m2)
+{
+    if (perform_timing.value()) { gt_timer_.start("GenericReconSMSPrepGadget_1of2::process"); }
+
+    process_called_times_epicorr++;
+
+    GDEBUG("Times passing in process : %d\n", process_called_times_epicorr);
+
+    if (this->next()->putq(m2) < 0)
+    {
+        GERROR_STREAM("SMSPrepGadget_1of2::process : Put EPICorrection to Queue failed ... ");
+        return GADGET_FAIL;
+    }
+
+    return GADGET_OK;
+}
+
 int GenericReconSMSPrepGadget_1of2::process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1)
 {
     if (perform_timing.value()) { gt_timer_.start("GenericReconSMSPrepGadget_1of2::process"); }
