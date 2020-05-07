@@ -2,6 +2,6 @@ if (WIN32)
 	add_definitions(-D_USE_MATH_DEFINES)
 endif()
 
-add_executable(example examplemain.cpp)
+add_executable(examples_run_gpu examplemain.cpp)
 
-install(TARGETS example DESTINATION bin COMPONENT main)
+install(TARGETS examples_run_gpu DESTINATION bin COMPONENT main)
