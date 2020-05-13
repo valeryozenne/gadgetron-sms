@@ -18,6 +18,7 @@ GenericReconSMSPostGadget_1of2::~GenericReconSMSPostGadget_1of2()
 int GenericReconSMSPostGadget_1of2::process_config(ACE_Message_Block* mb)
 {
     GADGET_CHECK_RETURN(BaseClass::process_config(mb) == GADGET_OK, GADGET_FAIL);
+    first_occurence = true;
 
     return GADGET_OK;
 }
@@ -30,12 +31,16 @@ int GenericReconSMSPostGadget_1of2::process(Gadgetron::GadgetContainerMessage< s
 
     GDEBUG("GenericReconSMSPostGadget_1of2: Passed %d times in the Post process function\n", process_called_times_epicorr);
 
-    epi_nav_neg_.create(dimensions_[0], lNumberOfSlices_);
-    epi_nav_pos_.create(dimensions_[0], lNumberOfSlices_);
+    if (first_occurence == true)
+    {
+        epi_nav_neg_.create(dimensions_[0], lNumberOfSlices_);
+        epi_nav_pos_.create(dimensions_[0], lNumberOfSlices_);
     
-    epi_nav_neg_no_exp_.create(dimensions_[0], lNumberOfSlices_);
-    epi_nav_pos_no_exp_.create(dimensions_[0], lNumberOfSlices_);
-
+        epi_nav_neg_no_exp_.create(dimensions_[0], lNumberOfSlices_);
+        epi_nav_pos_no_exp_.create(dimensions_[0], lNumberOfSlices_);
+        first_occurence = false;
+    }
+    
     if (m2->getObjectPtr()->hdr.user_int[0] == 0)//corrneg_
     {
         std::complex<float> * out_neg = &(epi_nav_neg_(0, m2->getObjectPtr()->hdr.idx.slice));
@@ -222,7 +227,7 @@ void GenericReconSMSPostGadget_1of2::post_process_sb_data(hoNDArray< std::comple
 
     }
 
-    load_epi_data();
+    //load_epi_data();
 
     prepare_epi_data(e, data_8D.get_size(1),  data_8D.get_size(2) ,  data_8D.get_size(3) );
 

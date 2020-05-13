@@ -43,7 +43,7 @@ namespace Gadgetron {
 
         hoNDArray< ISMRMRD::AcquisitionHeader > headers_buffered;
         size_t process_called_times_epicorr;
-        
+        bool first_occurence;
 
         // --------------------------------------------------
         // variable for recon

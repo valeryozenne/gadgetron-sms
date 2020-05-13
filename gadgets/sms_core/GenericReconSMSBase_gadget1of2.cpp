@@ -1239,14 +1239,14 @@ void GenericReconSMSBase_gadget1of2::prepare_epi_data(size_t e, size_t E1, size_
     reorganize_nav(epi_nav_neg_, indice_sb);
     reorganize_nav(epi_nav_pos_, indice_sb);
 
-    reorganize_arma_nav(corrneg_all_, indice_sb);
-    reorganize_arma_nav(corrpos_all_, indice_sb);
+    //reorganize_arma_nav(corrneg_all_, indice_sb);
+    //reorganize_arma_nav(corrpos_all_, indice_sb);
 
     reorganize_nav(epi_nav_neg_no_exp_, indice_sb);
     reorganize_nav(epi_nav_pos_no_exp_, indice_sb);
 
-    reorganize_arma_nav(corrneg_all_no_exp_, indice_sb);
-    reorganize_arma_nav(corrpos_all_no_exp_, indice_sb);
+    // reorganize_arma_nav(corrneg_all_no_exp_, indice_sb);
+    // reorganize_arma_nav(corrpos_all_no_exp_, indice_sb);
 
     epi_nav_neg_STK_.create(RO, MB_factor, lNumberOfStacks_ );
     epi_nav_pos_STK_.create(RO, MB_factor, lNumberOfStacks_ );
@@ -1260,25 +1260,25 @@ void GenericReconSMSBase_gadget1of2::prepare_epi_data(size_t e, size_t E1, size_
     epi_nav_neg_STK_mean_.create(RO, lNumberOfStacks_ );
     epi_nav_pos_STK_mean_.create(RO, lNumberOfStacks_ );
 
-    corrneg_all_STK_.set_size(RO, MB_factor, lNumberOfStacks_ );
-    corrpos_all_STK_.set_size(RO, MB_factor, lNumberOfStacks_ );
-    corrneg_all_STK_.zeros();
-    corrpos_all_STK_.zeros();
+    // corrneg_all_STK_.set_size(RO, MB_factor, lNumberOfStacks_ );
+    // corrpos_all_STK_.set_size(RO, MB_factor, lNumberOfStacks_ );
+    // corrneg_all_STK_.zeros();
+    // corrpos_all_STK_.zeros();
 
-    corrneg_all_no_exp_STK_.set_size(RO, MB_factor, lNumberOfStacks_ );
-    corrpos_all_no_exp_STK_.set_size(RO, MB_factor, lNumberOfStacks_ );
-    corrneg_all_no_exp_STK_.zeros();
-    corrpos_all_no_exp_STK_.zeros();
+    // corrneg_all_no_exp_STK_.set_size(RO, MB_factor, lNumberOfStacks_ );
+    // corrpos_all_no_exp_STK_.set_size(RO, MB_factor, lNumberOfStacks_ );
+    // corrneg_all_no_exp_STK_.zeros();
+    // corrpos_all_no_exp_STK_.zeros();
 
-    corrneg_all_no_exp_STK_mean_.set_size(RO, lNumberOfStacks_ );
-    corrpos_all_no_exp_STK_mean_.set_size(RO, lNumberOfStacks_ );
-    corrneg_all_no_exp_STK_mean_.zeros();
-    corrpos_all_no_exp_STK_mean_.zeros();
+    // corrneg_all_no_exp_STK_mean_.set_size(RO, lNumberOfStacks_ );
+    // corrpos_all_no_exp_STK_mean_.set_size(RO, lNumberOfStacks_ );
+    // corrneg_all_no_exp_STK_mean_.zeros();
+    // corrpos_all_no_exp_STK_mean_.zeros();
 
-    corrneg_all_STK_mean_.set_size(RO, lNumberOfStacks_ );
-    corrpos_all_STK_mean_.set_size(RO, lNumberOfStacks_ );
-    corrneg_all_STK_mean_.zeros();
-    corrpos_all_STK_mean_.zeros();
+    // corrneg_all_STK_mean_.set_size(RO, lNumberOfStacks_ );
+    // corrpos_all_STK_mean_.set_size(RO, lNumberOfStacks_ );
+    // corrneg_all_STK_mean_.zeros();
+    // corrpos_all_STK_mean_.zeros();
 
     create_stacks_of_nav(epi_nav_neg_, epi_nav_neg_STK_);
     create_stacks_of_nav(epi_nav_pos_, epi_nav_pos_STK_);
@@ -1286,23 +1286,23 @@ void GenericReconSMSBase_gadget1of2::prepare_epi_data(size_t e, size_t E1, size_
     create_stacks_of_nav(epi_nav_neg_no_exp_, epi_nav_neg_no_exp_STK_);
     create_stacks_of_nav(epi_nav_pos_no_exp_, epi_nav_pos_no_exp_STK_);
 
-    create_stacks_of_arma_nav(corrneg_all_, corrneg_all_STK_);
-    create_stacks_of_arma_nav(corrpos_all_, corrpos_all_STK_);
+    // create_stacks_of_arma_nav(corrneg_all_, corrneg_all_STK_);
+    // create_stacks_of_arma_nav(corrpos_all_, corrpos_all_STK_);
 
-    create_stacks_of_arma_nav(corrneg_all_no_exp_, corrneg_all_no_exp_STK_);
-    create_stacks_of_arma_nav(corrpos_all_no_exp_, corrpos_all_no_exp_STK_);
+    // create_stacks_of_arma_nav(corrneg_all_no_exp_, corrneg_all_no_exp_STK_);
+    // create_stacks_of_arma_nav(corrpos_all_no_exp_, corrpos_all_no_exp_STK_);
 
     compute_mean_epi_nav(epi_nav_neg_no_exp_STK_, epi_nav_neg_no_exp_STK_mean_,  epi_nav_neg_STK_mean_);
     compute_mean_epi_nav(epi_nav_pos_no_exp_STK_, epi_nav_pos_no_exp_STK_mean_,  epi_nav_pos_STK_mean_);
 
-    compute_mean_epi_arma_nav(corrneg_all_no_exp_STK_, corrneg_all_no_exp_STK_mean_, corrneg_all_STK_mean_);
-    compute_mean_epi_arma_nav(corrpos_all_no_exp_STK_, corrpos_all_no_exp_STK_mean_, corrpos_all_STK_mean_);
+    // compute_mean_epi_arma_nav(corrneg_all_no_exp_STK_, corrneg_all_no_exp_STK_mean_, corrneg_all_STK_mean_);
+    // compute_mean_epi_arma_nav(corrpos_all_no_exp_STK_, corrpos_all_no_exp_STK_mean_, corrpos_all_STK_mean_);
 
-    CheckComplexNumberEqualInMatrix(epi_nav_neg_STK_mean_,corrneg_all_STK_mean_ );
-    CheckComplexNumberEqualInMatrix(epi_nav_neg_no_exp_STK_mean_,corrneg_all_no_exp_STK_mean_ );
+    // CheckComplexNumberEqualInMatrix(epi_nav_neg_STK_mean_,corrneg_all_STK_mean_ );
+    // CheckComplexNumberEqualInMatrix(epi_nav_neg_no_exp_STK_mean_,corrneg_all_no_exp_STK_mean_ );
 
-    CheckComplexNumberEqualInMatrix(epi_nav_pos_STK_mean_,corrpos_all_STK_mean_ );
-    CheckComplexNumberEqualInMatrix(epi_nav_pos_no_exp_STK_mean_,corrpos_all_no_exp_STK_mean_ );
+    // CheckComplexNumberEqualInMatrix(epi_nav_pos_STK_mean_,corrpos_all_STK_mean_ );
+    // CheckComplexNumberEqualInMatrix(epi_nav_pos_no_exp_STK_mean_,corrpos_all_no_exp_STK_mean_ );
 
     correction_pos_hoND.create(RO);
     correction_neg_hoND.create(RO);

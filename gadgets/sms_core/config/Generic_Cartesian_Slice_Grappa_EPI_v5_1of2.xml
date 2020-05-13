@@ -182,9 +182,9 @@
 
 
   <gadget>
-    <name>SMSPostGadget_1of2</name>
+    <name>SMSPostGadget</name>
     <dll>gadgetron_smscore</dll>
-    <classname>GenericReconSMSPostGadget_1of2</classname>
+    <classname>GenericReconSMSPostGadget</classname>
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
