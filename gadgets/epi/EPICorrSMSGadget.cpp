@@ -797,6 +797,9 @@ void EPICorrSMSGadget::send_data_to_next_function(int slice)
     hoNDArray<std::complex<float>> input;
     GadgetContainerMessage<s_EPICorrection> *m1, *m2, *m3, *m4;
 
+    //for temporary values used in the loops
+    int i, j;
+
     m1 = new GadgetContainerMessage<s_EPICorrection>;
     m2 = new GadgetContainerMessage<s_EPICorrection>;
     m3 = new GadgetContainerMessage<s_EPICorrection>;
@@ -807,8 +810,26 @@ void EPICorrSMSGadget::send_data_to_next_function(int slice)
     dim0 = size(corrneg_, 0);
     dim1 = size(corrneg_, 1);
     input.create(dim0, dim1);
-    //GDEBUG_STREAM("corrneg_size dim0: " << dim0 << ", dim1: " << dim1);
-    memcpy(input.get_data_ptr(), &corrneg_, dim0 * dim1);
+    //memcpy(input.get_data_ptr(), &corrneg_, dim0 * dim1);
+    GDEBUG_STREAM("corrneg_size dim0: " << dim0 << ", dim1: " << dim1);
+    
+    i = 0;
+    while (i < dim0)
+    {
+        if (i > dim0)
+        {
+            GDEBUG("I > dim0\n");
+        }
+        //GDEBUG_STREAM(i);
+        j = 0;
+        while (j < dim1)
+        {
+            input.at(i + size(corrneg_, 0) * j).real(corrneg_.at(i, j).real());
+            input.at(i + size(corrneg_, 0) * j).imag(corrneg_.at(i, j).imag());
+            j++;
+        }
+        i++;
+    }
 
     m1->getObjectPtr()->hdr = head;
     m1->getObjectPtr()->correction = input;
@@ -820,7 +841,25 @@ void EPICorrSMSGadget::send_data_to_next_function(int slice)
     dim1 = size(corrpos_, 1);
     input.create(dim0, dim1);
     //GDEBUG_STREAM("corrpos_size dim0: " << dim0 << ", dim1: " << dim1);
-    memcpy(input.get_data_ptr(), &corrpos_, dim0 * dim1);
+    //memcpy(input.get_data_ptr(), &corrpos_, dim0 * dim1);
+
+    i = 0;
+    while (i < dim0)
+    {
+        if (i > dim0)
+        {
+            GDEBUG("I > dim0\n");
+        }
+        //GDEBUG_STREAM(i);
+        j = 0;
+        while (j < dim1)
+        {
+            input.at(i + size(corrpos_, 0) * j).real(corrpos_.at(i, j).real());
+            input.at(i + size(corrpos_, 0) * j).imag(corrpos_.at(i, j).imag());
+            j++;
+        }
+        i++;
+    }
 
     m2->getObjectPtr()->hdr = head;
     m2->getObjectPtr()->correction = input;
@@ -833,8 +872,25 @@ void EPICorrSMSGadget::send_data_to_next_function(int slice)
     dim1 = size(corrneg_no_exp_save_.col(slice), 1);
     input.create(dim0, dim1);
     //GDEBUG_STREAM("corrneg_no_exp_size dim0: " << dim0 << ", dim1: " << dim1);
-    memcpy(input.get_data_ptr(), &corrneg_no_exp_save_, dim0 * dim1);
+    //memcpy(input.get_data_ptr(), &corrneg_no_exp_save_, dim0 * dim1);
 
+    i = 0;
+    while (i < dim0)
+    {
+        if (i > dim0)
+        {
+            GDEBUG("I > dim0\n");
+        }
+        //GDEBUG_STREAM(i);
+        j = 0;
+        while (j < dim1)
+        {
+            input.at(i + size(corrneg_no_exp_save_, 0) * j).real(corrneg_no_exp_save_.at(i, j).real());
+            input.at(i + size(corrneg_no_exp_save_, 0) * j).imag(corrneg_no_exp_save_.at(i, j).imag());
+            j++;
+        }
+        i++;
+    }
     m3->getObjectPtr()->hdr = head;
     m3->getObjectPtr()->correction = input;
     
@@ -846,7 +902,25 @@ void EPICorrSMSGadget::send_data_to_next_function(int slice)
     dim1 = size(corrpos_no_exp_save_.col(slice), 1);
     input.create(dim0, dim1);
     //GDEBUG_STREAM("corrpos_no_exp_size dim0: " << dim0 << ", dim1: " << dim1);
-    memcpy(input.get_data_ptr(), &corrpos_no_exp_save_, dim0 * dim1);
+    //memcpy(input.get_data_ptr(), &corrpos_no_exp_save_, dim0 * dim1);
+
+    i = 0;
+    while (i < dim0)
+    {
+        if (i > dim0)
+        {
+            GDEBUG("I > dim0\n");
+        }
+        //GDEBUG_STREAM(i);
+        j = 0;
+        while (j < dim1)
+        {
+            input.at(i + size(corrpos_no_exp_save_, 0) * j).real(corrpos_no_exp_save_.at(i, j).real());
+            input.at(i + size(corrpos_no_exp_save_, 0) * j).imag(corrpos_no_exp_save_.at(i, j).imag());
+            j++;
+        }
+        i++;
+    }
 
     m4->getObjectPtr()->hdr = head;
     m4->getObjectPtr()->correction = input;

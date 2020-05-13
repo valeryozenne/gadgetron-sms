@@ -49,7 +49,8 @@ namespace Gadgetron {
 
         size_t process_called_times_epicorr;
 
-        
+        bool first_occurence;
+        int nb_occurences;
 
         // --------------------------------------------------
         // gadget functions

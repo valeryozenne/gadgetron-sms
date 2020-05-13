@@ -8,6 +8,7 @@ if (ARMADILLO_FOUND)
     Generic_Cartesian_Slice_Grappa_EPI.xml
     Generic_Cartesian_Slice_Grappa_EPI_Error.xml
     Generic_Cartesian_Slice_Grappa_EPI_v5.xml
+    Generic_Cartesian_Slice_Grappa_EPI_v5_1of2.xml
     Generic_Cartesian_Slice_Grappa_EPI_With_Msg.xml
     Generic_Cartesian_Slice_Grappa_EPI_v2.xml
     Generic_Cartesian_Slice_Grappa_EPI_v3.xml

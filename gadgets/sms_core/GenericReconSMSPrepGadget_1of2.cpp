@@ -18,6 +18,8 @@ GenericReconSMSPrepGadget_1of2::~GenericReconSMSPrepGadget_1of2()
 int GenericReconSMSPrepGadget_1of2::process_config(ACE_Message_Block* mb)
 {
     GADGET_CHECK_RETURN(BaseClass::process_config(mb) == GADGET_OK, GADGET_FAIL);
+    first_occurence = true;
+    nb_occurences = 0;
 
     return GADGET_OK;
 }
@@ -29,6 +31,45 @@ int GenericReconSMSPrepGadget_1of2::process(Gadgetron::GadgetContainerMessage<s_
     process_called_times_epicorr++;
 
     GDEBUG("Times passing in process : %d\n", process_called_times_epicorr);
+
+    if (perform_timing.value()) { gt_timer_.start("GenericReconSMSPostGadget_1of2::process"); }
+
+    process_called_times_epicorr++;
+
+    GDEBUG("GenericReconSMSPrepGadget_1of2: Passed %d times in the Prep process function\n", process_called_times_epicorr);
+
+    //if (first_occurence == true)
+    if (nb_occurences == 0)
+    {
+        nb_occurences++;
+        //first_occurence = false
+    }
+    
+    if (m2->getObjectPtr()->hdr.user_int[0] == 0)//corrneg_
+    {
+        std::complex<float> * out_neg = &(epi_nav_neg_debug(0, m2->getObjectPtr()->hdr.idx.slice));
+        memcpy(out_neg, m2->getObjectPtr()->correction.get_data_ptr(), sizeof(std::complex<float>) * dimensions_[0]);
+        
+    }
+    if (m2->getObjectPtr()->hdr.user_int[0] == 1)//corrpos_
+    {
+        std::complex<float> * out_pos = &(epi_nav_pos_debug(0, m2->getObjectPtr()->hdr.idx.slice));
+        memcpy(out_pos, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
+
+        
+    }
+    if (m2->getObjectPtr()->hdr.user_int[0] == 2)//corrneg_no_exp
+    {
+        std::complex<float> * out_neg_no_exp = &(epi_nav_neg_no_exp_debug(0, m2->getObjectPtr()->hdr.idx.slice));
+        memcpy(out_neg_no_exp, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
+
+        
+    }
+    if (m2->getObjectPtr()->hdr.user_int[0] == 3)//corrpos_no_exp
+    {
+        std::complex<float> * out_pos_no_exp = &(epi_nav_pos_no_exp_debug(0, m2->getObjectPtr()->hdr.idx.slice));
+        memcpy(out_pos_no_exp, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
+    }
 
     if (this->next()->putq(m2) < 0)
     {
@@ -351,6 +392,8 @@ void GenericReconSMSPrepGadget_1of2::apply_averaged_epi_ghost_correction_sb(hoND
 
     //prepare epi data
     if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget_1of2::prepare_epi_data"); }
+
+    GDEBUG_STREAM("Nb occurences before preparing EPI: " << process_called_times_epicorr << std::endl);
     prepare_epi_data(e, sb_8D.get_size(1), sb_8D.get_size(2), sb_8D.get_size(3));
     if (perform_timing.value()) { gt_timer_local_.stop(); }
 
