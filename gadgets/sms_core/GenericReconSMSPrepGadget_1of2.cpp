@@ -26,6 +26,7 @@ int GenericReconSMSPrepGadget_1of2::process_config(ACE_Message_Block* mb)
 
 int GenericReconSMSPrepGadget_1of2::process(Gadgetron::GadgetContainerMessage<s_EPICorrection> *m2)
 {
+    GDEBUG("Passing in EPICorrection Process\n");
     if (perform_timing.value()) { gt_timer_.start("GenericReconSMSPrepGadget_1of2::process"); }
 
     process_called_times_epicorr++;
@@ -41,33 +42,38 @@ int GenericReconSMSPrepGadget_1of2::process(Gadgetron::GadgetContainerMessage<s_
     //if (first_occurence == true)
     if (nb_occurences == 0)
     {
+        epi_nav_neg_.create(dimensions_[0], lNumberOfSlices_);
+        epi_nav_pos_.create(dimensions_[0], lNumberOfSlices_);
+    
+        epi_nav_neg_no_exp_.create(dimensions_[0], lNumberOfSlices_);
+        epi_nav_pos_no_exp_.create(dimensions_[0], lNumberOfSlices_);
         nb_occurences++;
         //first_occurence = false
     }
     
     if (m2->getObjectPtr()->hdr.user_int[0] == 0)//corrneg_
     {
-        std::complex<float> * out_neg = &(epi_nav_neg_debug(0, m2->getObjectPtr()->hdr.idx.slice));
+        std::complex<float> * out_neg = &(epi_nav_neg_(0, m2->getObjectPtr()->hdr.idx.slice));
         memcpy(out_neg, m2->getObjectPtr()->correction.get_data_ptr(), sizeof(std::complex<float>) * dimensions_[0]);
         
     }
     if (m2->getObjectPtr()->hdr.user_int[0] == 1)//corrpos_
     {
-        std::complex<float> * out_pos = &(epi_nav_pos_debug(0, m2->getObjectPtr()->hdr.idx.slice));
+        std::complex<float> * out_pos = &(epi_nav_pos_(0, m2->getObjectPtr()->hdr.idx.slice));
         memcpy(out_pos, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
 
         
     }
     if (m2->getObjectPtr()->hdr.user_int[0] == 2)//corrneg_no_exp
     {
-        std::complex<float> * out_neg_no_exp = &(epi_nav_neg_no_exp_debug(0, m2->getObjectPtr()->hdr.idx.slice));
+        std::complex<float> * out_neg_no_exp = &(epi_nav_neg_no_exp_(0, m2->getObjectPtr()->hdr.idx.slice));
         memcpy(out_neg_no_exp, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
 
         
     }
     if (m2->getObjectPtr()->hdr.user_int[0] == 3)//corrpos_no_exp
     {
-        std::complex<float> * out_pos_no_exp = &(epi_nav_pos_no_exp_debug(0, m2->getObjectPtr()->hdr.idx.slice));
+        std::complex<float> * out_pos_no_exp = &(epi_nav_pos_no_exp_(0, m2->getObjectPtr()->hdr.idx.slice));
         memcpy(out_pos_no_exp, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
     }
 
@@ -85,6 +91,8 @@ int GenericReconSMSPrepGadget_1of2::process(Gadgetron::GadgetContainerMessage< I
     if (perform_timing.value()) { gt_timer_.start("GenericReconSMSPrepGadget_1of2::process"); }
 
     process_called_times_++;
+
+    GDEBUG("Passing in ISMRMRDReconData Process\n");
 
     IsmrmrdReconData* recon_bit_ = m1->getObjectPtr();
     if (recon_bit_->rbit_.size() > num_encoding_spaces_)
