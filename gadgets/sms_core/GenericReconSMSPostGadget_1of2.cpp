@@ -31,6 +31,26 @@ int GenericReconSMSPostGadget_1of2::process(Gadgetron::GadgetContainerMessage< s
 
     GDEBUG("GenericReconSMSPostGadget_1of2: Passed %d times in the Post process function\n", process_called_times_epicorr);
 
+    if (m2->getObjectPtr()->hdr.idx.slice == 0)
+    {
+        if (m2->getObjectPtr()->hdr.user_int[0] == 0) //corrneg_
+        {
+            GDEBUG_STREAM("SMSPostGadget_1of2::process EPICorr - epiNavNeg : " << *(m2->getObjectPtr()->correction.begin()) << " - " << *(m2->getObjectPtr()->correction.end()));
+        }
+        else if (m2->getObjectPtr()->hdr.user_int[0] == 1) //corrpos_
+        {
+            GDEBUG_STREAM("SMSPostGadget_1of2::process EPICorr - epiNavPos : " << *(m2->getObjectPtr()->correction.begin()) << " - " << *(m2->getObjectPtr()->correction.end()));
+        }
+        else if (m2->getObjectPtr()->hdr.user_int[0] == 2) //corrneg_no_exp_
+        {
+GDEBUG_STREAM("SMSPostGadget_1of2::process EPICorr - epiNavNeg_No_Exp : " << *(m2->getObjectPtr()->correction.begin()) << " - " << *(m2->getObjectPtr()->correction.end()));
+        }
+        else if (m2->getObjectPtr()->hdr.user_int[0] == 3) //corrpos_no_exp_
+        {
+GDEBUG_STREAM("SMSPostGadget_1of2::process EPICorr - epiNavPos_No_Exp : " << *(m2->getObjectPtr()->correction.begin()) << " - " << *(m2->getObjectPtr()->correction.end()));
+        }
+    }
+
     if (first_occurence == true)
     {
         epi_nav_neg_.create(dimensions_[0], lNumberOfSlices_);
@@ -66,6 +86,7 @@ int GenericReconSMSPostGadget_1of2::process(Gadgetron::GadgetContainerMessage< s
         std::complex<float> * out_pos_no_exp = &(epi_nav_pos_no_exp_(0, m2->getObjectPtr()->hdr.idx.slice));
         memcpy(out_pos_no_exp, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
     }
+    m2->release();
     return GADGET_OK;
 }
 
@@ -81,6 +102,7 @@ int GenericReconSMSPostGadget_1of2::process(Gadgetron::GadgetContainerMessage< I
         GWARN_STREAM("Incoming recon_bit has more encoding spaces than the protocol : " << recon_bit_->rbit_.size() << " instead of " << num_encoding_spaces_);
     }
 
+    
 
     // for every encoding space, prepare the recon_bit_->rbit_[e].ref_
     size_t e, n, s, slc;
@@ -228,6 +250,9 @@ void GenericReconSMSPostGadget_1of2::post_process_sb_data(hoNDArray< std::comple
     }
 
     //load_epi_data();
+
+    GDEBUG("GenericReconSMSPostGadget_1of2: Passed %d times in the Post process function before preparing EPI data\n", process_called_times_epicorr);
+
 
     prepare_epi_data(e, data_8D.get_size(1),  data_8D.get_size(2) ,  data_8D.get_size(3) );
 
