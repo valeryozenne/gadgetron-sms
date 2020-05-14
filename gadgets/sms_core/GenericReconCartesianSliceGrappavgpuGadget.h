@@ -189,6 +189,7 @@ namespace Gadgetron {
 
         void do_gpu_unmix(hoNDArray<std::complex<float> > & input, hoNDArray<std::complex<float> > & output, hoNDArray<std::complex<float> > & kernel );
         ///////////
+        void compute_leak_factor(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e);
 
         GADGET_PROPERTY(deviceno,int,"GPU device number", 0);
         int device_number_;

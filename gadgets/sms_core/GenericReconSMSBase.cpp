@@ -678,6 +678,12 @@ void GenericReconSMSBase::save_8D_containers_as_4D_matrix_with_a_loop_along_the_
     size_t N = input.get_size(6);
     size_t S = input.get_size(7);
 
+    if ( E2> 1 || N> 1 || S> 1 )
+    {
+        GERROR_STREAM(" save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk failed ... ");
+    }
+
+
     hoNDArray< std::complex<float> > output;
     output.create(RO, E1, CHA , MB);
 
@@ -685,6 +691,7 @@ void GenericReconSMSBase::save_8D_containers_as_4D_matrix_with_a_loop_along_the_
 
     for (a = 0; a < STK; a++)
     {
+        output.fill(0);
         std::stringstream stk;
         stk << "_stack_" << a;
 
@@ -717,10 +724,6 @@ void GenericReconSMSBase::save_4D_with_STK_5(hoNDArray< std::complex<float> >& i
     if ( X6> 1 || X7> 1  )
     {
         GERROR_STREAM(" save_4D_5D_data failed ... ");
-    }
-    else
-    {
-        //GDEBUG_STREAM(" saving 4D with STK_5 data soon ... ");
     }
 
     hoNDArray< std::complex<float> > output;

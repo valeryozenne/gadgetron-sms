@@ -23,6 +23,12 @@
     <!-- writer -->
     <writer><slot>1022</slot><dll>gadgetron_mricore</dll><classname>MRIImageWriter</classname></writer>
 
+<gadget>
+<name>RemoveNavigationDataKspace</name>
+ <dll>gadgetron_smscore</dll>
+<classname>RemoveNavigationDataKspaceGadget</classname>
+</gadget>
+
     <!-- Noise prewhitening -->
     <gadget><name>NoiseAdjust</name><dll>gadgetron_mricore</dll><classname>NoiseAdjustGadget</classname></gadget>
 
@@ -162,21 +168,20 @@
     <name>SliceGrappavgpuGadget</name>
     <dll>gadgetron_smscore</dll>
     <classname>GenericReconCartesianSliceGrappavgpuGadget</classname>
-    <property><name>debug_folder</name><value>Grappa/</value></property>
+    <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
 
     <property><name>use_slice_grappa_gpu</name><value>true</value></property>
-    <property><name>send_out_lfactor</name><value>true</value></property>
     <property><name>use_gpu</name><value>true</value></property>
     <property><name>use_omp</name><value>true</value></property>
     <property><name>calib_fast</name><value>true</value></property>
     <property><name>grappa_kSize_RO</name><value>5</value></property>
     <property><name>grappa_kSize_E1</name><value>5</value></property>
 
-    <property><name>downstream_coil_compression</name><value>true</value></property>
+    <property><name>downstream_coil_compression</name><value>false</value></property>
     <property><name>downstream_coil_compression_thres</name><value>0.002</value></property>
-    <property><name>downstream_coil_compression_num_modesKept</name><value>8</value></property>
+    <property><name>downstream_coil_compression_num_modesKept</name><value>0</value></property>
 
     </gadget>
 

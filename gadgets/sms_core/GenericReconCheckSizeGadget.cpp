@@ -48,7 +48,7 @@ namespace Gadgetron {
                // std::cout << " je suis la structure qui contient les données acs" << std::endl;
 
                 hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].ref_->data_;
-                hoNDArray< ISMRMRD::AcquisitionHeader > headers_ = recon_bit_->rbit_[e].sb_->headers_;
+                hoNDArray< ISMRMRD::AcquisitionHeader > headers_ = recon_bit_->rbit_[e].ref_->headers_;
                 ISMRMRD::AcquisitionHeader & curr_header = headers_(0, 0, 0, 0, 0);
                 std::cout << " repetition" << curr_header.idx.repetition << std::endl;
 
@@ -63,7 +63,7 @@ namespace Gadgetron {
                 GDEBUG_STREAM("GenericCheckSizeGadget - incoming data array ref : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
             }
 
-            if (recon_bit_->rbit_[e].sb_)
+            /*if (recon_bit_->rbit_[e].sb_)
             {
                // std::cout << " je suis la structure qui contient les données single band" << std::endl;
 
@@ -84,14 +84,14 @@ namespace Gadgetron {
 
                 GDEBUG_STREAM("GenericCheckSizeGadget - incoming data array sb : [RO E1 E2 CHA N S SLC X ] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC<< " " << MB << "]");
 
-            }
+            }*/
 
             if (recon_bit_->rbit_[e].data_.data_.get_number_of_elements() > 0)
             {
                // std::cout << " je suis la structure qui contient les données multi band" << std::endl;
 
                 hoNDArray< std::complex<float> >& data = recon_bit_->rbit_[e].data_.data_;
-                hoNDArray< ISMRMRD::AcquisitionHeader > headers_ = recon_bit_->rbit_[e].sb_->headers_;
+                hoNDArray< ISMRMRD::AcquisitionHeader > headers_ = recon_bit_->rbit_[e].data_.headers_;
                 ISMRMRD::AcquisitionHeader & curr_header = headers_(0, 0, 0, 0, 0);
                 std::cout << " repetition" << curr_header.idx.repetition << std::endl;
 

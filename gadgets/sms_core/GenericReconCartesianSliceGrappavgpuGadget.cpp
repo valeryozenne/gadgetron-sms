@@ -122,6 +122,12 @@ int GenericReconCartesianSliceGrappavgpuGadget::process(Gadgetron::GadgetContain
                 this->perform_slice_grappa_calib(recon_bit_->rbit_[e], recon_obj_[e], e);
                 if (perform_timing.value()) { gt_timer_.stop(); }
 
+                if (send_out_lfactor.value())
+                {
+                    this->compute_leak_factor(recon_bit_->rbit_[e], recon_obj_[e], e);
+                }
+
+
             }
             else
             {
@@ -375,7 +381,16 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
                 for (size_t m = 0; m < MB_factor; m++) {
 
                     //[ CHA*kernel_size_, CHA, MB, STK, N, S]
-                    T *pkernel = &(recon_obj.kernelonov_(0, 0, m, a, n, s));
+                     T *pkernel ;
+
+                    if (calib_fast.value()==true)
+                    {
+                        pkernel = &(recon_obj.kernelonov_(0, 0, m, a, n, s));
+                    }
+                    else
+                    {
+                        pkernel = &(recon_obj.kernel_(0, 0, m, a, n, s));
+                    }
 
                     if(cudaMemcpy(device_kernel.get_data_ptr(),
                                   pkernel,
@@ -1245,7 +1260,7 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
     gt_timer_local_.stop();
     */
 
-     gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::process  unmix version 2 ");
+    gt_timer_local_.start("GenericReconCartesianSliceGrappavgpuGadget::process  unmix version 2 ");
 
     size_t ref_N = recon_obj.block_MB_.get_size(5);
     size_t ref_S = recon_obj.block_MB_.get_size(6);
@@ -1349,6 +1364,85 @@ void GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_unwrapping
 
 }
 
+
+
+void  GenericReconCartesianSliceGrappavgpuGadget::compute_leak_factor(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e)
+{
+
+
+
+    hoNDArray< std::complex<float> >& sb = recon_obj.sb_compression_;
+
+    size_t RO = sb.get_size(0);
+    size_t E1 = sb.get_size(1);
+    size_t E2 = sb.get_size(2);
+    size_t CHA = sb.get_size(3);
+    size_t MB = sb.get_size(4);
+    size_t STK = sb.get_size(5);
+    size_t N = sb.get_size(6);
+    size_t S = sb.get_size(7);
+
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappavgpuGadget - incoming data array sb compute_leak_factor : [RO E1 E2 CHA MB STK N S] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << MB << " " << STK << " " << N<< " " << S << "]");
+
+
+    // On boucle sur les stacks dans la reco donc pas besoin de la faire
+    // mais on ne fait passer que une des N coupes aliasées
+
+    recon_obj.mb_compression_.create(RO, E1, E2, CHA, 1, STK, N, S);
+
+    for (long long m = 0; m < MB; m++)
+    {
+
+        recon_obj.mb_compression_.fill(0);
+
+        for (long long s = 0; s < S; s++)    {
+
+            for (long long n = 0; n < N; n++)  {
+
+                for (long long a = 0; a < STK; a++) {
+
+                    std::complex<float>* in = &(sb(0, 0, 0, 0, m, a, n, s));
+                    std::complex<float>* out = &(recon_obj.mb_compression_(0, 0, 0 , 0, 0, a, n, s));
+
+                    memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
+
+
+
+                }
+            }
+        }
+
+        size_t RO2 = recon_obj.mb_compression_.get_size(0);
+        size_t E12 = recon_obj.mb_compression_.get_size(1);
+        size_t E22 = recon_obj.mb_compression_.get_size(2);
+        size_t CHA2 = recon_obj.mb_compression_.get_size(3);
+        size_t MB2 = recon_obj.mb_compression_.get_size(4);
+        size_t STK2 = recon_obj.mb_compression_.get_size(5);
+        size_t N2 = recon_obj.mb_compression_.get_size(6);
+        size_t S2 = recon_obj.mb_compression_.get_size(7);
+
+        GDEBUG_STREAM("GenericReconCartesianSliceGrappavgpuGadget - incoming ready data array sb compute_leak_factor : [RO E1 E2 CHA MB STK N S] - [" << RO2 << " " << E12 << " " << E22 << " " << CHA2 << " " << MB2 << " " << STK2 << " " << N2<< " " << S2 << "]");
+
+        this->perform_slice_grappa_unwrapping_gpu(recon_bit, recon_obj, e);
+
+
+        hoNDArray<std::complex<float> > output_leak;
+        output_leak.create(RO, E1, E2, CHA, MB, STK, N, S);
+
+        recopy_kspace( recon_obj_[e], output_leak, acceFactorSMSE1_[e] );
+
+        std::stringstream om;
+        om << "_mb_" << m;
+        save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(output_leak, "FID_LEAK", om.str());
+        //GDEBUG_STREAM("GenericReconCartesianSliceGrappavgpuGadget - incoming middle data array sb compute_leak_factor : [RO E1 E2 CHA MB STK N S] - [" << RO3 << " " << E13 << " " << E23 << " " << CHA3 << " " << MB3 << " " << STK3 << " " << N3<< " " << S3 << "]");
+
+
+
+    }
+
+
+
+}
 
 
 void  GenericReconCartesianSliceGrappavgpuGadget::perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e)
@@ -1614,12 +1708,12 @@ void GenericReconCartesianSliceGrappavgpuGadget::recopy_kspace(  ReconObjType &r
     size_t N = recon_obj.unfolded_image_.get_size(5);
     size_t S = recon_obj.unfolded_image_.get_size(6);
 
-    //show_size(recon_obj.unfolded_image_," input ");
-    //show_size(output," output ");
+    show_size(recon_obj.unfolded_image_," input ");
+    show_size(output," output ");
 
     size_t index_x, index_y ;
 
-    index_x=2;
+    index_x=2; //TODO ceci est associé à la taille du kernel
 
     size_t s,n,a,m,cha,e1,ro;
 

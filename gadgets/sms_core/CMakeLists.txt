@@ -92,6 +92,9 @@ set( gadgetron_smscore_header_files
         GenericReconCartesianSliceGrappav3Gadget.h
         GenericReconCartesianSliceGrappavgpuGadget.h
         GenericReconEigenChannelSMSGadget.h
+        RemoveNavigationDataKspaceGadget.h
+        GenericReconSaveAndLoadRefGadget.h
+
 )
 
 set( gadgetron_smscore_src_files 	
@@ -107,6 +110,8 @@ set( gadgetron_smscore_src_files
         GenericReconCartesianSliceGrappav3Gadget.cpp
         GenericReconCartesianSliceGrappavgpuGadget.cpp
         GenericReconEigenChannelSMSGadget.cpp
+        RemoveNavigationDataKspaceGadget.cpp
+        GenericReconSaveAndLoadRefGadget.cpp
         )
 
 set( gadgetron_smscore_config_files 
@@ -117,6 +122,7 @@ set( gadgetron_smscore_config_files
     config/Generic_Cartesian_Slice_Grappa_EPI_vopenmp.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_vgpu.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_vgpu_gold.xml
+    config/Generic_Cartesian_Slice_Grappa_EPI_vgpu_gold_nav.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_vgpu_gold_error.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_vcpu.xml
 )
