@@ -788,7 +788,7 @@ void EPICorrSMSGadget::increase_no_repetitions(size_t delta_rep) {
 
 }
 
-int EPICorrSMSGadget::copy_and_send_data(int currentDataType, int slice, arma::cx_fmat data)
+int EPICorrSMSGadget::copy_and_send_data(int currentDataType, int slice, arma::cx_fvec data)
 {
     ISMRMRD::AcquisitionHeader head;
     std::vector<size_t> dims_new(2);
@@ -813,7 +813,7 @@ int EPICorrSMSGadget::copy_and_send_data(int currentDataType, int slice, arma::c
     }
     head.user_int[0] = currentDataType;
     head.idx.slice = slice;
-    memcpy(m1->getObjectPtr()->correction.begin(), data.begin(), dim0 * dim1);
+    memcpy(m1->getObjectPtr()->correction.begin(), data.begin(), sizeof(complex<float>) * dim0 * dim1);
     m1->getObjectPtr()->hdr = head;
 
     if (this->next()->putq(m1) == -1) {
@@ -830,17 +830,17 @@ void EPICorrSMSGadget::send_data_to_next_function(int slice)
 
     if (copy_and_send_data(0, slice, corrneg_) == GADGET_FAIL ||
     copy_and_send_data(1, slice, corrpos_) == GADGET_FAIL ||
-    copy_and_send_data(2, slice, corrneg_no_exp_save_) == GADGET_FAIL ||
-    copy_and_send_data(3, slice, corrpos_no_exp_save_) == GADGET_FAIL)
+    copy_and_send_data(2, slice, corrneg_no_exp_save_.col(slice)) == GADGET_FAIL ||
+    copy_and_send_data(3, slice, corrpos_no_exp_save_.col(slice)) == GADGET_FAIL)
         return;
 
-    if (slice == 0)
+    /*if (slice == 0)
     {
         GDEBUG_STREAM("EPICorr send_data_to_next_function : corrneg(0) = " << corrneg_.at(0) << ", corrneg_(12) = " << *(corrneg_.end()))
         GDEBUG_STREAM("EPICorr send_data_to_next_function : corrpos(0) = " << corrpos_.at(0) << ", corrneg_(12) = " << *(corrpos_.end()))
         GDEBUG_STREAM("EPICorr send_data_to_next_function : corrneg_no_exp(0) = " << corrneg_no_exp_save_.at(0) << ", corrneg_(12) = " << *(corrneg_no_exp_save_.end()))
-        GDEBUG_STREAM("EPICorr send_data_to_next_function : corrpow_no_exp(0) = " << corrpos_no_exp_save_.at(0) << ", corrneg_(12) = " << *(corrpos_no_exp_save_.end()))
-    }
+        GDEBUG_STREAM("EPICorr send_data_to_next_function : corrpos_no_exp(0) = " << corrpos_no_exp_save_.at(0) << ", corrneg_(12) = " << *(corrpos_no_exp_save_.end()))
+    }*/
     // ISMRMRD::AcquisitionHeader head;
     // int dim0, dim1;
     // std::vector<size_t> dims_new(2);

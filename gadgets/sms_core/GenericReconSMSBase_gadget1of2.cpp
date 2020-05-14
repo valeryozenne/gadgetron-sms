@@ -1048,6 +1048,43 @@ int GenericReconSMSBase_gadget1of2::CheckComplexNumberEqualInMatrix(hoNDArray< s
     return 0;
 }
 
+
+int GenericReconSMSBase_gadget1of2::CheckComplexNumberEqualInVector(hoNDArray< std::complex<float> >& input ,hoNDArray< std::complex<float> >& input2 )
+{
+
+    GADGET_CHECK_THROW( input2.get_size(0) == input.get_size(0) );
+
+    for (size_t ro = 0; ro < input.get_size(0); ro++)
+    {
+        if (input2(ro)!=input(ro))
+        {GERROR_STREAM("CheckComplexNumberEqualInVector hoNDArray"<< input2(ro) << " "<<  input(ro) );
+            //return GADGET_FAIL;
+        }
+    }
+
+    //GADGET_CHECK_THROW( size(input2,1) == input1.get_size(1) );
+    return 0;
+}
+
+int GenericReconSMSBase_gadget1of2::CheckComplexNumberEqualInMatrix(hoNDArray< std::complex<float> >& input , hoNDArray< std::complex<float> >& input2)
+{
+
+    GADGET_CHECK_THROW( input2.get_size(0) == input.get_size(0) );
+    GADGET_CHECK_THROW( input2.get_size(1) == input.get_size(1) );
+
+    for (size_t s = 0; s < input.get_size(1)  ; s++)
+    {
+        for (size_t ro = 0; ro < input.get_size(0); ro++)
+        {
+            if (input2(ro,s)!=input(ro,s))
+            {GERROR_STREAM("CheckComplexNumberEqualInMatrix hoNDArray"<< input2(ro,s) << " "<<  input(ro,s) <<  " ro: "<<  ro << " s: "<< s );
+                //return GADGET_FAIL;
+            }
+        }
+    }
+    return 0;
+}
+
 int GenericReconSMSBase_gadget1of2::CheckComplexNumberEqualInCube(hoNDArray< std::complex<float> >& input , arma::cx_fcube  input_arma)
 {
 

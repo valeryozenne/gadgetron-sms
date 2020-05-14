@@ -39,50 +39,50 @@ int GenericReconSMSPrepGadget_1of2::process(Gadgetron::GadgetContainerMessage<s_
         GDEBUG("GenericReconSMSPrepGadget_1of2::Process using EPICorr\n");
         if (nb_occurences == 0)
         {
-            epi_nav_neg_.create(dimensions_[0], lNumberOfSlices_);
-            epi_nav_pos_.create(dimensions_[0], lNumberOfSlices_);
+            epi_nav_neg_debug_.create(dimensions_[0], lNumberOfSlices_);
+            epi_nav_pos_debug_.create(dimensions_[0], lNumberOfSlices_);
         
-            epi_nav_neg_no_exp_.create(dimensions_[0], lNumberOfSlices_);
-            epi_nav_pos_no_exp_.create(dimensions_[0], lNumberOfSlices_);
+            epi_nav_neg_no_exp_debug_.create(dimensions_[0], lNumberOfSlices_);
+            epi_nav_pos_no_exp_debug_.create(dimensions_[0], lNumberOfSlices_);
             nb_occurences++;
             
         }
         
-        GDEBUG_STREAM("PrepTest" << *(m2->getObjectPtr()->correction.begin()));
+        //GDEBUG_STREAM("PrepTest" << *(m2->getObjectPtr()->correction.begin()));
 
         if (m2->getObjectPtr()->hdr.user_int[0] == 0)//corrneg_
         {
-            std::complex<float> * out_neg = &(epi_nav_neg_(0, m2->getObjectPtr()->hdr.idx.slice));
+            std::complex<float> * out_neg = &(epi_nav_neg_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
 
             memcpy(out_neg, m2->getObjectPtr()->correction.get_data_ptr(), sizeof(std::complex<float>) * dimensions_[0]);
             
         }
         if (m2->getObjectPtr()->hdr.user_int[0] == 1)//corrpos_
         {
-            std::complex<float> * out_pos = &(epi_nav_pos_(0, m2->getObjectPtr()->hdr.idx.slice));
+            std::complex<float> * out_pos = &(epi_nav_pos_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
             memcpy(out_pos, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
 
             
         }
         if (m2->getObjectPtr()->hdr.user_int[0] == 2)//corrneg_no_exp
         {
-            std::complex<float> * out_neg_no_exp = &(epi_nav_neg_no_exp_(0, m2->getObjectPtr()->hdr.idx.slice));
+            std::complex<float> * out_neg_no_exp = &(epi_nav_neg_no_exp_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
             memcpy(out_neg_no_exp, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
 
             
         }
         if (m2->getObjectPtr()->hdr.user_int[0] == 3)//corrpos_no_exp
         {
-            std::complex<float> * out_pos_no_exp = &(epi_nav_pos_no_exp_(0, m2->getObjectPtr()->hdr.idx.slice));
+            std::complex<float> * out_pos_no_exp = &(epi_nav_pos_no_exp_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
             memcpy(out_pos_no_exp, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
         }
-        if (m2->getObjectPtr()->hdr.idx.slice == 0 && m2->getObjectPtr()->hdr.user_int[0] == 3)
+        /*if (m2->getObjectPtr()->hdr.idx.slice == 0 && m2->getObjectPtr()->hdr.user_int[0] == 3)
         {
             GDEBUG_STREAM("SMSPrepGadget_1of2::process EPICorr - slice " << m2->getObjectPtr()->hdr.idx.slice << " - epi_nav_neg : " << *(epi_nav_neg_.begin()) << " - " << *(epi_nav_neg_.end()));
             GDEBUG_STREAM("SMSPrepGadget_1of2::process EPICorr - slice " << m2->getObjectPtr()->hdr.idx.slice << " - epiNavPos : " << *(epi_nav_pos_.begin()) << " - " << *(epi_nav_pos_.end()));
             GDEBUG_STREAM("SMSPrepGadget_1of2::process EPICorr - slice " << m2->getObjectPtr()->hdr.idx.slice << " - epiNavNeg_noexp : " << *(epi_nav_neg_no_exp_.begin()) << " - " << *(epi_nav_neg_no_exp_.end()));
             GDEBUG_STREAM("SMSPrepGadget_1of2::process EPICorr - slice " << m2->getObjectPtr()->hdr.idx.slice << " - epiNavPos_noExp : " << *(epi_nav_pos_no_exp_.begin()) << " - " << *(epi_nav_pos_no_exp_.end()));
-        }
+        }*/
         
     }
     
@@ -408,6 +408,14 @@ void GenericReconSMSPrepGadget_1of2::apply_averaged_epi_ghost_correction_sb(hoND
         GDEBUG("GenericReconSMSPrepGadget_1of2::Process using data from disk");
         load_epi_data();
         
+    }
+    
+    if (useDiskData == true && useEPICorrData==true)
+    {
+        CheckComplexNumberEqualInMatrix(epi_nav_neg_debug_,epi_nav_neg_);
+        CheckComplexNumberEqualInMatrix(epi_nav_pos_debug_,epi_nav_pos_);
+        CheckComplexNumberEqualInMatrix(epi_nav_neg_no_exp_debug_,epi_nav_neg_no_exp_);
+        CheckComplexNumberEqualInMatrix(epi_nav_pos_no_exp_debug_,epi_nav_pos_no_exp_);
     }
     
 
