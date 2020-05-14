@@ -788,7 +788,7 @@ void EPICorrSMSGadget::increase_no_repetitions(size_t delta_rep) {
 
 }
 
-int EPICorrSMSGadget::copy_and_send_data(int currentDataType, int slice, arma::cx_fmat data)
+int EPICorrSMSGadget::copy_and_send_data(int currentDataType, int slice, arma::cx_fvec data)
 {
     ISMRMRD::AcquisitionHeader head;
     std::vector<size_t> dims_new(2);
@@ -813,7 +813,10 @@ int EPICorrSMSGadget::copy_and_send_data(int currentDataType, int slice, arma::c
     }
     head.user_int[0] = currentDataType;
     head.idx.slice = slice;
-    memcpy(m1->getObjectPtr()->correction.begin(), data.begin(), dim0 * dim1);
+
+    std::cout << "sending "<< dim0 << " "  <<dim1 << std::endl;
+
+    memcpy(m1->getObjectPtr()->correction.begin(), data.begin(), sizeof(std::complex<float>)* dim0 * dim1);
     m1->getObjectPtr()->hdr = head;
 
     if (this->next()->putq(m1) == -1) {
@@ -830,8 +833,8 @@ void EPICorrSMSGadget::send_data_to_next_function(int slice)
 
     if (copy_and_send_data(0, slice, corrneg_) == GADGET_FAIL ||
     copy_and_send_data(1, slice, corrpos_) == GADGET_FAIL ||
-    copy_and_send_data(2, slice, corrneg_no_exp_save_) == GADGET_FAIL ||
-    copy_and_send_data(3, slice, corrpos_no_exp_save_) == GADGET_FAIL)
+    copy_and_send_data(2, slice, corrneg_no_exp_save_.col(slice)) == GADGET_FAIL ||
+    copy_and_send_data(3, slice, corrpos_no_exp_save_.col(slice)) == GADGET_FAIL)
         return;
 
     if (slice == 0)

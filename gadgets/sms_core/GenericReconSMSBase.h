@@ -219,6 +219,7 @@ namespace Gadgetron {
         virtual int CheckComplexNumberEqualInMatrix(hoNDArray< std::complex<float> >& input , arma::cx_fmat  input_arma);
         virtual int CheckComplexNumberEqualInCube(hoNDArray< std::complex<float> >& input , arma::cx_fcube  input_arma);
 
+
         virtual void do_fft_for_ref_scan(hoNDArray< std::complex<float> >& data);
     };
 }

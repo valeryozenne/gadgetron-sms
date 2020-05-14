@@ -1,19 +1,15 @@
-#ifndef EPICorrSMSGadget_H
-#define EPICorrSMSGadget_H
+#ifndef GENERICRECONARTESIANRECEIVEEPIMSGGADGET_H
+#define GENERICRECONARTESIANRECEIVEEPIMSGGADGET_H
 
 #include "Gadget.h"
 #include "hoNDArray.h"
 #include "hoArmadillo.h"
 #include "gadgetron_epi_export.h"
-#include "mri_core_slice_grappa.h"
-#include "mri_core_utility_interventional.h"
-
+#include "SMS_utils.h"
 #include <ismrmrd/ismrmrd.h>
 #include "ismrmrd/xml.h"
 #include <complex>
-
-#include "ImageIOAnalyze.h"
-#include "mri_core_utility.h"
+#include "mri_core_data.h"
 
 #define _USE_MATH_DEFINES
 
@@ -21,12 +17,12 @@
 
 namespace Gadgetron {
 
-class EXPORTGADGETS_EPI EPICorrSMSGadget :
-        public Gadget2<ISMRMRD::AcquisitionHeader, hoNDArray<std::complex<float> > > {
+class EXPORTGADGETS_EPI GenericReconCartesianReceiveEpiMsgGadget :
+        public Gadget1<IsmrmrdReconData> {
 public:
-    EPICorrSMSGadget();
+    GenericReconCartesianReceiveEpiMsgGadget();
 
-    virtual ~EPICorrSMSGadget();
+    virtual ~GenericReconCartesianReceiveEpiMsgGadget();
 
 protected:
     GADGET_PROPERTY(verboseMode, bool, "Verbose output", false);
@@ -51,29 +47,16 @@ protected:
                     "Number of volumes/repetitions to exclude from the beginning of the run when filtering the navigator parameters (e.g., to take into account dummy acquisitions. Default: 0)",
                     0);
 
-    GADGET_PROPERTY(debug_folder, std::string, "If set, the debug output will be written out", "");
-    GADGET_PROPERTY(verbose, bool, "Whether to print more information", false);
-
     virtual int process_config(ACE_Message_Block *mb);
 
-    virtual int process(GadgetContainerMessage<ISMRMRD::AcquisitionHeader> *m1,
-                        GadgetContainerMessage<hoNDArray<std::complex<float> > > *m2);
+    virtual int process(
+            GadgetContainerMessage<IsmrmrdReconData> *m2);
+
+    /*virtual int process(
+            GadgetContainerMessage<t_EPICorrection > *m2);*/
 
     // in verbose mode, more info is printed out
     bool verboseMode_;
-
-    void init_arrays_for_nav_parameter_filtering(ISMRMRD::EncodingLimits e_limits);
-
-    float filter_nav_correction_parameter(hoNDArray<float> &nav_corr_param_array,
-                                          hoNDArray<float> &weights_array,
-                                          size_t exc,  // current excitation number (for this set and slice)
-                                          size_t set,  // set of the array to filter (current one)
-                                          size_t slc,  // slice of the array to filter (current one)
-                                          size_t Nt,   // number of e2/timepoints/repetitions to filter
-                                          bool filter_in_complex_domain = false);
-
-    void increase_no_repetitions(size_t delta_rep);
-
 
     // --------------------------------------------------
     // variables for navigator parameter computation
@@ -117,67 +100,6 @@ protected:
     hoNDArray<float> OE_phi_intercept_; // array to store the Odd-Even phase-correction constant term (for filtering)
     std::vector<hoNDArray<float> > OE_phi_poly_coef_;   // vector of arrays to store the polynomial coefficients for Odd-Even phase correction
 
-    void process_phase_correction_data(ISMRMRD::AcquisitionHeader &hdr, arma::cx_fmat &adata);
-
-    arma::fvec
-    polynomial_correction(int Nx_, const arma::fvec &x, const arma::cx_fvec &ctemp, size_t set, size_t slc,
-                          size_t exc,
-                          float intercept);
-
-    void apply_epi_correction(ISMRMRD::AcquisitionHeader &hdr, arma::cx_fmat &adata);
-    
-
-    /////////////////
-    /// \brief detect_flag
-    /// \ajout SMS
-    ///
-
-    void detect_flag(GadgetContainerMessage<ISMRMRD::AcquisitionHeader> *m1);
-
-    int copy_and_send_data(int currentDataType, int slice, arma::cx_fvec data);
-    void send_data_to_next_function(int slice);
-    void fonction_qui_sauvegarde_sur_le_disk_les_corrections_par_coupes(int slice );
-
-    std::vector<size_t> dimensions_;
-
-    std::string str_s;
-
-    arma::cx_fmat corrpos_all_;     // Odd-Even correction -- positive readouts
-    arma::cx_fmat corrneg_all_;     // Odd-Even correction -- negative readouts
-
-    arma::cx_fmat corrpos_mean_;     // Odd-Even correction -- positive readouts
-    arma::cx_fmat corrneg_mean_;     // Odd-Even correction -- negative readouts
-
-    arma::cx_fmat corrpos_no_exp_mean_;     // Odd-Even correction -- positive readouts
-    arma::cx_fmat corrneg_no_exp_mean_;     // Odd-Even correction -- negative readouts
-
-    arma::cx_fmat corrpos_no_exp_save_;     // Odd-Even correction -- positive readouts
-    arma::cx_fmat corrneg_no_exp_save_;     // Odd-Even correction -- negative readouts
-
-
-    unsigned int lNumberOfSlices_;
-    unsigned int lNumberOfChannels_;
-    unsigned int readout;
-    unsigned int encoding;   
-
-     Gadgetron::ImageIOAnalyze gt_exporter_;
-
-     // debug folder
-     std::string debug_folder_full_path_;    
-
-     std::string epi_dependency_folder_;
-     std::string epi_dependency_prefix_;
-     std::string measurement_id_;;
-     std::string partial_name_stored_epi_dependency_;
-     std::string full_name_stored_epi_dependency_;
-
-     std::string generateEpiDependencyFilename(const std::string& measurement_id);
-
-     hoNDArray< std::complex<float> > corrneg_output_format_analyze;
-     hoNDArray< std::complex<float> > corrpos_output_format_analyze;
-
-     //unsigned int compteur_acs;
-
 };
 }
-#endif //EPICorrSMSGadget_H
+#endif //GENERICRECONARTESIANRECEIVEEPIMSGGADGET_H
