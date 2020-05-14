@@ -788,171 +788,266 @@ void EPICorrSMSGadget::increase_no_repetitions(size_t delta_rep) {
 
 }
 
+int EPICorrSMSGadget::copy_and_send_data(int currentDataType, int slice, arma::cx_fmat data)
+{
+    ISMRMRD::AcquisitionHeader head;
+    std::vector<size_t> dims_new(2);
+
+    int dim0, dim1;
+
+    dim0 = size(corrneg_, 0);
+    dim1 = size(corrneg_, 1);
+
+    dims_new[0] = size(corrneg_, 0);
+    dims_new[1] = size(corrneg_, 1);
+
+    GadgetContainerMessage<s_EPICorrection> *m1;
+    
+    m1 = new GadgetContainerMessage<s_EPICorrection>;
+    try{
+        m1->getObjectPtr()->correction.create(&dims_new);
+    }
+    catch (std::runtime_error &err){
+        GEXCEPTION(err,"Unable to create unsigned short storage in Extract Magnitude Gadget");
+        return GADGET_FAIL;
+    }
+    head.user_int[0] = currentDataType;
+    head.idx.slice = slice;
+    memcpy(m1->getObjectPtr()->correction.begin(), data.begin(), dim0 * dim1);
+    m1->getObjectPtr()->hdr = head;
+
+    if (this->next()->putq(m1) == -1) {
+        m1->release();
+        GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+        return GADGET_FAIL;
+    }
+    return (GADGET_OK);
+}
+
 void EPICorrSMSGadget::send_data_to_next_function(int slice)
 {
     GDEBUG("STEP 2 : EPI correction : slice %d\n", slice);
 
-    ISMRMRD::AcquisitionHeader head;
-    int dim0, dim1;
-    hoNDArray<std::complex<float>> input;
-    GadgetContainerMessage<s_EPICorrection> *m1, *m2, *m3, *m4;
+    if (copy_and_send_data(0, slice, corrneg_) == GADGET_FAIL ||
+    copy_and_send_data(1, slice, corrpos_) == GADGET_FAIL ||
+    copy_and_send_data(2, slice, corrneg_no_exp_save_) == GADGET_FAIL ||
+    copy_and_send_data(3, slice, corrpos_no_exp_save_) == GADGET_FAIL)
+        return;
 
-    //for temporary values used in the loops
-    int i, j;
-
-    m1 = new GadgetContainerMessage<s_EPICorrection>;
-    m2 = new GadgetContainerMessage<s_EPICorrection>;
-    m3 = new GadgetContainerMessage<s_EPICorrection>;
-    m4 = new GadgetContainerMessage<s_EPICorrection>;
-
-    head.user_int[0] = 0;
-    head.idx.slice = slice;
-    dim0 = size(corrneg_, 0);
-    dim1 = size(corrneg_, 1);
-    input.create(dim0, dim1);
-    //memcpy(input.get_data_ptr(), &corrneg_, dim0 * dim1);
-    GDEBUG_STREAM("corrneg_size dim0: " << dim0 << ", dim1: " << dim1);
-    
-    i = 0;
-    while (i < dim0)
+    if (slice == 0)
     {
-        if (i > dim0)
-        {
-            GDEBUG("I > dim0\n");
-        }
-        //GDEBUG_STREAM(i);
-        j = 0;
-        while (j < dim1)
-        {
-            input.at(i + size(corrneg_, 0) * j).real(corrneg_.at(i, j).real());
-            input.at(i + size(corrneg_, 0) * j).imag(corrneg_.at(i, j).imag());
-            j++;
-        }
-        i++;
+        GDEBUG_STREAM("EPICorr send_data_to_next_function : corrneg(0) = " << corrneg_.at(0) << ", corrneg_(12) = " << *(corrneg_.end()))
+        GDEBUG_STREAM("EPICorr send_data_to_next_function : corrpos(0) = " << corrpos_.at(0) << ", corrneg_(12) = " << *(corrpos_.end()))
+        GDEBUG_STREAM("EPICorr send_data_to_next_function : corrneg_no_exp(0) = " << corrneg_no_exp_save_.at(0) << ", corrneg_(12) = " << *(corrneg_no_exp_save_.end()))
+        GDEBUG_STREAM("EPICorr send_data_to_next_function : corrpow_no_exp(0) = " << corrpos_no_exp_save_.at(0) << ", corrneg_(12) = " << *(corrpos_no_exp_save_.end()))
     }
+    // ISMRMRD::AcquisitionHeader head;
+    // int dim0, dim1;
+    // std::vector<size_t> dims_new(2);
 
-    m1->getObjectPtr()->hdr = head;
-    m1->getObjectPtr()->correction = input;
-    //------------------------------------------------
+    // dim0 = size(corrneg_, 0);
+    // dim1 = size(corrneg_, 1);
+
+    // dims_new[0] = size(corrneg_, 0);
+    // dims_new[1] = size(corrneg_, 1);
+
+    // //hoNDArray<std::complex<float>> input;
+    // GadgetContainerMessage<s_EPICorrection> *m1, *m2, *m3, *m4;
+
+    // //for temporary values used in the loops
+    // int i, j;
+
+    // m1 = new GadgetContainerMessage<s_EPICorrection>;
+    // m2 = new GadgetContainerMessage<s_EPICorrection>;
+    // m3 = new GadgetContainerMessage<s_EPICorrection>;
+    // m4 = new GadgetContainerMessage<s_EPICorrection>;
+
+    // try{
+    //     m1->getObjectPtr()->correction.create(&dims_new);
+    // }
+    // catch (std::runtime_error &err){
+    //     GEXCEPTION(err,"Unable to create unsigned short storage in Extract Magnitude Gadget");
+    //     //return GADGET_FAIL;
+    // }
+
+    // try{
+    //     m2->getObjectPtr()->correction.create(&dims_new);
+    // }
+    // catch (std::runtime_error &err){
+    //     GEXCEPTION(err,"Unable to create unsigned short storage in Extract Magnitude Gadget");
+    //     //return GADGET_FAIL;
+    // }
+
+    // try{
+    //     m3->getObjectPtr()->correction.create(&dims_new);
+    // }
+    // catch (std::runtime_error &err){
+    //     GEXCEPTION(err,"Unable to create unsigned short storage in Extract Magnitude Gadget");
+    //     //return GADGET_FAIL;
+    // }
+
+    // try{
+    //     m4->getObjectPtr()->correction.create(&dims_new);
+    // }
+    // catch (std::runtime_error &err){
+    //     GEXCEPTION(err,"Unable to create unsigned short storage in Extract Magnitude Gadget");
+    //     //return GADGET_FAIL;
+    // }
     
-    head.user_int[0] = 1;
-
-    dim0 = size(corrpos_, 0);
-    dim1 = size(corrpos_, 1);
-    input.create(dim0, dim1);
-    //GDEBUG_STREAM("corrpos_size dim0: " << dim0 << ", dim1: " << dim1);
-    //memcpy(input.get_data_ptr(), &corrpos_, dim0 * dim1);
-
-    i = 0;
-    while (i < dim0)
-    {
-        if (i > dim0)
-        {
-            GDEBUG("I > dim0\n");
-        }
-        //GDEBUG_STREAM(i);
-        j = 0;
-        while (j < dim1)
-        {
-            input.at(i + size(corrpos_, 0) * j).real(corrpos_.at(i, j).real());
-            input.at(i + size(corrpos_, 0) * j).imag(corrpos_.at(i, j).imag());
-            j++;
-        }
-        i++;
-    }
-
-    m2->getObjectPtr()->hdr = head;
-    m2->getObjectPtr()->correction = input;
+    // head.user_int[0] = 0;
+    // head.idx.slice = slice;
+    // //dim0 = size(corrneg_, 0);
+    // //dim1 = size(corrneg_, 1);
+    // //input.create(dim0, dim1);
     
-    //------------------------------------------------
+    // GDEBUG_STREAM("corrneg_size dim0: " << dim0 << ", dim1: " << dim1);
     
-    head.user_int[0] = 2;
+    // if (slice == 0)
+    // {
+    //     GDEBUG_STREAM("EPICorr send_data_to_next_function : corrneg(0) = " << corrneg_.begin() << ", corrneg_(12) = " << *(corrneg_.end()))
+    //     GDEBUG_STREAM("EPICorr send_data_to_next_function : corrpos(0) = " << corrpos_.begin() << ", corrneg_(12) = " << *(corrpos_.end()))
+    //     GDEBUG_STREAM("EPICorr send_data_to_next_function : corrneg_no_exp(0) = " << corrneg_no_exp_save_.begin() << ", corrneg_(12) = " << *(corrneg_no_exp_save_.end()))
+    //     GDEBUG_STREAM("EPICorr send_data_to_next_function : corrpow_no_exp(0) = " << corrpos_no_exp_save_.begin() << ", corrneg_(12) = " << *(corrpos_no_exp_save_.end()))
+    // }
 
-    dim0 = size(corrneg_no_exp_save_.col(slice), 0);
-    dim1 = size(corrneg_no_exp_save_.col(slice), 1);
-    input.create(dim0, dim1);
-    //GDEBUG_STREAM("corrneg_no_exp_size dim0: " << dim0 << ", dim1: " << dim1);
-    //memcpy(input.get_data_ptr(), &corrneg_no_exp_save_, dim0 * dim1);
-
-    i = 0;
-    while (i < dim0)
-    {
-        if (i > dim0)
-        {
-            GDEBUG("I > dim0\n");
-        }
-        //GDEBUG_STREAM(i);
-        j = 0;
-        while (j < dim1)
-        {
-            input.at(i + size(corrneg_no_exp_save_, 0) * j).real(corrneg_no_exp_save_.at(i, j).real());
-            input.at(i + size(corrneg_no_exp_save_, 0) * j).imag(corrneg_no_exp_save_.at(i, j).imag());
-            j++;
-        }
-        i++;
-    }
-    m3->getObjectPtr()->hdr = head;
-    m3->getObjectPtr()->correction = input;
     
-    //----------------------------------------------------
 
-    head.user_int[0] = 3;
-
-    dim0 = size(corrpos_no_exp_save_.col(slice), 0);
-    dim1 = size(corrpos_no_exp_save_.col(slice), 1);
-    input.create(dim0, dim1);
-    //GDEBUG_STREAM("corrpos_no_exp_size dim0: " << dim0 << ", dim1: " << dim1);
-    //memcpy(input.get_data_ptr(), &corrpos_no_exp_save_, dim0 * dim1);
-
-    i = 0;
-    while (i < dim0)
-    {
-        if (i > dim0)
-        {
-            GDEBUG("I > dim0\n");
-        }
-        //GDEBUG_STREAM(i);
-        j = 0;
-        while (j < dim1)
-        {
-            input.at(i + size(corrpos_no_exp_save_, 0) * j).real(corrpos_no_exp_save_.at(i, j).real());
-            input.at(i + size(corrpos_no_exp_save_, 0) * j).imag(corrpos_no_exp_save_.at(i, j).imag());
-            j++;
-        }
-        i++;
-    }
-
-    m4->getObjectPtr()->hdr = head;
-    m4->getObjectPtr()->correction = input;
+    // // i = 0;
+    // // while (i < dim0)
+    // // {
+    // //     if (i > dim0)
+    // //     {
+    // //         GDEBUG("I > dim0\n");
+    // //     }
+    // //     //GDEBUG_STREAM(i);
+    // //     j = 0;
+    // //     while (j < dim1)
+    // //     {
+    // //         input.at(i + size(corrneg_, 0) * j).real(corrneg_.at(i, j).real());
+    // //         input.at(i + size(corrneg_, 0) * j).imag(corrneg_.at(i, j).imag());
+    // //         j++;
+    // //     }
+    // //     i++;
+    // // }
+    // memcpy(m1->getObjectPtr()->correction.begin(), corrneg_.begin(), dim0 * dim1);
+    // m1->getObjectPtr()->hdr = head;
+    // //m1->getObjectPtr()->correction = input;
+    // //------------------------------------------------
     
-    //---------------------------------------------------
+    // head.user_int[0] = 1;
 
-        // It is enough to put the first one, since they are linked
-        if (this->next()->putq(m1) == -1) {
-            //m1->release();
-            GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
-            return;
-        }
-        else
-        {
-            GDEBUG("EPICorrSMSGadget::process, Sending Message M1");
-        }
+    // dims_new[0] = size(corrpos_, 0);
+    // dims_new[1] = size(corrpos_, 1);
+    // //input.create(dim0, dim1);
+    // //GDEBUG_STREAM("corrpos_size dim0: " << dim0 << ", dim1: " << dim1);
+    // memcpy(m2->getObjectPtr()->correction.begin(), corrneg_.begin(), dim0 * dim1);
+
+    // // i = 0;
+    // // while (i < dim0)
+    // // {
+    // //     if (i > dim0)
+    // //     {
+    // //         GDEBUG("I > dim0\n");
+    // //     }
+    // //     //GDEBUG_STREAM(i);
+    // //     j = 0;
+    // //     while (j < dim1)
+    // //     {
+    // //         input.at(i + size(corrpos_, 0) * j).real(corrpos_.at(i, j).real());
+    // //         input.at(i + size(corrpos_, 0) * j).imag(corrpos_.at(i, j).imag());
+    // //         j++;
+    // //     }
+    // //     i++;
+    // // }
+
+    // m2->getObjectPtr()->hdr = head;
+    // //m2->getObjectPtr()->correction = input;
+    
+    // //------------------------------------------------
+    
+    // head.user_int[0] = 2;
+
+    // dims_new[0] = size(corrneg_no_exp_save_.col(slice), 0);
+    // dims_new[1] = size(corrneg_no_exp_save_.col(slice), 1);
+    // //input.create(dim0, dim1);
+    // //GDEBUG_STREAM("corrneg_no_exp_size dim0: " << dim0 << ", dim1: " << dim1);
+    // memcpy(m3->getObjectPtr()->correction.begin(), corrneg_.begin(), dim0 * dim1);
+
+    // // i = 0;
+    // // while (i < dim0)
+    // // {
+    // //     if (i > dim0)
+    // //     {
+    // //         GDEBUG("I > dim0\n");
+    // //     }
+    // //     //GDEBUG_STREAM(i);
+    // //     j = 0;
+    // //     while (j < dim1)
+    // //     {
+    // //         input.at(i + size(corrneg_no_exp_save_, 0) * j).real(corrneg_no_exp_save_.at(i, j).real());
+    // //         input.at(i + size(corrneg_no_exp_save_, 0) * j).imag(corrneg_no_exp_save_.at(i, j).imag());
+    // //         j++;
+    // //     }
+    // //     i++;
+    // // }
+    // m3->getObjectPtr()->hdr = head;
+    // // m3->getObjectPtr()->correction = input;
+    
+    // //----------------------------------------------------
+
+    // head.user_int[0] = 3;
+
+    // dims_new[0] = size(corrpos_no_exp_save_.col(slice), 0);
+    // dims_new[1] = size(corrpos_no_exp_save_.col(slice), 1);
+    // //input.create(dim0, dim1);
+    // //GDEBUG_STREAM("corrpos_no_exp_size dim0: " << dim0 << ", dim1: " << dim1);
+    // memcpy(m4->getObjectPtr()->correction.begin(), corrneg_.begin(), dim0 * dim1);
+
+    // // i = 0;
+    // // while (i < dim0)
+    // // {
+    // //     if (i > dim0)
+    // //     {
+    // //         GDEBUG("I > dim0\n");
+    // //     }
+    // //     //GDEBUG_STREAM(i);
+    // //     j = 0;
+    // //     while (j < dim1)
+    // //     {
+    // //         input.at(i + size(corrpos_no_exp_save_, 0) * j).real(corrpos_no_exp_save_.at(i, j).real());
+    // //         input.at(i + size(corrpos_no_exp_save_, 0) * j).imag(corrpos_no_exp_save_.at(i, j).imag());
+    // //         j++;
+    // //     }
+    // //     i++;
+    // // }
+
+    // m4->getObjectPtr()->hdr = head;
+    // //m4->getObjectPtr()->correction = input;
+    
+    // //---------------------------------------------------
+
+    //     // It is enough to put the first one, since they are linked
+    //     if (this->next()->putq(m1) == -1) {
+    //         //m1->release();
+    //         GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+    //         return;
+    //     }
         
-        if (this->next()->putq(m2) == -1) {
-            //m2->release();
-            GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
-            return;
-        }
-        if (this->next()->putq(m3) == -1) {
-            //m3->release();
-            GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
-            return;
-        }
-        if (this->next()->putq(m4) == -1) {
-            //m4->release();
-            GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
-            return;
-        }
+    //     if (this->next()->putq(m2) == -1) {
+    //         //m2->release();
+    //         GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+    //         return;
+    //     }
+    //     if (this->next()->putq(m3) == -1) {
+    //         //m3->release();
+    //         GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+    //         return;
+    //     }
+    //     if (this->next()->putq(m4) == -1) {
+    //         //m4->release();
+    //         GERROR("EPICorrSMSGadget::process, passing data on to next gadget");
+    //         return;
+    //     }
         return;
 }
 

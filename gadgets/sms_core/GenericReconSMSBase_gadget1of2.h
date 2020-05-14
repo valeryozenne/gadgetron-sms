@@ -113,6 +113,16 @@ namespace Gadgetron {
         hoNDArray<std::complex<float>> epi_nav_neg_no_exp_;
         hoNDArray<std::complex<float>> epi_nav_pos_no_exp_;
 
+        //tmp for debug
+
+        hoNDArray<std::complex<float>> epi_nav_neg_debug_;
+        hoNDArray<std::complex<float>> epi_nav_pos_debug_;
+
+        hoNDArray<std::complex<float>> epi_nav_neg_no_exp_debug_;
+        hoNDArray<std::complex<float>> epi_nav_pos_no_exp_debug_;
+
+        //end of tmp
+
         hoNDArray< std::complex<float> > epi_nav_neg_STK_;
         hoNDArray< std::complex<float> > epi_nav_pos_STK_;
 

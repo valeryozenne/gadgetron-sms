@@ -21,6 +21,9 @@ namespace Gadgetron {
 
         typedef GenericReconSMSBase_gadget1of2 BaseClass;
 
+        GADGET_PROPERTY(useDiskData, bool, "Whether to use data saved on disk or not", false);
+        GADGET_PROPERTY(useEPICorrData, bool, "Whether to use data from struct EPICorrection or not", false);
+
         GenericReconSMSPrepGadget_1of2();
         ~GenericReconSMSPrepGadget_1of2();
 
@@ -49,7 +52,6 @@ namespace Gadgetron {
 
         size_t process_called_times_epicorr;
 
-        bool first_occurence;
         int nb_occurences;
 
         // --------------------------------------------------
