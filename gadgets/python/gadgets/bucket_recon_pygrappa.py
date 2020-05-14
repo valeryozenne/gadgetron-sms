@@ -6,7 +6,7 @@ import ismrmrd
 import ismrmrd.xsd
 from pygrappa import grappa
 
-class BucketReconGrappa(Gadget):
+class BucketReconPyGrappa(Gadget):
     def __init__(self, next_gadget=None):
         Gadget.__init__(self,next_gadget)
         self.array_calib=[]
@@ -25,11 +25,13 @@ class BucketReconGrappa(Gadget):
         try: 
            if recondata[0].ref.data is not None:
              print("reference data exist")
-             print(np.shape(recondata[0].ref.data)) # only for repetition 0 # il faut creer le bucket recon grappa
+
              reference=recondata[0].ref.data
              data=recondata[0].data.data
+
              print(np.shape(reference))
              print(np.shape(data))
+
              self.array_calib=reference
              np.save('/tmp/gadgetron/reference', reference)
              np.save('/tmp/gadgetron/data', data)

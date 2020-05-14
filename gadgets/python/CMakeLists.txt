@@ -44,6 +44,8 @@ set(gadgetron_python_config_files
                             config/python_short.xml
                             config/python_tpat_snr_scale.xml 
                             config/Generic_Cartesian_Grappa_RealTimeCine_Python.xml 
+                            config/Generic_Cartesian_Grappa_EPI_python_tuto.xml
+                            config/Generic_Cartesian_FFT_EPI_python_tuto.xml
                             )
 
 set(gadgetron_python_utils_files 
@@ -53,8 +55,7 @@ set(gadgetron_python_utils_files
 
 set(gadgetron_python_gadgets_files 
                             gadgets/accumulate_and_recon.py
-                            gadgets/bucket_recon.py
-                            gadgets/bucket_recon_fft.py
+                            gadgets/bucket_recon.py                            
                             gadgets/gadgetron.py
                             gadgets/IDEAL.py
                             gadgets/image_viewer.py
@@ -68,6 +69,10 @@ set(gadgetron_python_gadgets_files
                             gadgets/image_array_recon.py
                             gadgets/passthrough_array_image.py
                             gadgets/image_array_recon_rtcine_plotting.py
+                            gadgets/bucket_recon_fft.py
+                            gadgets/bucket_recon_grappa.py
+                            gadgets/bucket_recon_pygrappa.py
+                            gadgets/bucket_recon_mp2rage.py
         )
 
 set(gadgetron_python_examples_files 
