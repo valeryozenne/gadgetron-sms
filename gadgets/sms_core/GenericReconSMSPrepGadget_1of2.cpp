@@ -417,6 +417,19 @@ void GenericReconSMSPrepGadget_1of2::apply_averaged_epi_ghost_correction_sb(hoND
         CheckComplexNumberEqualInMatrix(epi_nav_neg_no_exp_debug_,epi_nav_neg_no_exp_);
         CheckComplexNumberEqualInMatrix(epi_nav_pos_no_exp_debug_,epi_nav_pos_no_exp_);
     }
+    else if (useEPICorrData==true)
+    {
+        epi_nav_neg_.create(dimensions_[0], lNumberOfSlices_);
+        epi_nav_pos_.create(dimensions_[0], lNumberOfSlices_);
+    
+        epi_nav_neg_no_exp_.create(dimensions_[0], lNumberOfSlices_);
+        epi_nav_pos_no_exp_.create(dimensions_[0], lNumberOfSlices_);
+
+        epi_nav_neg_ = epi_nav_neg_debug_;
+        epi_nav_pos_ = epi_nav_pos_debug_;
+        epi_nav_neg_no_exp_ = epi_nav_neg_no_exp_debug_;
+        epi_nav_pos_no_exp_ = epi_nav_pos_no_exp_debug_;
+    }
     
 
     if (perform_timing.value()) { gt_timer_local_.stop(); }

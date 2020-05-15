@@ -111,7 +111,7 @@
     <dll>gadgetron_smscore</dll>
     <classname>GenericReconSMSPrepGadget_1of2</classname>   
     <property><name>useEPICorrData</name><value>true</value></property>
-    <property><name>useDiskData</name><value>true</value></property>
+    <property><name>useDiskData</name><value>false</value></property>
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
@@ -187,6 +187,8 @@
     <name>SMSPostGadget_1of2</name>
     <dll>gadgetron_smscore</dll>
     <classname>GenericReconSMSPostGadget_1of2</classname>
+    <property><name>useEPICorrData</name><value>true</value></property>
+    <property><name>useDiskData</name><value>false</value></property>
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
