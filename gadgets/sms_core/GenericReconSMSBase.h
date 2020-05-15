@@ -14,6 +14,7 @@
 #include "hoNDKLT.h"
 #include "hoArmadillo.h"
 #include "test_slice_grappa.h"
+#include "hoNDFFT.h"
 
 namespace Gadgetron {
 
@@ -27,6 +28,7 @@ namespace Gadgetron {
 
         GADGET_PROPERTY(use_omp, bool, "Whether to use omp acceleration", false);
         GADGET_PROPERTY(use_gpu, bool, "Whether to use gpu acceleration", false);
+        GADGET_PROPERTY(test_value, int, "value", 1);
 
         GenericReconSMSBase();
         ~GenericReconSMSBase();
@@ -132,6 +134,14 @@ namespace Gadgetron {
 
 
 
+        cuNDArray<float_complext> device_epi_nav_pos_STK_test ;
+        cuNDArray<float_complext> device_epi_nav_neg_STK_test ;
+        cuNDArray<float_complext> device_epi_nav_pos_STK_mean_test ;
+        cuNDArray<float_complext> device_epi_nav_neg_STK_mean_test ;
+
+        cuNDArray<float_complext> device_d_epi_sb;
+        cuNDArray<float_complext> device_d_epi_mb;
+
 
         // --------------------------------------------------
         // gadget functions
@@ -166,6 +176,8 @@ namespace Gadgetron {
 
         virtual void save_4D_8D_kspace(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
 
+        virtual void save_4D_data(hoNDArray<float >& input, std::string name, std::string encoding_number);
+
         virtual void show_size(hoNDArray< std::complex<float> >& input, std::string name);
 
         virtual void load_epi_data();
@@ -181,6 +193,8 @@ namespace Gadgetron {
         virtual void apply_ghost_correction_with_STK6_old(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo , bool optimal);
 
         virtual void apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal, bool ifft , std::string msg);
+
+        virtual void apply_ghost_correction_with_STK6_gpu(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , bool ifft , std::string msg);
 
         virtual void apply_ghost_correction_with_STK6_open(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal, bool ifft , std::string msg);
 
@@ -198,7 +212,8 @@ namespace Gadgetron {
 
         virtual void apply_relative_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
         virtual void apply_relative_phase_shift_test(hoNDArray< std::complex<float> >& data, bool is_positive );
-        virtual void apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
+        virtual void apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive, bool is_mb );
+        //virtual void apply_absolute_phase_shift_MB2(hoNDArray< std::complex<float> >& data, bool is_positive );
 
         virtual void get_header_and_position_and_gap(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > headers_);
 

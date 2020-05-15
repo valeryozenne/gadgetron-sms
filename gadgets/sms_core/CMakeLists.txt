@@ -92,6 +92,9 @@ set( gadgetron_smscore_header_files
         GenericReconCartesianSliceGrappav3Gadget.h
         GenericReconCartesianSliceGrappavgpuGadget.h
         GenericReconEigenChannelSMSGadget.h
+        RemoveNavigationDataKspaceGadget.h
+        GenericReconSaveAndLoadRefGadget.h
+
 )
 
 set( gadgetron_smscore_src_files 	
@@ -107,6 +110,8 @@ set( gadgetron_smscore_src_files
         GenericReconCartesianSliceGrappav3Gadget.cpp
         GenericReconCartesianSliceGrappavgpuGadget.cpp
         GenericReconEigenChannelSMSGadget.cpp
+        RemoveNavigationDataKspaceGadget.cpp
+        GenericReconSaveAndLoadRefGadget.cpp
         )
 
 set( gadgetron_smscore_config_files 
@@ -114,8 +119,12 @@ set( gadgetron_smscore_config_files
     config/Generic_Cartesian_Slice_Grappa_EPI_v3.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_v4.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_v5.xml
-    config/Generic_Cartesian_Slice_Grappa_EPI_v6.xml
+    config/Generic_Cartesian_Slice_Grappa_EPI_vopenmp.xml
     config/Generic_Cartesian_Slice_Grappa_EPI_vgpu.xml
+    config/Generic_Cartesian_Slice_Grappa_EPI_vgpu_gold.xml
+    config/Generic_Cartesian_Slice_Grappa_EPI_vgpu_gold_nav.xml
+    config/Generic_Cartesian_Slice_Grappa_EPI_vgpu_gold_error.xml
+    config/Generic_Cartesian_Slice_Grappa_EPI_vcpu.xml
 )
 
 add_library(gadgetron_smscore SHARED 
@@ -140,7 +149,6 @@ target_link_libraries(gadgetron_smscore
     gadgetron_toolbox_image_analyze_io
     gadgetron_toolbox_denoise
     gadgetron_toolbox_hostutils
-
     ${ISMRMRD_LIBRARIES} 
     ${FFTW3_LIBRARIES} 
     optimized ${ACE_LIBRARIES} debug ${ACE_DEBUG_LIBRARY} 

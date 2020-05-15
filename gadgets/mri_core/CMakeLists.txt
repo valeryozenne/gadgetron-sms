@@ -217,6 +217,8 @@ set( gadgetron_mricore_config_files
     config/isalive.xml
     config/gtquery.xml
     config/Generic_Cartesian_FFT.xml
+    config/Generic_Cartesian_MP2RAGE.xml
+    config/Generic_Cartesian_MP2RAGE_python.xml
     config/Generic_Cartesian_FFT_EPI.xml
     config/Generic_Cartesian_FFT_EPI_python.xml
     config/Generic_Cartesian_Grappa.xml
@@ -225,6 +227,15 @@ set( gadgetron_mricore_config_files
     config/Generic_Cartesian_Grappa_RealTimeCine.xml
     config/Generic_Cartesian_Grappa_RealTimeCine_Cloud.xml
     config/Generic_Cartesian_Grappa_EPI.xml
+    config/Generic_Cartesian_Grappa_EPI_Phase.xml
+    config/Generic_Cartesian_Grappa_EPI_Multiple_Ref.xml
+    config/Generic_Cartesian_Grappa_EPI_Multiple_Ref_Save_0.xml
+    config/Generic_Cartesian_Grappa_EPI_Multiple_Ref_Save_1.xml
+    config/Generic_Cartesian_Grappa_EPI_Multiple_Ref_Save_2.xml
+    config/Generic_Cartesian_Grappa_EPI_Multiple_Ref_Save_3.xml
+    config/Generic_Cartesian_Grappa_EPI_Multiple_Ref_Save_4.xml
+    config/Generic_Cartesian_Grappa_EPI_Multiple_Ref_Load_4.xml
+    config/Generic_Cartesian_Grappa_EPI_SNR.xml
     config/Generic_Cartesian_Grappa_EPI_python.xml
     config/Generic_Cartesian_Grappa_EPI_AVE.xml
     config/Generic_Cartesian_Spirit.xml

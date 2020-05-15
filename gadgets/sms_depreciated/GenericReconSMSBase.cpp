@@ -307,10 +307,11 @@ void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<flo
 
     int facteur;
 
+
     if (is_positive==true)
-    {facteur=1;}
-    else
     {facteur=-1;}
+    else
+    {facteur=1;}
 
 
     for (m = 0; m < MB_factor; m++) {
@@ -1806,8 +1807,12 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
         for (m = 0; m < MB; m++) {
 
             index = MapSliceSMS(a,m);
+            std::complex<double> lala;
 
-            std::complex<double> lala=  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
+
+              lala=  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
+
+
             std::complex<float>  lili=  static_cast< std::complex<float> >(lala) ;           
 
             for (s = 0; s < S; s++)

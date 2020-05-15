@@ -5,9 +5,8 @@
 
 #pragma once
 
-#include "GenericReconGadget.h"
-#include "hoArmadillo.h"
 #include "GenericReconSMSBase.h"
+#include "hoArmadillo.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/shared_array.hpp>
 
@@ -115,6 +114,7 @@ namespace Gadgetron {
         /// image sending
         GADGET_PROPERTY(blocking, bool, "Whether to do blocking reco", false);
         GADGET_PROPERTY(dual, bool, "Whether to dual dual", false);
+        GADGET_PROPERTY(use_slice_grappa_gpu, bool, "Whether to slice_grappa on the gpu", false);
 
         /// ------------------------------------------------------------------------------------
         /// Grappa parameters
@@ -174,8 +174,8 @@ namespace Gadgetron {
         void perform_slice_grappa_unwrapping(IsmrmrdReconBit& recon_bit, ReconObjType& recon_obj, size_t encoding);
 
         void remove_unnecessary_kspace_gpu(hoNDArray<std::complex<float> >& input, hoNDArray<std::complex<float> >& output, const size_t acc, const size_t startE1, const size_t endE1, bool is_mb );
-        void perform_slice_grappa_unwrapping_gpu(hoNDArray<std::complex<float> > & input);
 
+        void perform_slice_grappa_unwrapping_gpu(IsmrmrdReconBit &recon_bit, ReconObjType &recon_obj, size_t e);
 
         void perform_slice_grappa_calib(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e);
 
@@ -186,7 +186,10 @@ namespace Gadgetron {
         void im2col_gpu(hoNDArray<std::complex<float> >& input, hoNDArray<std::complex<float> >& output, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1 );
 
         void do_gpu_test(hoNDArray<std::complex<float> > & input);
+
+        void do_gpu_unmix(hoNDArray<std::complex<float> > & input, hoNDArray<std::complex<float> > & output, hoNDArray<std::complex<float> > & kernel );
         ///////////
+        void compute_leak_factor(IsmrmrdReconBit &recon_bit,  ReconObjType &recon_obj, size_t e);
 
         GADGET_PROPERTY(deviceno,int,"GPU device number", 0);
         int device_number_;

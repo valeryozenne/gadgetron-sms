@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "GenericReconGadget.h"
+
 #include "hoArmadillo.h"
 #include "GenericReconSMSBase.h"
 

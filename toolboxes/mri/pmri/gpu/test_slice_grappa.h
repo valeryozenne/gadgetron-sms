@@ -31,10 +31,16 @@ template<class REAL> EXPORTGPUPMRI  bool
 estimate_feasibility_with_STK(cuNDArray<complext<REAL> >& data_in , cuNDArray<complext<REAL> >& data_out , const size_t acc , const size_t startE1, const size_t endE1, const size_t reduceE1);
 
 template<class REAL> EXPORTGPUPMRI bool
-compute_im2col_2D( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& data_out, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1);
+prepare_im2col_2D( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& data_out, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1);
 
 template<class REAL> EXPORTGPUPMRI bool
-compute_im2col_5D( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& data_out, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1);
+prepare_im2col_5D( cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& data_out, const size_t blocks_RO, const size_t blocks_E1, const size_t grappa_kSize_RO, const size_t grappa_kSize_E1);
+
+template<class REAL> EXPORTGPUPMRI bool
+prepare_EPI_corr_5D(  bool undo, bool optimal, cuNDArray<complext<REAL> >& data_in, cuNDArray<complext<REAL> >& pos, cuNDArray<complext<REAL> >& neg ,cuNDArray<complext<REAL> >& pos_mean, cuNDArray<complext<REAL> >& neg_mean, cuNDArray<int >& reverse_line, const size_t start_E1_, const size_t end_E1_);
+
+template<class REAL> EXPORTGPUPMRI bool
+prepare_gpu_unmix(   cuNDArray<complext<REAL> >& in, cuNDArray<complext<REAL> >& kernel, cuNDArray<complext<REAL> >& out );
 
 /**
    * \brief Estimate b1 map (coil sensitivities) of single or double precision using the NIH Souheil method

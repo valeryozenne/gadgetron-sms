@@ -6,7 +6,7 @@ import ismrmrd
 import ismrmrd.xsd
 from pygrappa import grappa
 
-class BucketReconGrappa(Gadget):
+class BucketReconMP2RAGE(Gadget):
     def __init__(self, next_gadget=None):
         Gadget.__init__(self,next_gadget)
         self.array_calib=[]
@@ -20,8 +20,15 @@ class BucketReconGrappa(Gadget):
         # receive kspace data and
         # extract acq_data and acq_header
         array_acq_headers=recondata[0].data.headers
+        
         kspace_data=recondata[0].data.data
         
+        # get one header with typical info
+        acq = np.ravel(array_acq_headers)[0]  
+
+        print("acq.idx.repetition", acq.idx.repetition)        
+
+
         try: 
            if recondata[0].ref.data is not None:
              print("reference data exist")
@@ -31,45 +38,19 @@ class BucketReconGrappa(Gadget):
              print(np.shape(reference))
              print(np.shape(data))
              self.array_calib=reference
-             np.save('/tmp/gadgetron/reference', reference)
-             np.save('/tmp/gadgetron/data', data)
+             np.save('/home/valery/DICOM/mp2rage_reference', reference)
+             np.save('/home/valery/DICOM/mp2rage_data', data)
         except:
            print("reference data not exist")
         
 
         # grappa 
-        array_data=recondata[0].data.data
-        dims=np.shape(recondata[0].data.data)
+        # array_data=recondata[0].data.data
+        # dims=np.shape(recondata[0].data.data)
        
-        kspace_data_tmp=np.ndarray(dims, dtype=np.complex64)   
+        # kspace_data_tmp=np.ndarray(dims, dtype=np.complex64)   
 
-        for slc in range(0, dims[6]):
-           for n in range(0, dims[5]):
-              for s in range(0, dims[4]):
-        
-                 kspace=array_data[:,:,:,:,s,n,slc]
-                 calib=self.array_calib[:,:,:,:,s,n,slc]        
-                
-                 calib=np.squeeze(calib,axis=2)
-                 kspace=np.squeeze(kspace,axis=2)
-               
-                 sx, sy,  ncoils = kspace.shape[:]
-                 cx, cy,  ncoils = calib.shape[:]
-
-                 # Here's the actual reconstruction
-                 res = grappa(kspace, calib, kernel_size=(5, 5), coil_axis=-1)
-
-                 # Here's the resulting shape of the reconstruction.  The coil
-                 # axis will end up in the same place you provided it in
-                 sx, sy, ncoils = res.shape[:]                
-                 kspace_data_tmp[:,:,0,:,s,n,slc]=res
-
-        
-        # ifft, this is necessary for the next gadget        
-        #image = transform.transform_kspace_to_image(kspace_data_tmp,dim=(0,1,2))
-        image = transform.transform_kspace_to_image(kspace_data_tmp,dim=(0,1,2))
-
-       
+        image = transform.transform_kspace_to_image(kspace_data,dim=(0,1,2))     
 
         # create a new IsmrmrdImageArray 
         array_data = IsmrmrdImageArray()
@@ -80,13 +61,10 @@ class BucketReconGrappa(Gadget):
         # get dimension for the acq_headers
         dims_header=np.shape(recondata[0].data.headers)
 
-        # get one header with typical info
-        acq = np.ravel(array_acq_headers)[0]  
-
-        print("acq.idx.repetition", acq.idx.repetition)
+       
 
         if (acq.idx.repetition==0):
-           np.save('/tmp/gadgetron/image',image)
+           np.save('/home/valery/DICOM/mp2rage_image',image)
 
 
         headers_list = []
@@ -111,19 +89,21 @@ class BucketReconGrappa(Gadget):
         for slc in range(0, dims_header[4]):
            for n in range(0, dims_header[3]):
               for s in range(0, dims_header[2]):
-
+                 #for e2 in range(0, dims_header[1]):
+                 #  for e1 in range(0, dims_header[0]):  
                      headers_list.append(base_header)
 
         
         array_headers_test = np.array(headers_list,dtype=np.dtype(object))  
         print(type(array_headers_test))
         print(np.shape(array_headers_test))
-
         array_headers_test=np.reshape(array_headers_test, (dims_header[2], dims_header[3], dims_header[4])) 
         print(type(array_headers_test))
         print(np.shape(array_headers_test))
+ 
+        
            
-
+        print("---> ok 0")
         # how to copy acquisition header into image header in python  ? 
         for slc in range(0, dims_header[4]):
            for n in range(0, dims_header[3]):
@@ -136,9 +116,19 @@ class BucketReconGrappa(Gadget):
                         #print(array_headers_test[s,n,slc].slice)
                                                 
 
-
+        #print("---> ok 1")
+        # print(np.shape(array_image_header))      
+        # attache the image headers to the IsmrmrdImageArray      
         array_data.headers=array_headers_test
 
+        #print("---> ok 2")
+        # Return image to Gadgetron
+        #print(np.shape(array_data.data))
+        #print(np.shape(array_data.headers))
+
+        #print(type(array_data.data))
+        #print(type(array_data.headers))
+        #print(type(array_data))
 
 	# send the data to the next gadget
 

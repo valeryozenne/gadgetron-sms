@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<gadgetronStreamConfiguration xsi:schemaLocation="http://gadgetron.sf.net/gadgetron gadgetron.xsd"
+        xmlns="http://gadgetron.sf.net/gadgetron"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <!--
+        Gadgetron generic recon chain for 2D and 3D cartesian sampling
+
+        T2W imaging
+        Triggered by repetition
+        Recon N is repetition and S is set
+
+        Ref data is only prepared for the first repetition and all other repetition will be reconstructed with the same coefficients
+
+        Author: Hui Xue
+        National Heart, Lung and Blood Institute, National Institutes of Health
+        10 Center Drive, Bethesda, MD 20814, USA
+        Email: hui.xue@nih.gov
+    -->
+
+    <!-- reader -->
+    <reader><slot>1008</slot><dll>gadgetron_mricore</dll><classname>GadgetIsmrmrdAcquisitionMessageReader</classname></reader>
+    <reader><slot>1026</slot><dll>gadgetron_mricore</dll><classname>GadgetIsmrmrdWaveformMessageReader</classname></reader>
+
+    <!-- writer -->
+    <writer><slot>1022</slot><dll>gadgetron_mricore</dll><classname>MRIImageWriter</classname></writer>
+
+
+    <gadget>
+        <name>ReadoutPassthroughPython</name>
+        <dll>gadgetron_python</dll>
+        <classname>PythonGadget</classname>
+        <property><name>python_path</name><value>/home/myuser/scripts/python</value></property>
+        <property><name>python_module</name><value>passthrough_readout</value></property>
+        <property><name>python_class</name><value>ReadoutPassThrough</value></property>
+    </gadget>
+
+
+
+</gadgetronStreamConfiguration>
