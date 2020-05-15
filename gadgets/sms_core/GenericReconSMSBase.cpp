@@ -2383,7 +2383,8 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
 
                         if (is_mb==true)
                         {
-                            lolo= exp(arma::datum::pi*-1*ii*z_offset_geo(index)/z_gap(0));
+                            //std::cout << "on passe ici "<< index << " " << z_offset_geo(index)<< " "<< z_gap(0)<< std::endl;
+                            lolo= 1; //exp(arma::datum::pi*-1*ii*z_offset_geo(index)/z_gap(0));
                         }
                         else
                         {
@@ -2404,7 +2405,7 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
 
                         if (is_mb==true)
                         {
-                            lolo= exp(arma::datum::pi*-1*ii*z_offset_geo(index)/z_gap(0));
+                            lolo= 1; //exp(arma::datum::pi*-1*ii*z_offset_geo(index)/z_gap(0));
                         }
                         else
                         {
