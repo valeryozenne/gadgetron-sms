@@ -22,6 +22,9 @@ namespace Gadgetron {
 
         typedef GenericReconSMSBase_gadget1of2 BaseClass;
 
+        GADGET_PROPERTY(useDiskData, bool, "Whether to use data saved on disk or not", false);
+        GADGET_PROPERTY(useEPICorrData, bool, "Whether to use data from struct EPICorrection or not", false);
+
         GenericReconSMSPostGadget_1of2();
         ~GenericReconSMSPostGadget_1of2();
 

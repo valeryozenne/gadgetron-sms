@@ -31,7 +31,7 @@ int GenericReconSMSPostGadget_1of2::process(Gadgetron::GadgetContainerMessage< s
 
     GDEBUG("GenericReconSMSPostGadget_1of2: Passed %d times in the Post process function\n", process_called_times_epicorr);
 
-    if (m2->getObjectPtr()->hdr.idx.slice == 0)
+    /*if (m2->getObjectPtr()->hdr.idx.slice == 0)
     {
         if (m2->getObjectPtr()->hdr.user_int[0] == 0) //corrneg_
         {
@@ -49,42 +49,45 @@ int GenericReconSMSPostGadget_1of2::process(Gadgetron::GadgetContainerMessage< s
         {
             GDEBUG_STREAM("SMSPostGadget_1of2::process EPICorr - epiNavPos_No_Exp : " << *(m2->getObjectPtr()->correction.begin()) << " - " << *(m2->getObjectPtr()->correction.end()));
         }
-    }
+    }*/
 
-    if (first_occurence == true)
+    if (useEPICorrData == true)
     {
-        epi_nav_neg_debug_.create(dimensions_[0], lNumberOfSlices_);
-        epi_nav_pos_debug_.create(dimensions_[0], lNumberOfSlices_);
-    
-        epi_nav_neg_no_exp_debug_.create(dimensions_[0], lNumberOfSlices_);
-        epi_nav_pos_no_exp_debug_.create(dimensions_[0], lNumberOfSlices_);
-        first_occurence = false;
-    }
-    
-    if (m2->getObjectPtr()->hdr.user_int[0] == 0)//corrneg_
-    {
-        std::complex<float> * out_neg = &(epi_nav_neg_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
-        memcpy(out_neg, m2->getObjectPtr()->correction.get_data_ptr(), sizeof(std::complex<float>) * dimensions_[0]);
+        if (first_occurence == true)
+        {
+            epi_nav_neg_debug_.create(dimensions_[0], lNumberOfSlices_);
+            epi_nav_pos_debug_.create(dimensions_[0], lNumberOfSlices_);
         
-    }
-    if (m2->getObjectPtr()->hdr.user_int[0] == 1)//corrpos_
-    {
-        std::complex<float> * out_pos = &(epi_nav_pos_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
-        memcpy(out_pos, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
+            epi_nav_neg_no_exp_debug_.create(dimensions_[0], lNumberOfSlices_);
+            epi_nav_pos_no_exp_debug_.create(dimensions_[0], lNumberOfSlices_);
+            first_occurence = false;
+        }
+        
+        if (m2->getObjectPtr()->hdr.user_int[0] == 0)//corrneg_
+        {
+            std::complex<float> * out_neg = &(epi_nav_neg_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
+            memcpy(out_neg, m2->getObjectPtr()->correction.get_data_ptr(), sizeof(std::complex<float>) * dimensions_[0]);
+            
+        }
+        if (m2->getObjectPtr()->hdr.user_int[0] == 1)//corrpos_
+        {
+            std::complex<float> * out_pos = &(epi_nav_pos_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
+            memcpy(out_pos, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
 
-        
-    }
-    if (m2->getObjectPtr()->hdr.user_int[0] == 2)//corrneg_no_exp
-    {
-        std::complex<float> * out_neg_no_exp = &(epi_nav_neg_no_exp_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
-        memcpy(out_neg_no_exp, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
+            
+        }
+        if (m2->getObjectPtr()->hdr.user_int[0] == 2)//corrneg_no_exp
+        {
+            std::complex<float> * out_neg_no_exp = &(epi_nav_neg_no_exp_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
+            memcpy(out_neg_no_exp, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
 
-        
-    }
-    if (m2->getObjectPtr()->hdr.user_int[0] == 3)//corrpos_no_exp
-    {
-        std::complex<float> * out_pos_no_exp = &(epi_nav_pos_no_exp_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
-        memcpy(out_pos_no_exp, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
+            
+        }
+        if (m2->getObjectPtr()->hdr.user_int[0] == 3)//corrpos_no_exp
+        {
+            std::complex<float> * out_pos_no_exp = &(epi_nav_pos_no_exp_debug_(0, m2->getObjectPtr()->hdr.idx.slice));
+            memcpy(out_pos_no_exp, m2->getObjectPtr()->correction.get_data_ptr() , sizeof(std::complex<float>)*dimensions_[0]);
+        }
     }
 
     m2->release();
@@ -251,15 +254,35 @@ void GenericReconSMSPostGadget_1of2::post_process_sb_data(hoNDArray< std::comple
 
     }
 
-    load_epi_data();
+    if (useDiskData == true)
+    {
+        GDEBUG("GenericReconSMSPrepGadget_1of2::Process using data from disk");
+        load_epi_data();
+        
+    }
+    else
+    {
+        epi_nav_neg_.create(dimensions_[0], lNumberOfSlices_);
+        epi_nav_pos_.create(dimensions_[0], lNumberOfSlices_);
+        
+        epi_nav_neg_no_exp_.create(dimensions_[0], lNumberOfSlices_);
+        epi_nav_pos_no_exp_.create(dimensions_[0], lNumberOfSlices_);
+        epi_nav_neg_ = epi_nav_neg_debug_;
+        epi_nav_pos_ = epi_nav_pos_debug_;
+        epi_nav_neg_no_exp_ = epi_nav_neg_no_exp_debug_;
+        epi_nav_pos_no_exp_ = epi_nav_pos_no_exp_debug_;
+    }
+    
 
     GDEBUG("GenericReconSMSPostGadget_1of2: Passed %d times in the Post process function before preparing EPI data\n", process_called_times_epicorr);
 
-    CheckComplexNumberEqualInMatrix(epi_nav_neg_debug_,epi_nav_neg_);
-    CheckComplexNumberEqualInMatrix(epi_nav_pos_debug_,epi_nav_pos_);
-    CheckComplexNumberEqualInMatrix(epi_nav_neg_no_exp_debug_,epi_nav_neg_no_exp_);
-    CheckComplexNumberEqualInMatrix(epi_nav_pos_no_exp_debug_,epi_nav_pos_no_exp_);
-
+    if (useDiskData == true && useEPICorrData == true)
+    {
+        CheckComplexNumberEqualInMatrix(epi_nav_neg_debug_,epi_nav_neg_);
+        CheckComplexNumberEqualInMatrix(epi_nav_pos_debug_,epi_nav_pos_);
+        CheckComplexNumberEqualInMatrix(epi_nav_neg_no_exp_debug_,epi_nav_neg_no_exp_);
+        CheckComplexNumberEqualInMatrix(epi_nav_pos_no_exp_debug_,epi_nav_pos_no_exp_);
+    }
     prepare_epi_data(e, data_8D.get_size(1),  data_8D.get_size(2) ,  data_8D.get_size(3) );
 
     if (!debug_folder_full_path_.empty())
