@@ -2360,9 +2360,9 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
 
             index = MapSliceSMS(a,m);
 
-            std::complex<double> lala =  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
+            //std::complex<double> lala =  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
 
-            /*std::complex<double> lala;
+            std::complex<double> lala;
             std::complex<float> lolo;
 
             if (MB==3){
@@ -2422,7 +2422,7 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
                 {    lala=  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
                      lolo=1;
                 }
-            }*/
+            }
 
 
 
