@@ -195,9 +195,17 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
     //std::cout <<  order_of_acquisition_mb << std::endl;
     //std::cout <<  order_of_acquisition_sb << std::endl;
 
-    indice_mb =  arma::sort_index( order_of_acquisition_mb );
-    indice_sb =  arma::sort_index( order_of_acquisition_sb );
-    indice_slice_mb=indice_sb.rows(0,lNumberOfStacks_-1);
+    // indice_mb =  arma::sort_index( order_of_acquisition_mb );
+    // indice_sb =  arma::sort_index( order_of_acquisition_sb );
+    // indice_slice_mb=indice_sb.rows(0,lNumberOfStacks_-1);
+    indice_mb = sort_index(order_of_acquisition_mb);
+    indice_sb = sort_index(order_of_acquisition_sb);
+
+    for (unsigned int i = 0; i < lNumberOfStacks_; i++)
+    {
+        indice_slice_mb.push_back(indice_sb[i]);
+    }
+
 
     // std::cout <<  indice_mb << std::endl;
     // std::cout <<  indice_sb << std::endl;
@@ -210,7 +218,7 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
     // }
 
 
-    //arma::uvec plot_mb= arma::sort( indice_sb );
+    //std::vector<unsigned int> plot_mb= arma::sort( indice_sb );
     // std::cout << plot_mb << std::endl;  ;
     //for (unsigned int i = 0; i < lNumberOfStacks_; i++)
     //{
@@ -220,13 +228,33 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
 
 
     MapSliceSMS=get_map_slice_single_band( MB_factor,  lNumberOfStacks_,  order_of_acquisition_mb,  no_reordering);
-    std::cout <<  MapSliceSMS<< std::endl;
+    //std::cout <<  MapSliceSMS<< std::endl;
 
     center_k_space_xml=h.encoding[0].encodingLimits.kspace_encoding_step_1->center+1;
 
     slice_thickness=h.encoding[0].encodedSpace.fieldOfView_mm.z;
 
     return GADGET_OK;
+}
+
+std::vector<unsigned int> GenericReconSMSBase::sort_index(std::vector<unsigned int> array)
+{
+    std::vector<unsigned int>sortedArray(array);
+    
+    std::sort(sortedArray.begin(), sortedArray.end());
+    //quicksort(sortedArray, 0, arraySize - 1);
+    for (int i = 0; i < (array.size()); i++)
+    {
+        for (int j = 0; j < (array.size()); j++)
+        {
+            if (sortedArray[i] == array[j])
+            {
+                sortedArray[i] = j;
+                break;
+            }
+        }
+    }
+    return (sortedArray);
 }
 
 int GenericReconSMSBase::process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1)
@@ -586,7 +614,7 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
 
     for (s = 0; s < SLC; s++)
     {
-        z_offset_geo(s)=z_offset(indice_sb(s));
+        z_offset_geo[s]=z_offset[indice_sb[s]];
     }
 
     //std::cout << z_offset_geo << std::endl;
@@ -607,8 +635,8 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
     GDEBUG_STREAM("slice gap factor is "<<  slice_gap_factor<< " %" );
 
     //selection d'un jeux de données :
-    arma::ivec index(MB);
-    index.zeros();
+    std::vector<unsigned int> index(MB, 0);
+    //index.zeros();
 
     //index.print();
 
@@ -616,17 +644,17 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
 
     for (a = 0; a < 1; a++)
     {
-        MapSliceSMS.row(a).print();
-        index=MapSliceSMS.row(a).t();
+        //MapSliceSMS.row(a).print();
+        index=MapSliceSMS[a];//.row(a).t();
 
         for (m = 0; m < MB-1; m++)
         {
-            if (z_offset_geo(index(m+1))>z_offset_geo(index(m)))
+            if (z_offset_geo[index[m+1]]>z_offset_geo[index[m]])
             {
-                GDEBUG_STREAM("distance au centre de la coupe la proche: " <<z_offset_geo(index(m))) ;
-                GDEBUG_STREAM("distance entre les coupes simultanées: " <<  z_offset_geo(index(m+1))-z_offset_geo(index(m))) ;
+                GDEBUG_STREAM("distance au centre de la coupe la proche: " <<z_offset_geo(index[m])) ;
+                GDEBUG_STREAM("distance entre les coupes simultanées: " <<  z_offset_geo(index[m + 1])-z_offset_geo(index[m])) ;
 
-                z_gap(m)=z_offset_geo(index(m+1))-z_offset_geo(index(m));
+                z_gap(m)=z_offset_geo(index[m+1]-z_offset_geo(index[m]));
             }
         }
     }
@@ -851,11 +879,11 @@ void GenericReconSMSBase::save_4D_8D_kspace(hoNDArray< std::complex<float> >& in
 
 
 
-arma::ivec GenericReconSMSBase::map_interleaved_acquisitions(int number_of_slices, bool no_reordering )
+std::vector<unsigned int> GenericReconSMSBase::map_interleaved_acquisitions(int number_of_slices, bool no_reordering )
 {
 
-    arma::ivec index(number_of_slices);
-    index.zeros();
+    std::vector<unsigned int> index(number_of_slices, 0);
+    //index.zeros();
 
 
     if(no_reordering)
@@ -864,7 +892,7 @@ arma::ivec GenericReconSMSBase::map_interleaved_acquisitions(int number_of_slice
 
         for (unsigned int i = 0; i < number_of_slices; i++)
         {
-            index(i)=i;
+            index[i]=i;
         }
     }
     else
@@ -873,28 +901,28 @@ arma::ivec GenericReconSMSBase::map_interleaved_acquisitions(int number_of_slice
 
         if (number_of_slices%2)
         {
-            index(0)=0;
+            index[0]=0;
             GDEBUG("Number of single band images is odd \n");
         }
         else
         {
-            index(0)=1;
+            index[0]=1;
             GDEBUG("Number of single band images is even \n");
         }
 
         for (unsigned int i = 1; i < number_of_slices; i++)
         {
-            index(i)=index(i-1)+2;
+            index[i]=index[i-1]+2;
 
-            if (index(i)>=number_of_slices)
+            if (index[i]>=number_of_slices)
             {
                 if (number_of_slices%2)
                 {
-                    index(i)=1;
+                    index[i]=1;
                 }
                 else
                 {
-                    index(i)=0;
+                    index[i]=0;
                 }
             }
         }
@@ -903,24 +931,24 @@ arma::ivec GenericReconSMSBase::map_interleaved_acquisitions(int number_of_slice
 }
 
 
-arma::imat GenericReconSMSBase::get_map_slice_single_band(int MB_factor, int lNumberOfStacks, arma::ivec order_of_acquisition_mb, bool no_reordering)
+std::vector< std::vector<unsigned int> > GenericReconSMSBase::get_map_slice_single_band(int MB_factor, int lNumberOfStacks, std::vector<unsigned int> order_of_acquisition_mb, bool no_reordering)
 {
-    arma::imat output(lNumberOfStacks, MB_factor);
-    output.zeros();
+    std::vector< std::vector<unsigned int> > output(lNumberOfStacks, std::vector<unsigned int>(MB_factor, 0));
+    //output.zeros();
 
     if (lNumberOfStacks==1)
     {
-        output=map_interleaved_acquisitions(MB_factor, no_reordering );
+        output[0]=map_interleaved_acquisitions(MB_factor, no_reordering );
     }
     else
     {
         for (unsigned int a = 0; a < lNumberOfStacks; a++)
         {
-            int count_map_slice=order_of_acquisition_mb(a);
+            int count_map_slice=order_of_acquisition_mb[a];
 
             for (unsigned int m = 0; m < MB_factor; m++)
             {
-                output(a,m) = count_map_slice;
+                output[a][m] = count_map_slice;
                 count_map_slice=count_map_slice+lNumberOfStacks;
             }
         }
@@ -1132,7 +1160,7 @@ void GenericReconSMSBase::compute_mean_epi_arma_nav(arma::cx_fcube &input,  arma
 
 
 
-void GenericReconSMSBase::reorganize_arma_nav(arma::cx_fmat &data, arma::uvec indice)
+void GenericReconSMSBase::reorganize_arma_nav(arma::cx_fmat &data, std::vector<unsigned int> indice)
 {
     size_t RO=size(data,0);
     size_t SLC=size(data,1);
@@ -1142,7 +1170,7 @@ void GenericReconSMSBase::reorganize_arma_nav(arma::cx_fmat &data, arma::uvec in
 
     for (int slc = 0; slc < SLC; slc++)
     {
-        new_data.col(slc)=data.col(indice(slc));
+        new_data.col(slc)=data.col(indice[slc]);
     }
 
     data = new_data;
@@ -1150,7 +1178,7 @@ void GenericReconSMSBase::reorganize_arma_nav(arma::cx_fmat &data, arma::uvec in
 }
 
 
-void GenericReconSMSBase::reorganize_nav(hoNDArray< std::complex<float> >& data, arma::uvec indice)
+void GenericReconSMSBase::reorganize_nav(hoNDArray< std::complex<float> >& data, std::vector<unsigned int> indice)
 {
     size_t RO=data.get_size(0);
     size_t SLC=data.get_size(1);
@@ -1160,7 +1188,7 @@ void GenericReconSMSBase::reorganize_nav(hoNDArray< std::complex<float> >& data,
 
     for (int slc = 0; slc < SLC; slc++) {
 
-        std::complex<float> * in = &(data(0, indice(slc)));
+        std::complex<float> * in = &(data(0, indice[slc]));
         std::complex<float> * out = &(new_data(0, slc));
         memcpy(out , in, sizeof(std::complex<float>)*RO);
     }
@@ -1188,7 +1216,7 @@ void GenericReconSMSBase::create_stacks_of_nav(hoNDArray< std::complex<float> >&
 
         for (m = 0; m < MB; m++) {
 
-            index = MapSliceSMS(a,m);
+            index = MapSliceSMS[a][m];
 
             std::complex<float> * in = &(data(0, index));
             std::complex<float> * out = &(new_stack(0, m, a));
@@ -1217,7 +1245,7 @@ void GenericReconSMSBase::create_stacks_of_arma_nav(arma::cx_fmat &data, arma::c
 
         for (m = 0; m < MB; m++) {
 
-            index = MapSliceSMS(a,m);
+            index = MapSliceSMS[a][m];
 
             new_stack.slice(a).col(m)=data.col(index);
 
@@ -2363,7 +2391,7 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
 
         for (m = 0; m < MB; m++) {
 
-            index = MapSliceSMS(a,m);
+            index = MapSliceSMS[a][m];
 
             std::complex<double> lala=  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
             std::complex<float>  lili=  static_cast< std::complex<float> >(lala) ;

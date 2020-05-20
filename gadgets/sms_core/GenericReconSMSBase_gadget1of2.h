@@ -70,13 +70,13 @@ namespace Gadgetron {
         std::vector<double> acceFactorSMSE2_;
 
         // ordre des coupes
-        arma::imat MapSliceSMS;
-        arma::ivec order_of_acquisition_sb;
-        arma::ivec order_of_acquisition_mb;
+        std::vector< std::vector<unsigned int> > MapSliceSMS;
+        std::vector<unsigned int> order_of_acquisition_sb;
+        std::vector<unsigned int> order_of_acquisition_mb;
 
-        arma::uvec indice_mb;
-        arma::uvec indice_sb;
-        arma::uvec indice_slice_mb;
+        std::vector<unsigned int> indice_mb;
+        std::vector<unsigned int> indice_sb;
+        std::vector<unsigned int> indice_slice_mb;
 
         unsigned int center_k_space_xml;
         unsigned int center_k_space_E1;
@@ -160,13 +160,13 @@ namespace Gadgetron {
         virtual int process_config(ACE_Message_Block* mb);
         virtual int process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1);
 
-        virtual arma::ivec map_interleaved_acquisitions(int number_of_slices, bool no_reordering );
-        virtual arma::imat get_map_slice_single_band(int MB_factor, int lNumberOfStacks, arma::ivec order_of_acquisition_mb, bool no_reordering);
-
+        virtual std::vector<unsigned int> map_interleaved_acquisitions(int number_of_slices, bool no_reordering );
+        virtual std::vector< std::vector<unsigned int> > get_map_slice_single_band(int MB_factor, int lNumberOfStacks, std::vector<unsigned int> order_of_acquisition_mb, bool no_reordering);
+        virtual std::vector<unsigned int> sort_index(std::vector<unsigned int> array);
         arma::vec z_offset_geo;
         arma::vec z_gap;
 
-        virtual void reorganize_arma_nav(arma::cx_fmat &data, arma::uvec indice);
+        virtual void reorganize_arma_nav(arma::cx_fmat &data, std::vector<unsigned int> indice);
 
         virtual void compute_mean_epi_arma_nav(arma::cx_fcube &input,  arma::cx_fmat& output_no_exp,  arma::cx_fmat& output);
 
@@ -196,7 +196,7 @@ namespace Gadgetron {
 
         virtual void create_stacks_of_nav(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack);
 
-        virtual void reorganize_nav(hoNDArray< std::complex<float> >& data, arma::uvec indice);
+        virtual void reorganize_nav(hoNDArray< std::complex<float> >& data, std::vector<unsigned int> indice);
 
         virtual void prepare_epi_data(size_t e, size_t E1, size_t E2, size_t CHA );
 

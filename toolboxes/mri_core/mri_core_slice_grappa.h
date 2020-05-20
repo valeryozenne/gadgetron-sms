@@ -21,13 +21,13 @@ namespace Gadgetron {
  template <typename T> EXPORTMRICORE void apply_unmix_coeff_kspace_SMS(hoNDArray<T>& in, hoNDArray<T>& kernel, hoNDArray<T>& out);
 
 
-template <typename T> EXPORTMRICORE void create_stacks_of_slices_directly_sb(hoNDArray< T >& data, hoNDArray< T >& new_stack , arma::uvec &indice, arma::imat &MapSliceSMS);
-template <typename T> EXPORTMRICORE void create_stacks_of_slices_directly_sb_open(hoNDArray< T >& data, hoNDArray< T >& new_stack , arma::uvec &indice, arma::imat &MapSliceSMS);
+template <typename T> EXPORTMRICORE void create_stacks_of_slices_directly_sb(hoNDArray< T >& data, hoNDArray< T >& new_stack , std::vector<unsigned int> &indice, std::vector< std::vector<unsigned int> > &MapSliceSMS);
+template <typename T> EXPORTMRICORE void create_stacks_of_slices_directly_sb_open(hoNDArray< T >& data, hoNDArray< T >& new_stack , std::vector<unsigned int> &indice, std::vector< std::vector<unsigned int> > &MapSliceSMS);
 
-template <typename T> EXPORTMRICORE void create_stacks_of_slices_directly_mb(hoNDArray<T >& mb,hoNDArray< T>& mb_8D , arma::uvec& indice_mb, arma::uvec& indice_slice_mb );
-template <typename T> EXPORTMRICORE void create_stacks_of_slices_directly_mb_open(hoNDArray<T >& mb,hoNDArray< T>& mb_8D , arma::uvec& indice_mb, arma::uvec& indice_slice_mb );
+template <typename T> EXPORTMRICORE void create_stacks_of_slices_directly_mb(hoNDArray<T >& mb,hoNDArray< T>& mb_8D , std::vector<unsigned int>& indice_mb, std::vector<unsigned int>& indice_slice_mb );
+template <typename T> EXPORTMRICORE void create_stacks_of_slices_directly_mb_open(hoNDArray<T >& mb,hoNDArray< T>& mb_8D , std::vector<unsigned int>& indice_mb, std::vector<unsigned int>& indice_slice_mb );
 
-template <typename T> EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< T >& data, hoNDArray< T > &output, arma::imat& MapSliceSMS, arma::uvec& indice_sb);
-template <typename T> EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< T >& data, hoNDArray< T > &output, arma::imat& MapSliceSMS, arma::uvec& indice_sb);
+template <typename T> EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< T >& data, hoNDArray< T > &output, std::vector< std::vector<unsigned int> >& MapSliceSMS, std::vector<unsigned int>& indice_sb);
+template <typename T> EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< T >& data, hoNDArray< T > &output, std::vector< std::vector<unsigned int> >& MapSliceSMS, std::vector<unsigned int>& indice_sb);
 
 }

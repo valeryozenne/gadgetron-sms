@@ -1,0 +1,1 @@
+get_map_slice_single_band
