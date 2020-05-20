@@ -492,7 +492,7 @@ template EXPORTMRICORE void apply_unmix_coeff_kspace_SMS(hoNDArray<std::complex<
 
 //sur les données single band
 template <typename T>
-void create_stacks_of_slices_directly_sb(hoNDArray< T >& data, hoNDArray< T >& new_stack , arma::uvec &indice, arma::imat &MapSliceSMS)
+void create_stacks_of_slices_directly_sb(hoNDArray< T >& data, hoNDArray< T >& new_stack , std::vector<unsigned int> &indice, std::vector< std::vector<unsigned int> > &MapSliceSMS)
 {
 
     size_t RO=data.get_size(0);
@@ -520,29 +520,29 @@ void create_stacks_of_slices_directly_sb(hoNDArray< T >& data, hoNDArray< T >& n
 
         for (m = 0; m < MB; m++) {
 
-            index = MapSliceSMS(a,m);
+            index = MapSliceSMS[a][m];
 
             for (s = 0; s < S; s++)
             {
                 for (n = 0; n < N; n++)
                 {
-                    std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice(index)));
+                    std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice[index]));
                     std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
                     memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
                     // using namespace Gadgetron::Indexing;
                     // std::copy_n(in,RO*E1*E2*CHA,out); in 4.1
-                    // new_stack(slice,slice,slice,slice,m,a,n,s) = data(slice,slice,slice,n,s,indice(index)); in 4.1
+                    // new_stack(slice,slice,slice,slice,m,a,n,s) = data(slice,slice,slice,n,s,indice[index]); in 4.1
                 }
             }
         }
     }
 }
 
-template EXPORTMRICORE void create_stacks_of_slices_directly_sb(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack , arma::uvec &indice, arma::imat &MapSliceSMS);
+template EXPORTMRICORE void create_stacks_of_slices_directly_sb(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack , std::vector<unsigned int> &indice, std::vector< std::vector<unsigned int> > &MapSliceSMS);
 
 //sur les données single band
 template <typename T>
-void create_stacks_of_slices_directly_sb_open(hoNDArray< T >& data, hoNDArray< T >& new_stack, arma::uvec &indice, arma::imat &MapSliceSMS)
+void create_stacks_of_slices_directly_sb_open(hoNDArray< T >& data, hoNDArray< T >& new_stack, std::vector<unsigned int> &indice, std::vector< std::vector<unsigned int> > &MapSliceSMS)
 {
 
     size_t RO=data.get_size(0);
@@ -566,18 +566,18 @@ void create_stacks_of_slices_directly_sb_open(hoNDArray< T >& data, hoNDArray< T
         long long  s = (ii - a * S * MB* N - m * S* N )  /  (N);
         long long  n=  ii - a * S * MB* N - m * S* N  -s *  N;
 
-        long long index = MapSliceSMS(a,m);
+        long long index = MapSliceSMS[a][m];
 
-        std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice(index)));
+        std::complex<float> * in = &(data(0, 0, 0, 0, n, s, indice[index]));
         std::complex<float> * out = &(new_stack(0, 0, 0, 0, m, a, n, s));
         memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
     }
 }
 
-template EXPORTMRICORE void create_stacks_of_slices_directly_sb_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack, arma::uvec &indice, arma::imat &MapSliceSMS);
+template EXPORTMRICORE void create_stacks_of_slices_directly_sb_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack, std::vector<unsigned int> &indice, std::vector< std::vector<unsigned int> > &MapSliceSMS);
 
 template <typename T>
-void create_stacks_of_slices_directly_mb_open(hoNDArray<T >& mb,hoNDArray< T>& mb_8D , arma::uvec& indice_mb, arma::uvec& indice_slice_mb )
+void create_stacks_of_slices_directly_mb_open(hoNDArray<T >& mb,hoNDArray< T>& mb_8D , std::vector<unsigned int>& indice_mb, std::vector<unsigned int>& indice_slice_mb )
 {
     size_t RO=mb.get_size(0);
     size_t E1=mb.get_size(1);
@@ -587,7 +587,7 @@ void create_stacks_of_slices_directly_mb_open(hoNDArray<T >& mb,hoNDArray< T>& m
     size_t S=mb.get_size(5);
     size_t SLC=mb.get_size(6);
 
-    size_t lNumberOfStacks_=size(indice_mb,0);
+    size_t lNumberOfStacks_=indice_mb.size();
 
     long long num = N * S * lNumberOfStacks_;
     long long ii;
@@ -616,10 +616,10 @@ void create_stacks_of_slices_directly_mb_open(hoNDArray<T >& mb,hoNDArray< T>& m
     }
 }
 
-template EXPORTMRICORE void create_stacks_of_slices_directly_mb_open(hoNDArray< std::complex<float> >& mb,hoNDArray<  std::complex<float> >& mb_8D, arma::uvec& indice_mb, arma::uvec& indice_slice_mb );
+template EXPORTMRICORE void create_stacks_of_slices_directly_mb_open(hoNDArray< std::complex<float> >& mb,hoNDArray<  std::complex<float> >& mb_8D, std::vector<unsigned int>& indice_mb, std::vector<unsigned int>& indice_slice_mb );
 
 template <typename T>
-void create_stacks_of_slices_directly_mb(hoNDArray< T >& mb,hoNDArray< T>& mb_8D , arma::uvec& indice_mb, arma::uvec& indice_slice_mb )
+void create_stacks_of_slices_directly_mb(hoNDArray< T >& mb,hoNDArray< T>& mb_8D , std::vector<unsigned int>& indice_mb, std::vector<unsigned int>& indice_slice_mb )
 {
     size_t RO=mb.get_size(0);
     size_t E1=mb.get_size(1);
@@ -632,7 +632,7 @@ void create_stacks_of_slices_directly_mb(hoNDArray< T >& mb,hoNDArray< T>& mb_8D
     long long index_in;
     long long index_out;
 
-    size_t lNumberOfStacks_=size(indice_mb,0);
+    size_t lNumberOfStacks_=indice_mb.size();
 
     for (int a = 0; a < lNumberOfStacks_; a++)
     {
@@ -660,11 +660,11 @@ void create_stacks_of_slices_directly_mb(hoNDArray< T >& mb,hoNDArray< T>& mb_8D
 
 }
 
-template EXPORTMRICORE void create_stacks_of_slices_directly_mb(hoNDArray< std::complex<float> >& mb,hoNDArray<  std::complex<float> >& mb_8D, arma::uvec& indice_mb, arma::uvec& indice_slice_mb );
+template EXPORTMRICORE void create_stacks_of_slices_directly_mb(hoNDArray< std::complex<float> >& mb,hoNDArray<  std::complex<float> >& mb_8D, std::vector<unsigned int>& indice_mb, std::vector<unsigned int>& indice_slice_mb );
 
 
 template <typename T>
-void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< T >& data, hoNDArray<T > &output, arma::imat& MapSliceSMS, arma::uvec& indice_sb)
+void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< T >& data, hoNDArray<T > &output, std::vector< std::vector<unsigned int> >& MapSliceSMS, std::vector<unsigned int>& indice_sb)
 {
 
     //TODO it should be remplaced by one single copy
@@ -692,7 +692,7 @@ void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< T >& data, hoNDArr
 
         for (m = 0; m < MB; m++) {
 
-            index = MapSliceSMS(a,m);
+            index = MapSliceSMS[a][m];
 
             for (s = 0; s < S; s++)
             {
@@ -713,17 +713,17 @@ void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< T >& data, hoNDArr
             for (n = 0; n < N; n++)
             {
                 std::complex<float> * in = &(tempo(0, 0, 0, 0, n, s, slc));
-                std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb(slc)));
+                std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb[slc]));
                 memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
             }
         }
     }
 }
 
-template EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output, arma::imat& MapSliceSMS, arma::uvec& indice_sb);
+template EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output, std::vector< std::vector<unsigned int> >& MapSliceSMS, std::vector<unsigned int>& indice_sb);
 
 template <typename T>
-void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< T >& data, hoNDArray< T > &output, arma::imat& MapSliceSMS, arma::uvec& indice_sb)
+void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< T >& data, hoNDArray< T > &output, std::vector< std::vector<unsigned int> >& MapSliceSMS, std::vector<unsigned int>& indice_sb)
 {
 
     //TODO it should be remplaced by one single copy
@@ -755,7 +755,7 @@ void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< T >& data, ho
         long long  s = (ii - a * S * MB* N - m * S* N )  /  (N);
         long long  n=  ii - a * S * MB* N - m * S* N  -s *  N;
 
-        long long index = MapSliceSMS(a,m);
+        long long index = MapSliceSMS[a][m];
 
         std::complex<float> * in = &(data(0, 0, 0, 0, m, a, n, s));
         std::complex<float> * out = &(tempo(0, 0, 0, 0, n, s, index));
@@ -772,13 +772,13 @@ void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< T >& data, ho
         long long n = ii - slc * N * S - s * N;
 
         std::complex<float> * in = &(tempo(0, 0, 0, 0, n, s, slc));
-        std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb(slc)));
+        std::complex<float> * out = &(output(0, 0, 0, 0, n, s, indice_sb[slc]));
         memcpy(out , in, sizeof(std::complex<float>)*RO*E1*E2*CHA);
 
     }
 }
 
-template EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output, arma::imat& MapSliceSMS, arma::uvec& indice_sb);
+template EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output, std::vector< std::vector<unsigned int> >& MapSliceSMS, std::vector<unsigned int>& indice_sb);
 
 
 
