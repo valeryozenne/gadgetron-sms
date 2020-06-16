@@ -44,7 +44,7 @@ int EmptyGadget_GPUBenoit::process(GadgetContainerMessage<ISMRMRD::AcquisitionHe
   
 
   std::complex<float> *in = &(data(0, 0));
-  std::complex<float> *out = &(data(0, 0));
+  std::complex<float> *out = &(data2(0, 0));
 
   if(cudaMemcpy(device_mb.get_data_ptr(),
                           in,//autre solution : data->get_data_ptr()
@@ -52,7 +52,13 @@ int EmptyGadget_GPUBenoit::process(GadgetContainerMessage<ISMRMRD::AcquisitionHe
                           cudaMemcpyHostToDevice)!= cudaSuccess )   {
                 GERROR_STREAM("Upload to device for device_mb failed\n");}
 
+  GDEBUG_STREAM("BEFORE CALLING GPU FUNCTION");
+  GDEBUG_STREAM("IN: " << in[0] << ", " << in[1] << ", " << in[1] << ", " << in[2] << ", " << in[3] << ", " << in[4] << ", " << in[5] << ", " << in[6] << ", " << in[7] << ", " << in[8] << ", " << in[9]);
+  GDEBUG_STREAM("OUT: " << out[0] << ", " << out[1] << ", " << out[1] << ", " << out[2] << ", " << out[3] << ", " << out[4] << ", " << out[5] << ", " << out[6] << ", " << out[7] << ", " << out[8] << ", " << out[9] << std::endl)
+
   create_and_copy_cuNDArray_benoit(device_mb, device_mb_out);
+
+  
 
   if(cudaMemcpy(out,
                 device_mb_out.get_data_ptr(),
@@ -60,6 +66,9 @@ int EmptyGadget_GPUBenoit::process(GadgetContainerMessage<ISMRMRD::AcquisitionHe
                 cudaMemcpyDeviceToHost)!= cudaSuccess )   {
     GERROR_STREAM("Upload to host for device_unfolded failed\n");}
 
+  GDEBUG_STREAM("AFTER CALLING GPU FUNCTION");
+  GDEBUG_STREAM("IN: " << in[0] << ", " << in[1] << ", " << in[1] << ", " << in[2] << ", " << in[3] << ", " << in[4] << ", " << in[5] << ", " << in[6] << ", " << in[7] << ", " << in[8] << ", " << in[9]);
+  GDEBUG_STREAM("OUT: " << out[0] << ", " << out[1] << ", " << out[1] << ", " << out[2] << ", " << out[3] << ", " << out[4] << ", " << out[5] << ", " << out[6] << ", " << out[7] << ", " << out[8] << ", " << out[9] << std::endl)
 
 
 

@@ -18,7 +18,7 @@ using namespace std;
 namespace Gadgetron{
 
     template<class REAL> 
-    __global__ void copy_cuNDArray_benoit(cuNDArray< complext<REAL> > in_data, cuNDArray< complext<REAL> > out_data, int *dimensions)
+    __global__ void copy_cuNDArray_benoit(complext<REAL> *in_data, complext<REAL> *out_data, int *dimensions)
     {
         int i = threadIdx.x + blockIdx.x * blockDim.x;
 
@@ -37,12 +37,18 @@ namespace Gadgetron{
         int max_blockDim = cudaDeviceManager::Instance()->max_blockdim(cur_device);//block size
         //dim3 blockDim(((max_blockdim/CHA)/warp_size)*warp_size, CHA);
         
-        GDEBUG_STREAM("warp size: " << warp_size << ", blockDim = " << max_blockDim << std::endl);
+        //GDEBUG_STREAM("warp size: " << warp_size << ", blockDim = " << max_blockDim << std::endl);
         int max_thread_x_size = 1024;
         int nbBlocks = (data_in.dimensions()[0] * data_in.dimensions()[1]) / max_thread_x_size;
 
+        int *dimensions = new int(data_in.dimensions().size());
+        for (unsigned int i = 0; i < data_in.dimensions().size(); i++)
+        {
+            dimensions[i] = data_in.dimensions()[i];
+        }
+
         // out_gpu_data.create(data_in.get_dimensions());
-        // copy_cuNDArray_benoit<<<nbBlocks, max_thread_x_size>>>(in_gpu_data, out_gpu_data);
+        //copy_cuNDArray_benoit<<<nbBlocks, max_thread_x_size>>>(data_in.get_data_ptr(), data_out.get_data_ptr(), dimensions);
         // CHECK_FOR_CUDA_ERROR();
     }
 
