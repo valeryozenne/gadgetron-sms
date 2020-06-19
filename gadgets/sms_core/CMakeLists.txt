@@ -47,6 +47,12 @@ add_library(gadgetron_smscore SHARED
     GenericReconSplitSimpleSMSGadget.cpp
     GenericReconCartesianReceiveEpiMsgGadget.h
 	GenericReconCartesianReceiveEpiMsgGadget.cpp
+	EmptyGadget_GPUBenoit.cpp
+	EmptyGadget_GPUBenoit.h
+	CuNDArraySendMessage_BenoitGadget.h
+	CuNDArraySendMessage_BenoitGadget.cpp
+	CuNDArrayReceiveMessage_BenoitGadget.h
+	CuNDArrayReceiveMessage_BenoitGadget.cpp
   )
 
 set_target_properties(gadgetron_smscore PROPERTIES VERSION ${GADGETRON_VERSION_STRING} SOVERSION ${GADGETRON_SOVERSION})
@@ -87,6 +93,8 @@ install (FILES  gadgetron_smscore_export.h
                 GenericReconSMSBase.cpp
                 EmptyGadget.cpp
                 EmptyGadget.h
+                EmptyGadget_GPUBenoit.cpp
+                EmptyGadget_GPUBenoit.h
                 GenericReconSplitSMSGadget.h
                 GenericReconSplitSimpleSMSGadget.h
 				GenericReconCartesianReceiveEpiMsgGadget.h
