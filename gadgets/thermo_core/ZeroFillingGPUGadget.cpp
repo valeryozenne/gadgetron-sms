@@ -301,8 +301,8 @@ void ZeroFillingGPUGadget::perform_zerofilling(hoNDArray< std::complex<float> > 
 
 void ZeroFillingGPUGadget::perform_zerofilling_gpu(cuNDArray<complext<float>> data_in, cuNDArray<complext<float>> data_out)
 {
-    try
-    {
+    //try
+    //{
         if (perform_timing.value()) { gt_timer_.start("ZeroFillingGPUGadget::perform_filling"); }
 
         GDEBUG_CONDITION_STREAM(verbose.value(), "ZeroFillingGPUGadget::perform_zerofilling(...) starts ... ");
@@ -327,13 +327,15 @@ void ZeroFillingGPUGadget::perform_zerofilling_gpu(cuNDArray<complext<float>> da
             unsigned int offset_e1=int(E1/oversampling.value());
             GDEBUG("offset %d %d\n", offset_ro, offset_e1);
 
-            int *in_data_dimensions = new int(data_in.get_number_of_dimensions());
+            int *in_data_dimensions = new int[data_in.get_number_of_dimensions()];
+            GDEBUG_STREAM("NUMBER OF DIMENSIONS: " << data_in.get_number_of_dimensions());
             for (unsigned int i = 0; i < data_in.get_number_of_dimensions(); i++)
             {
                 in_data_dimensions[i] = data_in.get_size(i);
+                GDEBUG_STREAM("Dimension " << i << ": " << in_data_dimensions[i]);
             }
 
-            int *out_data_dimensions = new int(data_out.get_number_of_dimensions());
+            int *out_data_dimensions = new int[data_out.get_number_of_dimensions()];
             for (unsigned int i = 0; i < data_out.get_number_of_dimensions(); i++)
             {
                 out_data_dimensions[i] = data_out.get_size(i);
@@ -346,7 +348,7 @@ void ZeroFillingGPUGadget::perform_zerofilling_gpu(cuNDArray<complext<float>> da
             //global function call arguments : data_in, data_out, dimensions, offsets
             //GDEBUG("-------------------------BEFORE EXECUTE_ZEROFILLING ------------------------------\n");
             execute_zerofilling_gpu(data_in.get_data_ptr(), data_out.get_data_ptr(), in_data_dimensions, out_data_dimensions, offset_ro, offset_e1, RO, E1);
-            GDEBUG("-------------------------AFTER EXECUTE_ZEROFILLING ------------------------------\n");
+            //GDEBUG("-------------------------AFTER EXECUTE_ZEROFILLING ------------------------------\n");
             //*******UNUSED CODE***************//
             // for (long long slc = 0; slc < SLC; slc++)
             // {
@@ -382,11 +384,11 @@ void ZeroFillingGPUGadget::perform_zerofilling_gpu(cuNDArray<complext<float>> da
         // -------------------------------------------------------------
 
         if (perform_timing.value()) { gt_timer_.stop(); }
-    }
+    /*}
     catch (...)
     {
         GERROR_STREAM("Exceptions happened in ZeroFillingGPUGadget::perform_zerofilling(...) ... ");
-    }
+    }*/
     GDEBUG("PERFORM_ZEROFILLING_GPU DONE\n");
 }
 

@@ -216,13 +216,13 @@
 
 
     <!-- ImageArray to images -->
-    <gadget>
+    <!--<gadget>
         <name>ZeroFilling</name>
         <dll>gadgetron_thermocore</dll>
         <classname>ZeroFillingGadget</classname>
         <property><name>perform_timing</name><value>true</value></property>
         <property><name>verbose</name><value>true </value></property>
-    </gadget>
+    </gadget>-->
 
     <!-- ImageArray to images -->
     <gadget>
