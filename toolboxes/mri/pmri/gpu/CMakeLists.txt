@@ -43,6 +43,8 @@ cuda_add_library(gadgetron_toolbox_gpuparallelmri SHARED
     test_slice_grappa.h
 	test_gpu_benoit.cu
 	test_gpu_benoit.h
+	cuZeroFilling.cu
+	cuZeroFilling.h
   )
 
 set_target_properties(gadgetron_toolbox_gpuparallelmri PROPERTIES VERSION ${GADGETRON_VERSION_STRING} SOVERSION ${GADGETRON_SOVERSION})
@@ -85,6 +87,7 @@ install(FILES
 	cuSpiritBuffer.h
 	gpupmri_export.h
 	test_gpu_benoit.h
+  cuZeroFilling.h
 DESTINATION ${GADGETRON_INSTALL_INCLUDE_PATH} COMPONENT main)
 
 set(GADGETRON_BUILD_RPATH "${CMAKE_CURRENT_BINARY_DIR};${GADGETRON_BUILD_RPATH}" PARENT_SCOPE)

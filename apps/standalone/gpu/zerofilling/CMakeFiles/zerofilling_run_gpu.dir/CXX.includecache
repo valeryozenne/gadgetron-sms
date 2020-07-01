@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/zerofilling.cpp
+hoNDArray_fileio.h
+/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/hoNDArray_fileio.h
+cuNDArray_blas.h
+/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/cuNDArray_blas.h
+cuNDArray_elemwise.h
+/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/cuNDArray_elemwise.h
+parameterparser.h
+/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/parameterparser.h
+cuConvolutionOperator.h
+/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/cuConvolutionOperator.h
+iostream
+-
+math.h
+-
+

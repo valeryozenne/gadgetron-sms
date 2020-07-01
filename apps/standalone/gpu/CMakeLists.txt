@@ -10,6 +10,7 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/toolboxes/operators/gpu
 	${CMAKE_SOURCE_DIR}/toolboxes/solvers
 	${CMAKE_SOURCE_DIR}/toolboxes/solvers/gpu
+	${CMAKE_SOURCE_DIR}/toolboxes/mri/pmri/gpu/
 	${Boost_INCLUDE_DIR}
 	${ISMRMRD_INCLUDE_DIR} 
 	)
@@ -19,3 +20,4 @@ add_subdirectory(denoising)
 add_subdirectory(deblurring)
 add_subdirectory(registration)
 add_subdirectory(examples)
+add_subdirectory(zerofilling)
