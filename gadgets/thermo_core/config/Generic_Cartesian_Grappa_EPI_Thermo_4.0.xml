@@ -216,13 +216,16 @@
 
 
     <!-- ImageArray to images -->
-    <!--<gadget>
+    <gadget>
         <name>ZeroFilling</name>
         <dll>gadgetron_thermocore</dll>
-        <classname>ZeroFillingGadget</classname>
+        <classname>ZeroFillingGPUGadget</classname>
         <property><name>perform_timing</name><value>true</value></property>
         <property><name>verbose</name><value>true </value></property>
-    </gadget>-->
+        <property><name>use_gpu</name><value>true</value></property>
+        <property><name>oversampling</name><value>2</value></property>
+        <property><name>debug_folder</name><value>/tmp/gadgetron</value></property>
+    </gadget>
 
     <!-- ImageArray to images -->
     <gadget>

@@ -120,70 +120,6 @@ int ZeroFillingGPUGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImag
     return GADGET_OK;
 }
 
-
-void ZeroFillingGPUGadget::perform_zerofilling_array_gpu(IsmrmrdImageArray& in, IsmrmrdImageArray& out)
-{
-
-    GDEBUG("----- go GPU -----------\n");
-
-    size_t RO = in.data_.get_size(0);
-    size_t E1 = in.data_.get_size(1);
-    size_t E2 = in.data_.get_size(2);
-    size_t CHA = in.data_.get_size(3);
-    size_t N = in.data_.get_size(4);
-    size_t S = in.data_.get_size(5);
-    size_t SLC = in.data_.get_size(6);
-
-    GDEBUG("Oversampling: %d\n", oversampling.value());
-    
-
-    //TODO need to be done once (if REP==0)
-    out.data_.create(RO*oversampling.value(), E1*oversampling.value(), E2, CHA, N, S, SLC);
-    out.headers_.create(N, S, SLC);
-    out.meta_.resize(N*S*SLC);
-
-    Gadgetron::clear(out.data_);
-
-    out.data_.fill(10);
-
-
-    cuNDArray< complext<float> > cu_data_out(reinterpret_cast<const hoNDArray<complext<float>> &>(out.data_));
-    cuNDArray< complext<float> > cu_data(reinterpret_cast<const hoNDArray<complext<float>> &>(in.data_));
-
-    //cuNDFFT<float>::instance()->fft2d(&cu_data);
-
-    GDEBUG("-----------------------------------BEFORE PERFORM_ZEROFILLING-----------------------------------\n");
-    perform_zerofilling_gpu(cu_data, cu_data_out);
-    GDEBUG("-----------------------------------PERFORM_ZEROFILLING DONE-----------------------------------\n");
-    
-    //cuNDFFT<float>::instance()->ifft2(&cu_data_out);
-
-    //perform_zerofilling(in.data_, out.data_);
-
-    //cu_data_out.to_host(reinterpret_cast<const hoNDArray<complext<float>> >(out.data_));
-    
-
-    size_t n, s, slc;
-
-    for (slc = 0; slc < SLC; slc++)
-    {
-        for (s = 0; s < S; s++)
-        {
-            for (n = 0; n < N; n++)
-            {
-                out.headers_(n, s, slc) = in.headers_(n, s, slc);
-
-                out.headers_(n, s, slc).matrix_size[0]=in.headers_(n, s, slc).matrix_size[0]*oversampling.value();
-                out.headers_(n, s, slc).matrix_size[1]=in.headers_(n, s, slc).matrix_size[1]*oversampling.value();
-
-
-            }
-        }
-    }
-
-    CHECK_FOR_CUDA_ERROR();
-}
-
 void ZeroFillingGPUGadget::perform_zerofilling_array(IsmrmrdImageArray& in, IsmrmrdImageArray& out)
 {
 
@@ -206,6 +142,7 @@ void ZeroFillingGPUGadget::perform_zerofilling_array(IsmrmrdImageArray& in, Ismr
 
     Gadgetron::clear(out.data_);
 
+    
     perform_zerofilling(in.data_, out.data_);
 
     size_t n, s, slc;
@@ -226,10 +163,6 @@ void ZeroFillingGPUGadget::perform_zerofilling_array(IsmrmrdImageArray& in, Ismr
         }
     }
 }
-
-
-
-
 
 void ZeroFillingGPUGadget::perform_zerofilling(hoNDArray< std::complex<float> > & data_in, hoNDArray< std::complex<float> > & data_out)
 {
@@ -299,10 +232,87 @@ void ZeroFillingGPUGadget::perform_zerofilling(hoNDArray< std::complex<float> > 
 
 }
 
+void ZeroFillingGPUGadget::perform_zerofilling_array_gpu(IsmrmrdImageArray& in, IsmrmrdImageArray& out)
+{
+
+    GDEBUG("----- go GPU -----------\n");
+
+    size_t RO = in.data_.get_size(0);
+    size_t E1 = in.data_.get_size(1);
+    size_t E2 = in.data_.get_size(2);
+    size_t CHA = in.data_.get_size(3);
+    size_t N = in.data_.get_size(4);
+    size_t S = in.data_.get_size(5);
+    size_t SLC = in.data_.get_size(6);
+
+    GDEBUG("Oversampling: %d\n", oversampling.value());
+    
+
+    //TODO need to be done once (if REP==0)
+    out.data_.create(RO*oversampling.value(), E1*oversampling.value(), E2, CHA, N, S, SLC);
+    out.headers_.create(N, S, SLC);
+    out.meta_.resize(N*S*SLC);
+    
+    Gadgetron::clear(out.data_);
+
+    out.data_.fill(10);
+
+    hoNDArray< std::complex<float> > data_in(in.data_);
+    hoNDArray< std::complex<float> > data_out(out.data_);
+
+    cuNDArray< std::complex<float> > cu_data(data_in);
+    cuNDArray< std::complex<float> > cu_data_out(data_out);
+
+    //cuNDFFT<float>::instance()->fft2d(&cu_data);
+
+    execute_zero_3D_complex(cu_data.get_data_ptr(), cu_data_out.get_data_ptr(), in.data_.get_size(0), in.data_.get_size(1), in.data_.get_size(6), oversampling);
+    
+    
+    //cuNDFFT<float>::instance()->ifft2(&cu_data_out);
+    
+    //perform_zerofilling(in.data_, out.data_);
+
+    //cu_data_out.to_host(reinterpret_cast<hoNDArray<complext<float>> *>(&(out.data_)));
+    auto output_ptr = cu_data_out.to_host();
+    out.data_ =  std::move(reinterpret_cast<hoNDArray<std::complex<float>>&>(*output_ptr));
+
+
+
+    std::string outfile = "/tmp/gadgetron/zerofilling_standalone_sortie_gpu";
+    std::string infile = "/tmp/gadgetron/zerofilling_standalone_entree_gpu";
+        
+    gt_exporter_.export_array_complex(in.data_, infile);
+    gt_exporter_.export_array_complex(out.data_, outfile);
+    // boost::shared_ptr< hoNDArray<float_complext  > >  host_result_out = device_data.to_host();
+    // hoNDArray<std::complex<float>> *host_result_cast=reinterpret_cast<hoNDArray<std::complex<float> >*>(host_result_out.get());
+    
+
+    size_t n, s, slc;
+
+    for (slc = 0; slc < SLC; slc++)
+    {
+        for (s = 0; s < S; s++)
+        {
+            for (n = 0; n < N; n++)
+            {
+                out.headers_(n, s, slc) = in.headers_(n, s, slc);
+
+                out.headers_(n, s, slc).matrix_size[0]=in.headers_(n, s, slc).matrix_size[0]*oversampling.value();
+                out.headers_(n, s, slc).matrix_size[1]=in.headers_(n, s, slc).matrix_size[1]*oversampling.value();
+
+
+            }
+        }
+    }
+    
+    CHECK_FOR_CUDA_ERROR();
+}
+
 void ZeroFillingGPUGadget::perform_zerofilling_gpu(cuNDArray<complext<float>> data_in, cuNDArray<complext<float>> data_out)
 {
     //try
     //{
+        
         if (perform_timing.value()) { gt_timer_.start("ZeroFillingGPUGadget::perform_filling"); }
 
         GDEBUG_CONDITION_STREAM(verbose.value(), "ZeroFillingGPUGadget::perform_zerofilling(...) starts ... ");
@@ -310,7 +320,7 @@ void ZeroFillingGPUGadget::perform_zerofilling_gpu(cuNDArray<complext<float>> da
         GDEBUG("data_out dimensions: %d, %d, %d, %d, %d, %d, %d\n", data_out.dimensions()[0], data_out.dimensions()[1], data_out.dimensions()[2], data_out.dimensions()[3], data_out.dimensions()[4], data_out.dimensions()[5], data_out.dimensions()[6]);
 
         
-        if (oversampling.value()>1)
+        if (oversampling.value()>=1)
         {
 
             size_t RO = data_in.get_size(0);
@@ -323,8 +333,8 @@ void ZeroFillingGPUGadget::perform_zerofilling_gpu(cuNDArray<complext<float>> da
 
             //Gadgetron::hoNDFFT<float>::instance()->fft2c(data_in);
 
-            unsigned int offset_ro=int(RO/oversampling.value());
-            unsigned int offset_e1=int(E1/oversampling.value());
+            unsigned int offset_ro= (RO*oversampling.value() - RO) / 2;
+            unsigned int offset_e1= (E1*oversampling.value() - E1) / 2;
             GDEBUG("offset %d %d\n", offset_ro, offset_e1);
 
             int *in_data_dimensions = new int[data_in.get_number_of_dimensions()];
@@ -344,11 +354,13 @@ void ZeroFillingGPUGadget::perform_zerofilling_gpu(cuNDArray<complext<float>> da
             
             //first complext array: data_in.get_data_ptr()
             //second complext array: data_out.get_data_ptr()
-
+            GDEBUG_STREAM(data_in.size() << ", " << data_out.size());
             //global function call arguments : data_in, data_out, dimensions, offsets
-            //GDEBUG("-------------------------BEFORE EXECUTE_ZEROFILLING ------------------------------\n");
-            execute_zerofilling_gpu(data_in.get_data_ptr(), data_out.get_data_ptr(), in_data_dimensions, out_data_dimensions, offset_ro, offset_e1, RO, E1);
-            //GDEBUG("-------------------------AFTER EXECUTE_ZEROFILLING ------------------------------\n");
+            GDEBUG("-------------------------BEFORE EXECUTE_ZEROFILLING ------------------------------\n");
+            //execute_zerofilling_gpu(data_in.get_data_ptr(), data_out.get_data_ptr(), in_data_dimensions, out_data_dimensions, offset_ro, offset_e1, RO, E1);
+            GDEBUG("-------------------------AFTER EXECUTE_ZEROFILLING ------------------------------\n");
+
+            GDEBUG_STREAM(*(data_in.data()) << ", " << *(data_out.data()));
             //*******UNUSED CODE***************//
             // for (long long slc = 0; slc < SLC; slc++)
             // {
