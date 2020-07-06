@@ -1,6 +1,8 @@
 if (ARMADILLO_FOUND)
    install (FILES     
-    Generic_Cartesian_Grappa_EPI_Thermo_4.0.xml
+    Generic_Cartesian_Grappa_EPI_Thermo_4.0_cpu.xml
+    Generic_Cartesian_Grappa_EPI_Thermo_4.0_gpu.xml
+    Generic_Cartesian_Grappa_EPI_Thermo_4.0_gpuplus.xml
     DESTINATION ${GADGETRON_INSTALL_CONFIG_PATH} COMPONENT main
     )
 elseif (ARMADILLO_FOUND)
