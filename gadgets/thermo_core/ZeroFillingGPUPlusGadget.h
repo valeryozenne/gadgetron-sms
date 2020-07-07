@@ -36,8 +36,8 @@ namespace Gadgetron {
         // --------------------------------------------------
         // variables for protocol
         // --------------------------------------------------
-        hoNDArray< complext<float> > data_in;
-        hoNDArray< complext<float> > data_out;
+        // hoNDArray< complext<float> > data_in;
+        // hoNDArray< complext<float> > data_out;
 
         cuNDArray< complext<float> > cu_data;
         cuNDArray< complext<float> > cu_data_out;

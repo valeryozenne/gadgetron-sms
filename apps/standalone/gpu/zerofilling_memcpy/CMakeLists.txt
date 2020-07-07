@@ -3,8 +3,8 @@ if (WIN32)
 endif()
 
 
-add_executable(zerofilling_run_gpu zerofilling.cpp)
+add_executable(zerofilling_memcpy_run_gpu zerofilling.cpp)
 
-target_link_libraries(zerofilling_run_gpu gadgetron_toolbox_gpuparallelmri gadgetron_toolbox_image_analyze_io gadgetron_toolbox_gpudwt gadgetron_toolbox_gpucore gadgetron_toolbox_hostutils gadgetron_toolbox_gpusolvers gadgetron_toolbox_gpuoperators ${CUDA_LIBRARIES})
+target_link_libraries(zerofilling_memcpy_run_gpu gadgetron_toolbox_gpuparallelmri gadgetron_toolbox_image_analyze_io gadgetron_toolbox_gpudwt gadgetron_toolbox_gpucore gadgetron_toolbox_hostutils gadgetron_toolbox_gpusolvers gadgetron_toolbox_gpuoperators ${CUDA_LIBRARIES})
 
 #install(TARGETS examples_run_gpu DESTINATION bin COMPONENT main)

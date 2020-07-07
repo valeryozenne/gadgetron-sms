@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/zerofilling_run_gpu.dir/zerofilling.o"
+  "CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.o"
   "zerofilling_run_gpu"
   "zerofilling_run_gpu.pdb"
 )
