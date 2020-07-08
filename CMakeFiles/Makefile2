@@ -349,6 +349,7 @@ apps/standalone/gpu/all: apps/standalone/gpu/registration/all
 apps/standalone/gpu/all: apps/standalone/gpu/examples/all
 apps/standalone/gpu/all: apps/standalone/gpu/zerofilling/all
 apps/standalone/gpu/all: apps/standalone/gpu/zerofilling_memcpy/all
+apps/standalone/gpu/all: apps/standalone/gpu/subsampling/all
 
 .PHONY : apps/standalone/gpu/all
 
@@ -360,6 +361,7 @@ apps/standalone/gpu/preinstall: apps/standalone/gpu/registration/preinstall
 apps/standalone/gpu/preinstall: apps/standalone/gpu/examples/preinstall
 apps/standalone/gpu/preinstall: apps/standalone/gpu/zerofilling/preinstall
 apps/standalone/gpu/preinstall: apps/standalone/gpu/zerofilling_memcpy/preinstall
+apps/standalone/gpu/preinstall: apps/standalone/gpu/subsampling/preinstall
 
 .PHONY : apps/standalone/gpu/preinstall
 
@@ -371,6 +373,7 @@ apps/standalone/gpu/clean: apps/standalone/gpu/registration/clean
 apps/standalone/gpu/clean: apps/standalone/gpu/examples/clean
 apps/standalone/gpu/clean: apps/standalone/gpu/zerofilling/clean
 apps/standalone/gpu/clean: apps/standalone/gpu/zerofilling_memcpy/clean
+apps/standalone/gpu/clean: apps/standalone/gpu/subsampling/clean
 
 .PHONY : apps/standalone/gpu/clean
 
@@ -742,6 +745,24 @@ apps/standalone/gpu/registration/3d/preinstall:
 apps/standalone/gpu/registration/3d/clean: apps/standalone/gpu/registration/3d/CMakeFiles/register_CK_3d_gpu.dir/clean
 
 .PHONY : apps/standalone/gpu/registration/3d/clean
+
+#=============================================================================
+# Directory level rules for directory apps/standalone/gpu/subsampling
+
+# Recursive "all" directory target.
+apps/standalone/gpu/subsampling/all: apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all
+
+.PHONY : apps/standalone/gpu/subsampling/all
+
+# Recursive "preinstall" directory target.
+apps/standalone/gpu/subsampling/preinstall:
+
+.PHONY : apps/standalone/gpu/subsampling/preinstall
+
+# Recursive "clean" directory target.
+apps/standalone/gpu/subsampling/clean: apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/clean
+
+.PHONY : apps/standalone/gpu/subsampling/clean
 
 #=============================================================================
 # Directory level rules for directory apps/standalone/gpu/zerofilling
@@ -2490,7 +2511,7 @@ core/CMakeFiles/gadgetron_core.dir/all: toolboxes/log/CMakeFiles/gadgetron_toolb
 core/CMakeFiles/gadgetron_core.dir/all: toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/all
 	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/gadgetron_core.dir/build.make core/CMakeFiles/gadgetron_core.dir/depend
 	$(MAKE) $(MAKESILENT) -f core/CMakeFiles/gadgetron_core.dir/build.make core/CMakeFiles/gadgetron_core.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=14,15 "Built target gadgetron_core"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=14 "Built target gadgetron_core"
 .PHONY : core/CMakeFiles/gadgetron_core.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2529,7 +2550,7 @@ core/readers/CMakeFiles/gadgetron_core_readers.dir/all: toolboxes/image_io/CMake
 
 # Build rule for subdir invocation for target.
 core/readers/CMakeFiles/gadgetron_core_readers.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 11
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 10
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 core/readers/CMakeFiles/gadgetron_core_readers.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : core/readers/CMakeFiles/gadgetron_core_readers.dir/rule
@@ -2558,12 +2579,12 @@ core/writers/CMakeFiles/gadgetron_core_writers.dir/all: toolboxes/klt/cpu/CMakeF
 core/writers/CMakeFiles/gadgetron_core_writers.dir/all: toolboxes/image_io/CMakeFiles/gadgetron_toolbox_image_analyze_io.dir/all
 	$(MAKE) $(MAKESILENT) -f core/writers/CMakeFiles/gadgetron_core_writers.dir/build.make core/writers/CMakeFiles/gadgetron_core_writers.dir/depend
 	$(MAKE) $(MAKESILENT) -f core/writers/CMakeFiles/gadgetron_core_writers.dir/build.make core/writers/CMakeFiles/gadgetron_core_writers.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=19,20 "Built target gadgetron_core_writers"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=19 "Built target gadgetron_core_writers"
 .PHONY : core/writers/CMakeFiles/gadgetron_core_writers.dir/all
 
 # Build rule for subdir invocation for target.
 core/writers/CMakeFiles/gadgetron_core_writers.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 11
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 core/writers/CMakeFiles/gadgetron_core_writers.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : core/writers/CMakeFiles/gadgetron_core_writers.dir/rule
@@ -2621,7 +2642,7 @@ core/distributed/CMakeFiles/gadgetron_core_distributed.dir/all: toolboxes/klt/cp
 core/distributed/CMakeFiles/gadgetron_core_distributed.dir/all: toolboxes/image_io/CMakeFiles/gadgetron_toolbox_image_analyze_io.dir/all
 	$(MAKE) $(MAKESILENT) -f core/distributed/CMakeFiles/gadgetron_core_distributed.dir/build.make core/distributed/CMakeFiles/gadgetron_core_distributed.dir/depend
 	$(MAKE) $(MAKESILENT) -f core/distributed/CMakeFiles/gadgetron_core_distributed.dir/build.make core/distributed/CMakeFiles/gadgetron_core_distributed.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_core_distributed"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=15 "Built target gadgetron_core_distributed"
 .PHONY : core/distributed/CMakeFiles/gadgetron_core_distributed.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2715,7 +2736,7 @@ toolboxes/operators/gpu/CMakeFiles/gadgetron_toolbox_gpuoperators.dir/all: toolb
 toolboxes/operators/gpu/CMakeFiles/gadgetron_toolbox_gpuoperators.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/operators/gpu/CMakeFiles/gadgetron_toolbox_gpuoperators.dir/build.make toolboxes/operators/gpu/CMakeFiles/gadgetron_toolbox_gpuoperators.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/operators/gpu/CMakeFiles/gadgetron_toolbox_gpuoperators.dir/build.make toolboxes/operators/gpu/CMakeFiles/gadgetron_toolbox_gpuoperators.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=76 "Built target gadgetron_toolbox_gpuoperators"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=75,76 "Built target gadgetron_toolbox_gpuoperators"
 .PHONY : toolboxes/operators/gpu/CMakeFiles/gadgetron_toolbox_gpuoperators.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2744,12 +2765,12 @@ toolboxes/solvers/gpu/CMakeFiles/gadgetron_toolbox_gpusolvers.dir/all: toolboxes
 toolboxes/solvers/gpu/CMakeFiles/gadgetron_toolbox_gpusolvers.dir/all: toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/solvers/gpu/CMakeFiles/gadgetron_toolbox_gpusolvers.dir/build.make toolboxes/solvers/gpu/CMakeFiles/gadgetron_toolbox_gpusolvers.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/solvers/gpu/CMakeFiles/gadgetron_toolbox_gpusolvers.dir/build.make toolboxes/solvers/gpu/CMakeFiles/gadgetron_toolbox_gpusolvers.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_gpusolvers"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=82 "Built target gadgetron_toolbox_gpusolvers"
 .PHONY : toolboxes/solvers/gpu/CMakeFiles/gadgetron_toolbox_gpusolvers.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/solvers/gpu/CMakeFiles/gadgetron_toolbox_gpusolvers.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/solvers/gpu/CMakeFiles/gadgetron_toolbox_gpusolvers.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/solvers/gpu/CMakeFiles/gadgetron_toolbox_gpusolvers.dir/rule
@@ -2773,12 +2794,12 @@ toolboxes/fft/cpu/CMakeFiles/gadgetron_toolbox_cpufft.dir/all: toolboxes/core/cp
 toolboxes/fft/cpu/CMakeFiles/gadgetron_toolbox_cpufft.dir/all: toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/fft/cpu/CMakeFiles/gadgetron_toolbox_cpufft.dir/build.make toolboxes/fft/cpu/CMakeFiles/gadgetron_toolbox_cpufft.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/fft/cpu/CMakeFiles/gadgetron_toolbox_cpufft.dir/build.make toolboxes/fft/cpu/CMakeFiles/gadgetron_toolbox_cpufft.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=63 "Built target gadgetron_toolbox_cpufft"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_cpufft"
 .PHONY : toolboxes/fft/cpu/CMakeFiles/gadgetron_toolbox_cpufft.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/fft/cpu/CMakeFiles/gadgetron_toolbox_cpufft.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/fft/cpu/CMakeFiles/gadgetron_toolbox_cpufft.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/fft/cpu/CMakeFiles/gadgetron_toolbox_cpufft.dir/rule
@@ -2802,12 +2823,12 @@ toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/all: toolboxes/core/cp
 toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/all: toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/build.make toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/build.make toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=74 "Built target gadgetron_toolbox_gpufft"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_gpufft"
 .PHONY : toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/rule
@@ -2829,12 +2850,12 @@ toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/clean:
 toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/all: toolboxes/log/CMakeFiles/gadgetron_toolbox_log.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/build.make toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/build.make toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_cpucore"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=60 "Built target gadgetron_toolbox_cpucore"
 .PHONY : toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 1
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/rule
@@ -2857,7 +2878,7 @@ toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/all: toolb
 toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/all: toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/build.make toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/build.make toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=61,62 "Built target gadgetron_toolbox_cpucore_math"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=61 "Built target gadgetron_toolbox_cpucore_math"
 .PHONY : toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2884,12 +2905,12 @@ toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/clean:
 toolboxes/core/cpu/hostutils/CMakeFiles/gadgetron_toolbox_hostutils.dir/all: toolboxes/log/CMakeFiles/gadgetron_toolbox_log.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/core/cpu/hostutils/CMakeFiles/gadgetron_toolbox_hostutils.dir/build.make toolboxes/core/cpu/hostutils/CMakeFiles/gadgetron_toolbox_hostutils.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/core/cpu/hostutils/CMakeFiles/gadgetron_toolbox_hostutils.dir/build.make toolboxes/core/cpu/hostutils/CMakeFiles/gadgetron_toolbox_hostutils.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=83 "Built target gadgetron_toolbox_hostutils"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_hostutils"
 .PHONY : toolboxes/core/cpu/hostutils/CMakeFiles/gadgetron_toolbox_hostutils.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/core/cpu/hostutils/CMakeFiles/gadgetron_toolbox_hostutils.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/core/cpu/hostutils/CMakeFiles/gadgetron_toolbox_hostutils.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/core/cpu/hostutils/CMakeFiles/gadgetron_toolbox_hostutils.dir/rule
@@ -2912,7 +2933,7 @@ toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/all: toolboxes/log/C
 toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/all: toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/build.make toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/build.make toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=71,72,73 "Built target gadgetron_toolbox_gpucore"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=71,72 "Built target gadgetron_toolbox_gpucore"
 .PHONY : toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/all
 
 # Build rule for subdir invocation for target.
@@ -2947,12 +2968,12 @@ toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core_python.dir/all: toolbox
 toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core_python.dir/all: toolboxes/python/CMakeFiles/gadgetron_toolbox_python.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core_python.dir/build.make toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core_python.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core_python.dir/build.make toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core_python.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=88 "Built target gadgetron_toolbox_mri_core_python"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_mri_core_python"
 .PHONY : toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core_python.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core_python.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 11
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core_python.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core_python.dir/rule
@@ -2985,7 +3006,7 @@ toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core.dir/all: toolboxes/imag
 
 # Build rule for subdir invocation for target.
 toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 9
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 8
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/mri_core/CMakeFiles/gadgetron_toolbox_mri_core.dir/rule
@@ -3018,7 +3039,7 @@ toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/all: tool
 
 # Build rule for subdir invocation for target.
 toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 11
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 10
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/rule
@@ -3044,7 +3065,7 @@ toolboxes/mri/hyper/CMakeFiles/gadgetron_toolbox_hyper.dir/all: toolboxes/core/g
 toolboxes/mri/hyper/CMakeFiles/gadgetron_toolbox_hyper.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/mri/hyper/CMakeFiles/gadgetron_toolbox_hyper.dir/build.make toolboxes/mri/hyper/CMakeFiles/gadgetron_toolbox_hyper.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/mri/hyper/CMakeFiles/gadgetron_toolbox_hyper.dir/build.make toolboxes/mri/hyper/CMakeFiles/gadgetron_toolbox_hyper.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_hyper"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=83 "Built target gadgetron_toolbox_hyper"
 .PHONY : toolboxes/mri/hyper/CMakeFiles/gadgetron_toolbox_hyper.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3087,7 +3108,7 @@ toolboxes/cmr/CMakeFiles/gadgetron_toolbox_cmr.dir/all: toolboxes/image_io/CMake
 
 # Build rule for subdir invocation for target.
 toolboxes/cmr/CMakeFiles/gadgetron_toolbox_cmr.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 15
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 14
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/cmr/CMakeFiles/gadgetron_toolbox_cmr.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/cmr/CMakeFiles/gadgetron_toolbox_cmr.dir/rule
@@ -3111,12 +3132,12 @@ toolboxes/klt/cpu/CMakeFiles/gadgetron_toolbox_cpuklt.dir/all: toolboxes/core/cp
 toolboxes/klt/cpu/CMakeFiles/gadgetron_toolbox_cpuklt.dir/all: toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/klt/cpu/CMakeFiles/gadgetron_toolbox_cpuklt.dir/build.make toolboxes/klt/cpu/CMakeFiles/gadgetron_toolbox_cpuklt.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/klt/cpu/CMakeFiles/gadgetron_toolbox_cpuklt.dir/build.make toolboxes/klt/cpu/CMakeFiles/gadgetron_toolbox_cpuklt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_cpuklt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=63 "Built target gadgetron_toolbox_cpuklt"
 .PHONY : toolboxes/klt/cpu/CMakeFiles/gadgetron_toolbox_cpuklt.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/klt/cpu/CMakeFiles/gadgetron_toolbox_cpuklt.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/klt/cpu/CMakeFiles/gadgetron_toolbox_cpuklt.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/klt/cpu/CMakeFiles/gadgetron_toolbox_cpuklt.dir/rule
@@ -3146,7 +3167,7 @@ toolboxes/fatwater/CMakeFiles/gadgetron_toolbox_fatwater.dir/all: toolboxes/core
 
 # Build rule for subdir invocation for target.
 toolboxes/fatwater/CMakeFiles/gadgetron_toolbox_fatwater.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/fatwater/CMakeFiles/gadgetron_toolbox_fatwater.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/fatwater/CMakeFiles/gadgetron_toolbox_fatwater.dir/rule
@@ -3175,12 +3196,12 @@ toolboxes/deblur/CMakeFiles/gadgetron_toolbox_deblur.dir/all: toolboxes/mri/pmri
 toolboxes/deblur/CMakeFiles/gadgetron_toolbox_deblur.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/deblur/CMakeFiles/gadgetron_toolbox_deblur.dir/build.make toolboxes/deblur/CMakeFiles/gadgetron_toolbox_deblur.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/deblur/CMakeFiles/gadgetron_toolbox_deblur.dir/build.make toolboxes/deblur/CMakeFiles/gadgetron_toolbox_deblur.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=68 "Built target gadgetron_toolbox_deblur"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_deblur"
 .PHONY : toolboxes/deblur/CMakeFiles/gadgetron_toolbox_deblur.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/deblur/CMakeFiles/gadgetron_toolbox_deblur.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 12
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 10
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/deblur/CMakeFiles/gadgetron_toolbox_deblur.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/deblur/CMakeFiles/gadgetron_toolbox_deblur.dir/rule
@@ -3205,12 +3226,12 @@ toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all: toolboxes/core/
 toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all: toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/build.make toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/build.make toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=75 "Built target gadgetron_toolbox_gpunfft"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=74 "Built target gadgetron_toolbox_gpunfft"
 .PHONY : toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/rule
@@ -3241,7 +3262,7 @@ toolboxes/nfft/cpu/CMakeFiles/gadgetron_toolbox_cpunfft.dir/all: toolboxes/core/
 
 # Build rule for subdir invocation for target.
 toolboxes/nfft/cpu/CMakeFiles/gadgetron_toolbox_cpunfft.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 5
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/nfft/cpu/CMakeFiles/gadgetron_toolbox_cpunfft.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/nfft/cpu/CMakeFiles/gadgetron_toolbox_cpunfft.dir/rule
@@ -3265,12 +3286,12 @@ toolboxes/dwt/gpu/CMakeFiles/gadgetron_toolbox_gpudwt.dir/all: toolboxes/core/cp
 toolboxes/dwt/gpu/CMakeFiles/gadgetron_toolbox_gpudwt.dir/all: toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/dwt/gpu/CMakeFiles/gadgetron_toolbox_gpudwt.dir/build.make toolboxes/dwt/gpu/CMakeFiles/gadgetron_toolbox_gpudwt.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/dwt/gpu/CMakeFiles/gadgetron_toolbox_gpudwt.dir/build.make toolboxes/dwt/gpu/CMakeFiles/gadgetron_toolbox_gpudwt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_gpudwt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=73 "Built target gadgetron_toolbox_gpudwt"
 .PHONY : toolboxes/dwt/gpu/CMakeFiles/gadgetron_toolbox_gpudwt.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/dwt/gpu/CMakeFiles/gadgetron_toolbox_gpudwt.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/dwt/gpu/CMakeFiles/gadgetron_toolbox_gpudwt.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/dwt/gpu/CMakeFiles/gadgetron_toolbox_gpudwt.dir/rule
@@ -3294,12 +3315,12 @@ toolboxes/dwt/cpu/CMakeFiles/gadgetron_toolbox_cpudwt.dir/all: toolboxes/core/cp
 toolboxes/dwt/cpu/CMakeFiles/gadgetron_toolbox_cpudwt.dir/all: toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/dwt/cpu/CMakeFiles/gadgetron_toolbox_cpudwt.dir/build.make toolboxes/dwt/cpu/CMakeFiles/gadgetron_toolbox_cpudwt.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/dwt/cpu/CMakeFiles/gadgetron_toolbox_cpudwt.dir/build.make toolboxes/dwt/cpu/CMakeFiles/gadgetron_toolbox_cpudwt.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_cpudwt"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=62 "Built target gadgetron_toolbox_cpudwt"
 .PHONY : toolboxes/dwt/cpu/CMakeFiles/gadgetron_toolbox_cpudwt.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/dwt/cpu/CMakeFiles/gadgetron_toolbox_cpudwt.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/dwt/cpu/CMakeFiles/gadgetron_toolbox_cpudwt.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/dwt/cpu/CMakeFiles/gadgetron_toolbox_cpudwt.dir/rule
@@ -3354,12 +3375,12 @@ toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/
 toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/all: toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/build.make toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/build.make toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=81,82 "Built target gadgetron_toolbox_gpureg"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=81 "Built target gadgetron_toolbox_gpureg"
 .PHONY : toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 5
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/rule
@@ -3383,12 +3404,12 @@ toolboxes/registration/demons/CMakeFiles/gadgetron_toolbox_demons.dir/all: toolb
 toolboxes/registration/demons/CMakeFiles/gadgetron_toolbox_demons.dir/all: toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/registration/demons/CMakeFiles/gadgetron_toolbox_demons.dir/build.make toolboxes/registration/demons/CMakeFiles/gadgetron_toolbox_demons.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/registration/demons/CMakeFiles/gadgetron_toolbox_demons.dir/build.make toolboxes/registration/demons/CMakeFiles/gadgetron_toolbox_demons.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_demons"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=68 "Built target gadgetron_toolbox_demons"
 .PHONY : toolboxes/registration/demons/CMakeFiles/gadgetron_toolbox_demons.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/registration/demons/CMakeFiles/gadgetron_toolbox_demons.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/registration/demons/CMakeFiles/gadgetron_toolbox_demons.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/registration/demons/CMakeFiles/gadgetron_toolbox_demons.dir/rule
@@ -3412,12 +3433,12 @@ toolboxes/image/cpu/CMakeFiles/gadgetron_toolbox_cpu_image.dir/all: toolboxes/co
 toolboxes/image/cpu/CMakeFiles/gadgetron_toolbox_cpu_image.dir/all: toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/image/cpu/CMakeFiles/gadgetron_toolbox_cpu_image.dir/build.make toolboxes/image/cpu/CMakeFiles/gadgetron_toolbox_cpu_image.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/image/cpu/CMakeFiles/gadgetron_toolbox_cpu_image.dir/build.make toolboxes/image/cpu/CMakeFiles/gadgetron_toolbox_cpu_image.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=60 "Built target gadgetron_toolbox_cpu_image"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_cpu_image"
 .PHONY : toolboxes/image/cpu/CMakeFiles/gadgetron_toolbox_cpu_image.dir/all
 
 # Build rule for subdir invocation for target.
 toolboxes/image/cpu/CMakeFiles/gadgetron_toolbox_cpu_image.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/image/cpu/CMakeFiles/gadgetron_toolbox_cpu_image.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/image/cpu/CMakeFiles/gadgetron_toolbox_cpu_image.dir/rule
@@ -3508,7 +3529,7 @@ toolboxes/image_io/CMakeFiles/gadgetron_toolbox_image_analyze_io.dir/all: toolbo
 
 # Build rule for subdir invocation for target.
 toolboxes/image_io/CMakeFiles/gadgetron_toolbox_image_analyze_io.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 1
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 2
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/image_io/CMakeFiles/gadgetron_toolbox_image_analyze_io.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/image_io/CMakeFiles/gadgetron_toolbox_image_analyze_io.dir/rule
@@ -3538,7 +3559,7 @@ toolboxes/T1/CMakeFiles/gadgetron_toolbox_t1.dir/all: toolboxes/registration/dem
 
 # Build rule for subdir invocation for target.
 toolboxes/T1/CMakeFiles/gadgetron_toolbox_t1.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/T1/CMakeFiles/gadgetron_toolbox_t1.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/T1/CMakeFiles/gadgetron_toolbox_t1.dir/rule
@@ -3572,7 +3593,7 @@ toolboxes/python/CMakeFiles/gadgetron_toolbox_python.dir/all: toolboxes/image_io
 
 # Build rule for subdir invocation for target.
 toolboxes/python/CMakeFiles/gadgetron_toolbox_python.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 10
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 toolboxes/python/CMakeFiles/gadgetron_toolbox_python.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : toolboxes/python/CMakeFiles/gadgetron_toolbox_python.dir/rule
@@ -3602,7 +3623,7 @@ toolboxes/python/example/CMakeFiles/python_demo.dir/all: toolboxes/image_io/CMak
 toolboxes/python/example/CMakeFiles/python_demo.dir/all: toolboxes/python/CMakeFiles/gadgetron_toolbox_python.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/python/example/CMakeFiles/python_demo.dir/build.make toolboxes/python/example/CMakeFiles/python_demo.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/python/example/CMakeFiles/python_demo.dir/build.make toolboxes/python/example/CMakeFiles/python_demo.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target python_demo"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=93 "Built target python_demo"
 .PHONY : toolboxes/python/example/CMakeFiles/python_demo.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3637,7 +3658,7 @@ toolboxes/python/example/CMakeFiles/gadgetron_test_python.dir/all: toolboxes/ima
 toolboxes/python/example/CMakeFiles/gadgetron_test_python.dir/all: toolboxes/python/CMakeFiles/gadgetron_toolbox_python.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/python/example/CMakeFiles/gadgetron_test_python.dir/build.make toolboxes/python/example/CMakeFiles/gadgetron_test_python.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/python/example/CMakeFiles/gadgetron_test_python.dir/build.make toolboxes/python/example/CMakeFiles/gadgetron_test_python.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_test_python"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=56 "Built target gadgetron_test_python"
 .PHONY : toolboxes/python/example/CMakeFiles/gadgetron_test_python.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3671,7 +3692,7 @@ toolboxes/plplot/CMakeFiles/gadgetron_toolbox_plplot.dir/all: toolboxes/klt/cpu/
 toolboxes/plplot/CMakeFiles/gadgetron_toolbox_plplot.dir/all: toolboxes/image_io/CMakeFiles/gadgetron_toolbox_image_analyze_io.dir/all
 	$(MAKE) $(MAKESILENT) -f toolboxes/plplot/CMakeFiles/gadgetron_toolbox_plplot.dir/build.make toolboxes/plplot/CMakeFiles/gadgetron_toolbox_plplot.dir/depend
 	$(MAKE) $(MAKESILENT) -f toolboxes/plplot/CMakeFiles/gadgetron_toolbox_plplot.dir/build.make toolboxes/plplot/CMakeFiles/gadgetron_toolbox_plplot.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_toolbox_plplot"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=88 "Built target gadgetron_toolbox_plplot"
 .PHONY : toolboxes/plplot/CMakeFiles/gadgetron_toolbox_plplot.dir/all
 
 # Build rule for subdir invocation for target.
@@ -3719,7 +3740,7 @@ gadgets/examples/CMakeFiles/gadgetron_examples.dir/all: gadgets/mri_core/CMakeFi
 
 # Build rule for subdir invocation for target.
 gadgets/examples/CMakeFiles/gadgetron_examples.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 33
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 31
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/examples/CMakeFiles/gadgetron_examples.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/examples/CMakeFiles/gadgetron_examples.dir/rule
@@ -3760,7 +3781,7 @@ gadgets/mri_core/CMakeFiles/gadgetron_mricore.dir/all: toolboxes/python/CMakeFil
 
 # Build rule for subdir invocation for target.
 gadgets/mri_core/CMakeFiles/gadgetron_mricore.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 31
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/mri_core/CMakeFiles/gadgetron_mricore.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/mri_core/CMakeFiles/gadgetron_mricore.dir/rule
@@ -3797,12 +3818,12 @@ gadgets/interventional_mri/CMakeFiles/gadgetron_interventional_mri.dir/all: tool
 gadgets/interventional_mri/CMakeFiles/gadgetron_interventional_mri.dir/all: gadgets/mri_core/CMakeFiles/gadgetron_mricore.dir/all
 	$(MAKE) $(MAKESILENT) -f gadgets/interventional_mri/CMakeFiles/gadgetron_interventional_mri.dir/build.make gadgets/interventional_mri/CMakeFiles/gadgetron_interventional_mri.dir/depend
 	$(MAKE) $(MAKESILENT) -f gadgets/interventional_mri/CMakeFiles/gadgetron_interventional_mri.dir/build.make gadgets/interventional_mri/CMakeFiles/gadgetron_interventional_mri.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_interventional_mri"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=32 "Built target gadgetron_interventional_mri"
 .PHONY : gadgets/interventional_mri/CMakeFiles/gadgetron_interventional_mri.dir/all
 
 # Build rule for subdir invocation for target.
 gadgets/interventional_mri/CMakeFiles/gadgetron_interventional_mri.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 31
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 30
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/interventional_mri/CMakeFiles/gadgetron_interventional_mri.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/interventional_mri/CMakeFiles/gadgetron_interventional_mri.dir/rule
@@ -3846,7 +3867,7 @@ gadgets/cmr/CMakeFiles/gadgetron_cmr.dir/all: gadgets/mri_core/CMakeFiles/gadget
 
 # Build rule for subdir invocation for target.
 gadgets/cmr/CMakeFiles/gadgetron_cmr.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 35
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 32
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/cmr/CMakeFiles/gadgetron_cmr.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/cmr/CMakeFiles/gadgetron_cmr.dir/rule
@@ -3888,7 +3909,7 @@ gadgets/epi/CMakeFiles/gadgetron_epi.dir/all: gadgets/mri_core/CMakeFiles/gadget
 
 # Build rule for subdir invocation for target.
 gadgets/epi/CMakeFiles/gadgetron_epi.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 33
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 31
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/epi/CMakeFiles/gadgetron_epi.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/epi/CMakeFiles/gadgetron_epi.dir/rule
@@ -3931,7 +3952,7 @@ gadgets/fatwater/CMakeFiles/gadgetron_fatwater.dir/all: gadgets/mri_core/CMakeFi
 
 # Build rule for subdir invocation for target.
 gadgets/fatwater/CMakeFiles/gadgetron_fatwater.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 33
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 31
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/fatwater/CMakeFiles/gadgetron_fatwater.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/fatwater/CMakeFiles/gadgetron_fatwater.dir/rule
@@ -3962,12 +3983,12 @@ gadgets/T1/CMakeFiles/gadgetron_t1.dir/all: toolboxes/image_io/CMakeFiles/gadget
 gadgets/T1/CMakeFiles/gadgetron_t1.dir/all: toolboxes/T1/CMakeFiles/gadgetron_toolbox_t1.dir/all
 	$(MAKE) $(MAKESILENT) -f gadgets/T1/CMakeFiles/gadgetron_t1.dir/build.make gadgets/T1/CMakeFiles/gadgetron_t1.dir/depend
 	$(MAKE) $(MAKESILENT) -f gadgets/T1/CMakeFiles/gadgetron_t1.dir/build.make gadgets/T1/CMakeFiles/gadgetron_t1.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=56 "Built target gadgetron_t1"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_t1"
 .PHONY : gadgets/T1/CMakeFiles/gadgetron_t1.dir/all
 
 # Build rule for subdir invocation for target.
 gadgets/T1/CMakeFiles/gadgetron_t1.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 10
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/T1/CMakeFiles/gadgetron_t1.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/T1/CMakeFiles/gadgetron_t1.dir/rule
@@ -4011,12 +4032,12 @@ gadgets/sms_core/CMakeFiles/gadgetron_smscore.dir/all: toolboxes/python/CMakeFil
 gadgets/sms_core/CMakeFiles/gadgetron_smscore.dir/all: gadgets/mri_core/CMakeFiles/gadgetron_mricore.dir/all
 	$(MAKE) $(MAKESILENT) -f gadgets/sms_core/CMakeFiles/gadgetron_smscore.dir/build.make gadgets/sms_core/CMakeFiles/gadgetron_smscore.dir/depend
 	$(MAKE) $(MAKESILENT) -f gadgets/sms_core/CMakeFiles/gadgetron_smscore.dir/build.make gadgets/sms_core/CMakeFiles/gadgetron_smscore.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=50,51,52,53,54 "Built target gadgetron_smscore"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=49,50,51,52,53 "Built target gadgetron_smscore"
 .PHONY : gadgets/sms_core/CMakeFiles/gadgetron_smscore.dir/all
 
 # Build rule for subdir invocation for target.
 gadgets/sms_core/CMakeFiles/gadgetron_smscore.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 46
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 45
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/sms_core/CMakeFiles/gadgetron_smscore.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/sms_core/CMakeFiles/gadgetron_smscore.dir/rule
@@ -4065,7 +4086,7 @@ gadgets/thermo_core/CMakeFiles/gadgetron_thermocore.dir/all: gadgets/mri_core/CM
 
 # Build rule for subdir invocation for target.
 gadgets/thermo_core/CMakeFiles/gadgetron_thermocore.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 42
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 41
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/thermo_core/CMakeFiles/gadgetron_thermocore.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/thermo_core/CMakeFiles/gadgetron_thermocore.dir/rule
@@ -4109,12 +4130,12 @@ gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/all: toolboxes/python/CMake
 gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/all: gadgets/mri_core/CMakeFiles/gadgetron_mricore.dir/all
 	$(MAKE) $(MAKESILENT) -f gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/build.make gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/depend
 	$(MAKE) $(MAKESILENT) -f gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/build.make gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=25,26,27 "Built target gadgetron_gpuparallelmri"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=25,26 "Built target gadgetron_gpuparallelmri"
 .PHONY : gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/all
 
 # Build rule for subdir invocation for target.
 gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 44
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 42
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/rule
@@ -4159,12 +4180,12 @@ gadgets/radial/CMakeFiles/gadgetron_gpuradial.dir/all: gadgets/mri_core/CMakeFil
 gadgets/radial/CMakeFiles/gadgetron_gpuradial.dir/all: gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/all
 	$(MAKE) $(MAKESILENT) -f gadgets/radial/CMakeFiles/gadgetron_gpuradial.dir/build.make gadgets/radial/CMakeFiles/gadgetron_gpuradial.dir/depend
 	$(MAKE) $(MAKESILENT) -f gadgets/radial/CMakeFiles/gadgetron_gpuradial.dir/build.make gadgets/radial/CMakeFiles/gadgetron_gpuradial.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=28 "Built target gadgetron_gpuradial"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=27,28 "Built target gadgetron_gpuradial"
 .PHONY : gadgets/radial/CMakeFiles/gadgetron_gpuradial.dir/all
 
 # Build rule for subdir invocation for target.
 gadgets/radial/CMakeFiles/gadgetron_gpuradial.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 45
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 44
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/radial/CMakeFiles/gadgetron_gpuradial.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/radial/CMakeFiles/gadgetron_gpuradial.dir/rule
@@ -4210,12 +4231,12 @@ gadgets/hyper/CMakeFiles/gadgetron_hyper.dir/all: gadgets/mri_core/CMakeFiles/ga
 gadgets/hyper/CMakeFiles/gadgetron_hyper.dir/all: gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/all
 	$(MAKE) $(MAKESILENT) -f gadgets/hyper/CMakeFiles/gadgetron_hyper.dir/build.make gadgets/hyper/CMakeFiles/gadgetron_hyper.dir/depend
 	$(MAKE) $(MAKESILENT) -f gadgets/hyper/CMakeFiles/gadgetron_hyper.dir/build.make gadgets/hyper/CMakeFiles/gadgetron_hyper.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=31,32 "Built target gadgetron_hyper"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=31 "Built target gadgetron_hyper"
 .PHONY : gadgets/hyper/CMakeFiles/gadgetron_hyper.dir/all
 
 # Build rule for subdir invocation for target.
 gadgets/hyper/CMakeFiles/gadgetron_hyper.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 46
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 44
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/hyper/CMakeFiles/gadgetron_hyper.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/hyper/CMakeFiles/gadgetron_hyper.dir/rule
@@ -4247,7 +4268,7 @@ gadgets/gpu/CMakeFiles/gadgetron_gpugadget.dir/all: toolboxes/nfft/gpu/CMakeFile
 
 # Build rule for subdir invocation for target.
 gadgets/gpu/CMakeFiles/gadgetron_gpugadget.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 5
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/gpu/CMakeFiles/gadgetron_gpugadget.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/gpu/CMakeFiles/gadgetron_gpugadget.dir/rule
@@ -4296,7 +4317,7 @@ gadgets/mri_noncartesian/CMakeFiles/gadgetron_mri_noncartesian.dir/all: gadgets/
 
 # Build rule for subdir invocation for target.
 gadgets/mri_noncartesian/CMakeFiles/gadgetron_mri_noncartesian.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 43
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 41
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/mri_noncartesian/CMakeFiles/gadgetron_mri_noncartesian.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/mri_noncartesian/CMakeFiles/gadgetron_mri_noncartesian.dir/rule
@@ -4342,12 +4363,12 @@ gadgets/spiral/CMakeFiles/gadgetron_spiral.dir/all: gadgets/mri_core/CMakeFiles/
 gadgets/spiral/CMakeFiles/gadgetron_spiral.dir/all: gadgets/pmri/CMakeFiles/gadgetron_gpuparallelmri.dir/all
 	$(MAKE) $(MAKESILENT) -f gadgets/spiral/CMakeFiles/gadgetron_spiral.dir/build.make gadgets/spiral/CMakeFiles/gadgetron_spiral.dir/depend
 	$(MAKE) $(MAKESILENT) -f gadgets/spiral/CMakeFiles/gadgetron_spiral.dir/build.make gadgets/spiral/CMakeFiles/gadgetron_spiral.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=55 "Built target gadgetron_spiral"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=54,55 "Built target gadgetron_spiral"
 .PHONY : gadgets/spiral/CMakeFiles/gadgetron_spiral.dir/all
 
 # Build rule for subdir invocation for target.
 gadgets/spiral/CMakeFiles/gadgetron_spiral.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 46
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 44
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/spiral/CMakeFiles/gadgetron_spiral.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/spiral/CMakeFiles/gadgetron_spiral.dir/rule
@@ -4395,7 +4416,7 @@ gadgets/grappa/CMakeFiles/gadgetron_grappa.dir/all: gadgets/mri_core/CMakeFiles/
 
 # Build rule for subdir invocation for target.
 gadgets/grappa/CMakeFiles/gadgetron_grappa.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 43
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 40
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/grappa/CMakeFiles/gadgetron_grappa.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/grappa/CMakeFiles/gadgetron_grappa.dir/rule
@@ -4432,12 +4453,12 @@ gadgets/dicom/CMakeFiles/gadgetron_dicom.dir/all: toolboxes/python/CMakeFiles/ga
 gadgets/dicom/CMakeFiles/gadgetron_dicom.dir/all: gadgets/mri_core/CMakeFiles/gadgetron_mricore.dir/all
 	$(MAKE) $(MAKESILENT) -f gadgets/dicom/CMakeFiles/gadgetron_dicom.dir/build.make gadgets/dicom/CMakeFiles/gadgetron_dicom.dir/depend
 	$(MAKE) $(MAKESILENT) -f gadgets/dicom/CMakeFiles/gadgetron_dicom.dir/build.make gadgets/dicom/CMakeFiles/gadgetron_dicom.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_dicom"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=20 "Built target gadgetron_dicom"
 .PHONY : gadgets/dicom/CMakeFiles/gadgetron_dicom.dir/all
 
 # Build rule for subdir invocation for target.
 gadgets/dicom/CMakeFiles/gadgetron_dicom.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 31
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 30
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/dicom/CMakeFiles/gadgetron_dicom.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/dicom/CMakeFiles/gadgetron_dicom.dir/rule
@@ -4479,7 +4500,7 @@ gadgets/cartesian/CMakeFiles/gadgetron_cartesian.dir/all: gadgets/mri_core/CMake
 
 # Build rule for subdir invocation for target.
 gadgets/cartesian/CMakeFiles/gadgetron_cartesian.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 32
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 30
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/cartesian/CMakeFiles/gadgetron_cartesian.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/cartesian/CMakeFiles/gadgetron_cartesian.dir/rule
@@ -4523,7 +4544,7 @@ gadgets/moco/CMakeFiles/gadgetron_moco.dir/all: gadgets/mri_core/CMakeFiles/gadg
 
 # Build rule for subdir invocation for target.
 gadgets/moco/CMakeFiles/gadgetron_moco.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 37
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 33
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/moco/CMakeFiles/gadgetron_moco.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/moco/CMakeFiles/gadgetron_moco.dir/rule
@@ -4561,12 +4582,12 @@ gadgets/plplot/CMakeFiles/gadgetron_plplot.dir/all: toolboxes/plplot/CMakeFiles/
 gadgets/plplot/CMakeFiles/gadgetron_plplot.dir/all: gadgets/mri_core/CMakeFiles/gadgetron_mricore.dir/all
 	$(MAKE) $(MAKESILENT) -f gadgets/plplot/CMakeFiles/gadgetron_plplot.dir/build.make gadgets/plplot/CMakeFiles/gadgetron_plplot.dir/depend
 	$(MAKE) $(MAKESILENT) -f gadgets/plplot/CMakeFiles/gadgetron_plplot.dir/build.make gadgets/plplot/CMakeFiles/gadgetron_plplot.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=49 "Built target gadgetron_plplot"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target gadgetron_plplot"
 .PHONY : gadgets/plplot/CMakeFiles/gadgetron_plplot.dir/all
 
 # Build rule for subdir invocation for target.
 gadgets/plplot/CMakeFiles/gadgetron_plplot.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 32
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 30
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gadgets/plplot/CMakeFiles/gadgetron_plplot.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : gadgets/plplot/CMakeFiles/gadgetron_plplot.dir/rule
@@ -4637,7 +4658,7 @@ apps/clients/gadgetron_ismrmrd_client/CMakeFiles/gadgetron_ismrmrd_client.dir/al
 
 # Build rule for subdir invocation for target.
 apps/clients/gadgetron_ismrmrd_client/CMakeFiles/gadgetron_ismrmrd_client.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 31
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 29
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/clients/gadgetron_ismrmrd_client/CMakeFiles/gadgetron_ismrmrd_client.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/clients/gadgetron_ismrmrd_client/CMakeFiles/gadgetron_ismrmrd_client.dir/rule
@@ -4667,7 +4688,7 @@ apps/standalone/cpu/denoising/2d/CMakeFiles/cpu_denoise_TV.dir/all: toolboxes/co
 
 # Build rule for subdir invocation for target.
 apps/standalone/cpu/denoising/2d/CMakeFiles/cpu_denoise_TV.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 3
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/cpu/denoising/2d/CMakeFiles/cpu_denoise_TV.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/cpu/denoising/2d/CMakeFiles/cpu_denoise_TV.dir/rule
@@ -4694,7 +4715,7 @@ apps/standalone/cpu/registration/2d/CMakeFiles/register_HS_2d_cpu.dir/all: toolb
 apps/standalone/cpu/registration/2d/CMakeFiles/register_HS_2d_cpu.dir/all: toolboxes/image_io/CMakeFiles/gadgetron_toolbox_image_analyze_io.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/cpu/registration/2d/CMakeFiles/register_HS_2d_cpu.dir/build.make apps/standalone/cpu/registration/2d/CMakeFiles/register_HS_2d_cpu.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/cpu/registration/2d/CMakeFiles/register_HS_2d_cpu.dir/build.make apps/standalone/cpu/registration/2d/CMakeFiles/register_HS_2d_cpu.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target register_HS_2d_cpu"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=96 "Built target register_HS_2d_cpu"
 .PHONY : apps/standalone/cpu/registration/2d/CMakeFiles/register_HS_2d_cpu.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4726,7 +4747,7 @@ apps/standalone/cpu/registration/2d/CMakeFiles/register_CK_2d_cpu.dir/all: toolb
 apps/standalone/cpu/registration/2d/CMakeFiles/register_CK_2d_cpu.dir/all: toolboxes/image_io/CMakeFiles/gadgetron_toolbox_image_analyze_io.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/cpu/registration/2d/CMakeFiles/register_CK_2d_cpu.dir/build.make apps/standalone/cpu/registration/2d/CMakeFiles/register_CK_2d_cpu.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/cpu/registration/2d/CMakeFiles/register_CK_2d_cpu.dir/build.make apps/standalone/cpu/registration/2d/CMakeFiles/register_CK_2d_cpu.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target register_CK_2d_cpu"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=94 "Built target register_CK_2d_cpu"
 .PHONY : apps/standalone/cpu/registration/2d/CMakeFiles/register_CK_2d_cpu.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4758,7 +4779,7 @@ apps/standalone/cpu/registration/3d/CMakeFiles/register_CK_3d_cpu.dir/all: toolb
 apps/standalone/cpu/registration/3d/CMakeFiles/register_CK_3d_cpu.dir/all: toolboxes/image_io/CMakeFiles/gadgetron_toolbox_image_analyze_io.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/cpu/registration/3d/CMakeFiles/register_CK_3d_cpu.dir/build.make apps/standalone/cpu/registration/3d/CMakeFiles/register_CK_3d_cpu.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/cpu/registration/3d/CMakeFiles/register_CK_3d_cpu.dir/build.make apps/standalone/cpu/registration/3d/CMakeFiles/register_CK_3d_cpu.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target register_CK_3d_cpu"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=95 "Built target register_CK_3d_cpu"
 .PHONY : apps/standalone/cpu/registration/3d/CMakeFiles/register_CK_3d_cpu.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4818,7 +4839,7 @@ apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_2d_radial.dir/all: toolboxes/co
 apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_2d_radial.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_2d_radial.dir/build.make apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_2d_radial.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_2d_radial.dir/build.make apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_2d_radial.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target nffth_2d_radial"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=92 "Built target nffth_2d_radial"
 .PHONY : apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_2d_radial.dir/all
 
 # Build rule for subdir invocation for target.
@@ -4851,12 +4872,12 @@ apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nfft_2d_radial.dir/all: toolboxes/cor
 apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nfft_2d_radial.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nfft_2d_radial.dir/build.make apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nfft_2d_radial.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nfft_2d_radial.dir/build.make apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nfft_2d_radial.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=91 "Built target nfft_2d_radial"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target nfft_2d_radial"
 .PHONY : apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nfft_2d_radial.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nfft_2d_radial.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 6
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nfft_2d_radial.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nfft_2d_radial.dir/rule
@@ -4919,12 +4940,12 @@ apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_sb_2d_radial.dir/all: toolboxes
 apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_sb_2d_radial.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_sb_2d_radial.dir/build.make apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_sb_2d_radial.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_sb_2d_radial.dir/build.make apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_sb_2d_radial.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=93 "Built target nffth_sb_2d_radial"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target nffth_sb_2d_radial"
 .PHONY : apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_sb_2d_radial.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_sb_2d_radial.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 8
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 7
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_sb_2d_radial.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/mri/nfft/2d/CMakeFiles/nffth_sb_2d_radial.dir/rule
@@ -4951,12 +4972,12 @@ apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_radial.dir/all: toolbox
 apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_radial.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_radial.dir/build.make apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_radial.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_radial.dir/build.make apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_radial.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=92 "Built target nffth_2d_ms_radial"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target nffth_2d_ms_radial"
 .PHONY : apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_radial.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_radial.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 4
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_radial.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_radial.dir/rule
@@ -4983,12 +5004,12 @@ apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nfft_2d_ms_radial.dir/all: toolboxe
 apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nfft_2d_ms_radial.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nfft_2d_ms_radial.dir/build.make apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nfft_2d_ms_radial.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nfft_2d_ms_radial.dir/build.make apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nfft_2d_ms_radial.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target nfft_2d_ms_radial"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=90 "Built target nfft_2d_ms_radial"
 .PHONY : apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nfft_2d_ms_radial.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nfft_2d_ms_radial.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 6
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 5
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nfft_2d_ms_radial.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nfft_2d_ms_radial.dir/rule
@@ -5015,12 +5036,12 @@ apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_generic.dir/all: toolbo
 apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_generic.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_generic.dir/build.make apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_generic.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_generic.dir/build.make apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_generic.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target nffth_2d_ms_generic"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=91 "Built target nffth_2d_ms_generic"
 .PHONY : apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_generic.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_generic.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 6
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 5
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_generic.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/mri/nfft/ms2d/CMakeFiles/nffth_2d_ms_generic.dir/rule
@@ -5051,12 +5072,12 @@ apps/standalone/gpu/mri/sense/noncartesian/CMakeFiles/sense_cg_generic_2d.dir/al
 apps/standalone/gpu/mri/sense/noncartesian/CMakeFiles/sense_cg_generic_2d.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/CMakeFiles/sense_cg_generic_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/CMakeFiles/sense_cg_generic_2d.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/CMakeFiles/sense_cg_generic_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/CMakeFiles/sense_cg_generic_2d.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=97 "Built target sense_cg_generic_2d"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target sense_cg_generic_2d"
 .PHONY : apps/standalone/gpu/mri/sense/noncartesian/CMakeFiles/sense_cg_generic_2d.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/mri/sense/noncartesian/CMakeFiles/sense_cg_generic_2d.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 14
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 12
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/mri/sense/noncartesian/CMakeFiles/sense_cg_generic_2d.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/mri/sense/noncartesian/CMakeFiles/sense_cg_generic_2d.dir/rule
@@ -5087,12 +5108,12 @@ apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sen
 apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_sbc_radial_2d.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_sbc_radial_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_sbc_radial_2d.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_sbc_radial_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_sbc_radial_2d.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=99 "Built target sense_sbc_radial_2d"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target sense_sbc_radial_2d"
 .PHONY : apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_sbc_radial_2d.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_sbc_radial_2d.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 14
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 12
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_sbc_radial_2d.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_sbc_radial_2d.dir/rule
@@ -5123,12 +5144,12 @@ apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sen
 apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_gpbb_radial_2d.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_gpbb_radial_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_gpbb_radial_2d.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_gpbb_radial_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_gpbb_radial_2d.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=98 "Built target sense_gpbb_radial_2d"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target sense_gpbb_radial_2d"
 .PHONY : apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_gpbb_radial_2d.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_gpbb_radial_2d.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 14
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 12
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_gpbb_radial_2d.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_gpbb_radial_2d.dir/rule
@@ -5159,7 +5180,7 @@ apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sen
 apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_cg_radial_2d.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_cg_radial_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_cg_radial_2d.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_cg_radial_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_cg_radial_2d.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target sense_cg_radial_2d"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=97 "Built target sense_cg_radial_2d"
 .PHONY : apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_cg_radial_2d.dir/all
 
 # Build rule for subdir invocation for target.
@@ -5195,7 +5216,7 @@ apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sen
 apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_nlcg_radial_2d.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_nlcg_radial_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_nlcg_radial_2d.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_nlcg_radial_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_nlcg_radial_2d.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target sense_nlcg_radial_2d"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=98 "Built target sense_nlcg_radial_2d"
 .PHONY : apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio/CMakeFiles/sense_nlcg_radial_2d.dir/all
 
 # Build rule for subdir invocation for target.
@@ -5231,12 +5252,12 @@ apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio_kt/CMakeFiles/
 apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio_kt/CMakeFiles/ktsense_radial_2d.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio_kt/CMakeFiles/ktsense_radial_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio_kt/CMakeFiles/ktsense_radial_2d.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio_kt/CMakeFiles/ktsense_radial_2d.dir/build.make apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio_kt/CMakeFiles/ktsense_radial_2d.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=90 "Built target ktsense_radial_2d"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target ktsense_radial_2d"
 .PHONY : apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio_kt/CMakeFiles/ktsense_radial_2d.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio_kt/CMakeFiles/ktsense_radial_2d.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 14
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 12
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio_kt/CMakeFiles/ktsense_radial_2d.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/mri/sense/noncartesian/radial/2d_golden_ratio_kt/CMakeFiles/ktsense_radial_2d.dir/rule
@@ -5271,7 +5292,7 @@ apps/standalone/gpu/denoising/2d/CMakeFiles/denoise_TV.dir/all: toolboxes/dwt/gp
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/denoising/2d/CMakeFiles/denoise_TV.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 8
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/denoising/2d/CMakeFiles/denoise_TV.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/denoising/2d/CMakeFiles/denoise_TV.dir/rule
@@ -5511,7 +5532,7 @@ apps/standalone/gpu/registration/2d/CMakeFiles/register_HS_2d_gpu.dir/all: toolb
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/registration/2d/CMakeFiles/register_HS_2d_gpu.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 11
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/registration/2d/CMakeFiles/register_HS_2d_gpu.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/registration/2d/CMakeFiles/register_HS_2d_gpu.dir/rule
@@ -5542,12 +5563,12 @@ apps/standalone/gpu/registration/2d/CMakeFiles/register_CK_2d_gpu.dir/all: toolb
 apps/standalone/gpu/registration/2d/CMakeFiles/register_CK_2d_gpu.dir/all: toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/registration/2d/CMakeFiles/register_CK_2d_gpu.dir/build.make apps/standalone/gpu/registration/2d/CMakeFiles/register_CK_2d_gpu.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/registration/2d/CMakeFiles/register_CK_2d_gpu.dir/build.make apps/standalone/gpu/registration/2d/CMakeFiles/register_CK_2d_gpu.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=95 "Built target register_CK_2d_gpu"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target register_CK_2d_gpu"
 .PHONY : apps/standalone/gpu/registration/2d/CMakeFiles/register_CK_2d_gpu.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/registration/2d/CMakeFiles/register_CK_2d_gpu.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 12
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/registration/2d/CMakeFiles/register_CK_2d_gpu.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/registration/2d/CMakeFiles/register_CK_2d_gpu.dir/rule
@@ -5578,12 +5599,12 @@ apps/standalone/gpu/registration/2d/CMakeFiles/register_CGHS_2d_gpu.dir/all: too
 apps/standalone/gpu/registration/2d/CMakeFiles/register_CGHS_2d_gpu.dir/all: toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/registration/2d/CMakeFiles/register_CGHS_2d_gpu.dir/build.make apps/standalone/gpu/registration/2d/CMakeFiles/register_CGHS_2d_gpu.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/registration/2d/CMakeFiles/register_CGHS_2d_gpu.dir/build.make apps/standalone/gpu/registration/2d/CMakeFiles/register_CGHS_2d_gpu.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=94 "Built target register_CGHS_2d_gpu"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target register_CGHS_2d_gpu"
 .PHONY : apps/standalone/gpu/registration/2d/CMakeFiles/register_CGHS_2d_gpu.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/registration/2d/CMakeFiles/register_CGHS_2d_gpu.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 12
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/registration/2d/CMakeFiles/register_CGHS_2d_gpu.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/registration/2d/CMakeFiles/register_CGHS_2d_gpu.dir/rule
@@ -5614,12 +5635,12 @@ apps/standalone/gpu/registration/3d/CMakeFiles/register_CK_3d_gpu.dir/all: toolb
 apps/standalone/gpu/registration/3d/CMakeFiles/register_CK_3d_gpu.dir/all: toolboxes/registration/optical_flow/gpu/CMakeFiles/gadgetron_toolbox_gpureg.dir/all
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/registration/3d/CMakeFiles/register_CK_3d_gpu.dir/build.make apps/standalone/gpu/registration/3d/CMakeFiles/register_CK_3d_gpu.dir/depend
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/registration/3d/CMakeFiles/register_CK_3d_gpu.dir/build.make apps/standalone/gpu/registration/3d/CMakeFiles/register_CK_3d_gpu.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=96 "Built target register_CK_3d_gpu"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num= "Built target register_CK_3d_gpu"
 .PHONY : apps/standalone/gpu/registration/3d/CMakeFiles/register_CK_3d_gpu.dir/all
 
 # Build rule for subdir invocation for target.
 apps/standalone/gpu/registration/3d/CMakeFiles/register_CK_3d_gpu.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 12
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 9
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/registration/3d/CMakeFiles/register_CK_3d_gpu.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : apps/standalone/gpu/registration/3d/CMakeFiles/register_CK_3d_gpu.dir/rule
@@ -5736,6 +5757,44 @@ zerofilling_memcpy_run_gpu: apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/ze
 apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/clean:
 	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/build.make apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/clean
 .PHONY : apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/clean
+
+#=============================================================================
+# Target rules for target apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir
+
+# All Build rule for target.
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/log/CMakeFiles/gadgetron_toolbox_log.dir/all
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/operators/gpu/CMakeFiles/gadgetron_toolbox_gpuoperators.dir/all
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/solvers/gpu/CMakeFiles/gadgetron_toolbox_gpusolvers.dir/all
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/fft/gpu/CMakeFiles/gadgetron_toolbox_gpufft.dir/all
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/core/cpu/CMakeFiles/gadgetron_toolbox_cpucore.dir/all
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/core/cpu/math/CMakeFiles/gadgetron_toolbox_cpucore_math.dir/all
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/core/cpu/hostutils/CMakeFiles/gadgetron_toolbox_hostutils.dir/all
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/core/gpu/CMakeFiles/gadgetron_toolbox_gpucore.dir/all
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/all
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/nfft/gpu/CMakeFiles/gadgetron_toolbox_gpunfft.dir/all
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/dwt/gpu/CMakeFiles/gadgetron_toolbox_gpudwt.dir/all
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all: toolboxes/image_io/CMakeFiles/gadgetron_toolbox_image_analyze_io.dir/all
+	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/build.make apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/depend
+	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/build.make apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=99 "Built target subsampling_run_gpu"
+.PHONY : apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all
+
+# Build rule for subdir invocation for target.
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 15
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
+.PHONY : apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/rule
+
+# Convenience name for target.
+subsampling_run_gpu: apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/rule
+
+.PHONY : subsampling_run_gpu
+
+# clean rule for target.
+apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/clean:
+	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/build.make apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/clean
+.PHONY : apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/clean
 
 #=============================================================================
 # Target rules for target chroot/CMakeFiles/chroot.dir

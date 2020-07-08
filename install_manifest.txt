@@ -317,6 +317,7 @@
 /home/benoit/gadgetron_install_dir/gadgetron4_sms/local/include/gadgetron/gpupmri_export.h
 /home/benoit/gadgetron_install_dir/gadgetron4_sms/local/include/gadgetron/test_gpu_benoit.h
 /home/benoit/gadgetron_install_dir/gadgetron4_sms/local/include/gadgetron/cuZeroFilling.h
+/home/benoit/gadgetron_install_dir/gadgetron4_sms/local/include/gadgetron/cuSubSampling.h
 /home/benoit/gadgetron_install_dir/gadgetron4_sms/local/include/gadgetron/EPIExport.h
 /home/benoit/gadgetron_install_dir/gadgetron4_sms/local/include/gadgetron/EPIReconXObject.h
 /home/benoit/gadgetron_install_dir/gadgetron4_sms/local/include/gadgetron/EPIReconXObjectFlat.h

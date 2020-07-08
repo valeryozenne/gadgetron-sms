@@ -48,6 +48,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "apps/standalone/gpu/registration/2d/CMakeLists.txt"
   "apps/standalone/gpu/registration/3d/CMakeLists.txt"
   "apps/standalone/gpu/registration/CMakeLists.txt"
+  "apps/standalone/gpu/subsampling/CMakeLists.txt"
   "apps/standalone/gpu/zerofilling/CMakeLists.txt"
   "apps/standalone/gpu/zerofilling_memcpy/CMakeLists.txt"
   "chroot/CMakeLists.txt"
@@ -180,6 +181,8 @@ set(CMAKE_MAKEFILE_DEPENDS
   "toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/gadgetron_toolbox_gpuparallelmri_generated_cuNonCartesianSenseOperator.cu.o.depend"
   "toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/gadgetron_toolbox_gpuparallelmri_generated_cuSenseOperator.cu.o.cmake.pre-gen"
   "toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/gadgetron_toolbox_gpuparallelmri_generated_cuSenseOperator.cu.o.depend"
+  "toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/gadgetron_toolbox_gpuparallelmri_generated_cuSubSampling.cu.o.cmake.pre-gen"
+  "toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/gadgetron_toolbox_gpuparallelmri_generated_cuSubSampling.cu.o.depend"
   "toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/gadgetron_toolbox_gpuparallelmri_generated_cuZeroFilling.cu.o.cmake.pre-gen"
   "toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/gadgetron_toolbox_gpuparallelmri_generated_cuZeroFilling.cu.o.depend"
   "toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/gadgetron_toolbox_gpuparallelmri_generated_htgrappa.cu.o.cmake.pre-gen"
@@ -432,6 +435,7 @@ set(CMAKE_MAKEFILE_PRODUCTS
   "apps/standalone/gpu/examples/CMakeFiles/CMakeDirectoryInformation.cmake"
   "apps/standalone/gpu/zerofilling/CMakeFiles/CMakeDirectoryInformation.cmake"
   "apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/CMakeDirectoryInformation.cmake"
+  "apps/standalone/gpu/subsampling/CMakeFiles/CMakeDirectoryInformation.cmake"
   "cmake/CMakeFiles/CMakeDirectoryInformation.cmake"
   "chroot/CMakeFiles/CMakeDirectoryInformation.cmake"
   )
@@ -531,6 +535,7 @@ set(CMAKE_DEPEND_INFO_FILES
   "apps/standalone/gpu/examples/CMakeFiles/examples_run_gpu.dir/DependInfo.cmake"
   "apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/DependInfo.cmake"
   "apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/DependInfo.cmake"
+  "apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/DependInfo.cmake"
   "chroot/CMakeFiles/chroot.dir/DependInfo.cmake"
   "chroot/CMakeFiles/chroot_base.dir/DependInfo.cmake"
   )

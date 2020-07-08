@@ -1408,6 +1408,19 @@ zerofilling_memcpy_run_gpu/fast:
 .PHONY : zerofilling_memcpy_run_gpu/fast
 
 #=============================================================================
+# Target rules for targets named subsampling_run_gpu
+
+# Build rule for target.
+subsampling_run_gpu: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 subsampling_run_gpu
+.PHONY : subsampling_run_gpu
+
+# fast build rule for target.
+subsampling_run_gpu/fast:
+	$(MAKE) $(MAKESILENT) -f apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/build.make apps/standalone/gpu/subsampling/CMakeFiles/subsampling_run_gpu.dir/build
+.PHONY : subsampling_run_gpu/fast
+
+#=============================================================================
 # Target rules for targets named chroot
 
 # Build rule for target.
@@ -1540,6 +1553,7 @@ help:
 	@echo "... sense_gpbb_radial_2d"
 	@echo "... sense_nlcg_radial_2d"
 	@echo "... sense_sbc_radial_2d"
+	@echo "... subsampling_run_gpu"
 	@echo "... zerofilling_memcpy_run_gpu"
 	@echo "... zerofilling_run_gpu"
 .PHONY : help

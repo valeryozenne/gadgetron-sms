@@ -1,0 +1,10 @@
+if (WIN32)
+	add_definitions(-D_USE_MATH_DEFINES)
+endif()
+
+
+add_executable(subsampling_run_gpu subsampling.cpp)
+
+target_link_libraries(subsampling_run_gpu gadgetron_toolbox_gpuparallelmri gadgetron_toolbox_image_analyze_io gadgetron_toolbox_gpudwt gadgetron_toolbox_gpucore gadgetron_toolbox_hostutils gadgetron_toolbox_gpusolvers gadgetron_toolbox_gpuoperators ${CUDA_LIBRARIES})
+
+#install(TARGETS examples_run_gpu DESTINATION bin COMPONENT main)

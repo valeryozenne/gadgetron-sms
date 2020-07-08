@@ -2257,6 +2257,11 @@
 			<location>/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/toolboxes/mri/pmri/gpu/cuZeroFilling.cu</location>
 		</link>
 		<link>
+			<name>[Targets]/[lib] gadgetron_toolbox_gpuparallelmri/Source Files/cuSubSampling.cu</name>
+			<type>1</type>
+			<location>/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/toolboxes/mri/pmri/gpu/cuSubSampling.cu</location>
+		</link>
+		<link>
 			<name>[Targets]/[lib] gadgetron_toolbox_gpuparallelmri/Header Files</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
@@ -2352,6 +2357,11 @@
 			<location>/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/toolboxes/mri/pmri/gpu/cuZeroFilling.h</location>
 		</link>
 		<link>
+			<name>[Targets]/[lib] gadgetron_toolbox_gpuparallelmri/Header Files/cuSubSampling.h</name>
+			<type>1</type>
+			<location>/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/toolboxes/mri/pmri/gpu/cuSubSampling.h</location>
+		</link>
+		<link>
 			<name>[Targets]/[lib] gadgetron_toolbox_gpuparallelmri/Precompile Header File</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
@@ -2435,6 +2445,11 @@
 			<name>[Targets]/[lib] gadgetron_toolbox_gpuparallelmri/Object Files/gadgetron_toolbox_gpuparallelmri_generated_cuZeroFilling.cu.o</name>
 			<type>1</type>
 			<location>/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/gadgetron_toolbox_gpuparallelmri_generated_cuZeroFilling.cu.o</location>
+		</link>
+		<link>
+			<name>[Targets]/[lib] gadgetron_toolbox_gpuparallelmri/Object Files/gadgetron_toolbox_gpuparallelmri_generated_cuSubSampling.cu.o</name>
+			<type>1</type>
+			<location>/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/toolboxes/mri/pmri/gpu/CMakeFiles/gadgetron_toolbox_gpuparallelmri.dir/gadgetron_toolbox_gpuparallelmri_generated_cuSubSampling.cu.o</location>
 		</link>
 		<link>
 			<name>[Targets]/[lib] gadgetron_toolbox_gpuparallelmri/Object Libraries</name>
@@ -8658,6 +8673,56 @@
 		</link>
 		<link>
 			<name>[Targets]/[exe] zerofilling_memcpy_run_gpu/Object Libraries</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] subsampling_run_gpu</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] subsampling_run_gpu/</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] subsampling_run_gpu/Source Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] subsampling_run_gpu/Source Files/subsampling.cpp</name>
+			<type>1</type>
+			<location>/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/subsampling/subsampling.cpp</location>
+		</link>
+		<link>
+			<name>[Targets]/[exe] subsampling_run_gpu/Header Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] subsampling_run_gpu/Precompile Header File</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] subsampling_run_gpu/CMake Rules</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] subsampling_run_gpu/Resources</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] subsampling_run_gpu/Object Files</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>[Targets]/[exe] subsampling_run_gpu/Object Libraries</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
