@@ -259,9 +259,6 @@ void ZeroFillingGPUPlusGadget::perform_zerofilling_array_gpu(IsmrmrdImageArray& 
 
     //out.data_.fill(10);
 
-    hoNDArray< complext<float> > data_in(reinterpret_cast<hoNDArray<complext<float>>&>(in.data_));
-    hoNDArray< complext<float> > data_out(reinterpret_cast<hoNDArray<complext<float>>&>(out.data_));
-
     ///////////////////////////////////////////////////////////////
     //tmp allocation - to change
 
