@@ -168,10 +168,6 @@ NonCartesianTools.h
 NFFTOperator.h
 /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/mri_noncartesian/NFFTOperator.h
 
-/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/mri_noncartesian/NonCartesianTools.cpp
-NonCartesianTools.h
-/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/mri_noncartesian/NonCartesianTools.h
-
 /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/mri_noncartesian/NonCartesianTools.h
 mri_core_data.h
 /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/mri_noncartesian/mri_core_data.h

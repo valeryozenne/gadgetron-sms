@@ -257,7 +257,7 @@ void ZeroFillingGPUPlusGadget::perform_zerofilling_array_gpu(IsmrmrdImageArray& 
     
     Gadgetron::clear(out.data_);
 
-    out.data_.fill(10);
+    //out.data_.fill(10);
 
     hoNDArray< complext<float> > data_in(reinterpret_cast<hoNDArray<complext<float>>&>(in.data_));
     hoNDArray< complext<float> > data_out(reinterpret_cast<hoNDArray<complext<float>>&>(out.data_));
@@ -300,11 +300,14 @@ void ZeroFillingGPUPlusGadget::perform_zerofilling_array_gpu(IsmrmrdImageArray& 
     cuNDFFT<float>::instance()->ifft2(&cu_data_out);
     
     ///////////////////////////////////////////////////////////////////////////////
-    //Code to be removed when below will be functionnal
-    auto output_ptr = cu_data_out.to_host();
-    out.data_ =  std::move(reinterpret_cast<hoNDArray<std::complex<float>>&>(*output_ptr));
+    //Code for solution 1 - WORKS
+    //auto output_ptr = cu_data_out.to_host();
+    //out.data_ =  std::move(reinterpret_cast<hoNDArray<std::complex<float>>&>(*output_ptr));
 
-
+    //code for solution 2 - WORKS BUT ERRORS WITH FFT
+    std::complex<float> *pOut = &(out.data_(0, 0, 0, 0, 0, 0, 0));
+    if (cudaMemcpy(pOut, cu_data_out.get_data_ptr(), RO * oversampling * E1 * oversampling * E2 * CHA * N * S * SLC * sizeof(std::complex<float>), cudaMemcpyDeviceToHost) != cudaSuccess)
+        GERROR("Upload to device from in_data failed\n");
     ///////////////////////////////////////////////////////////////////////////////
     // GDEBUG_STREAM("data_out memory size: " << data_out.get_number_of_bytes() << " bytes");
     // GDEBUG_STREAM("copy size: " << RO * oversampling.value() * E1 * oversampling.value() * E2 * CHA * N * S * SLC * sizeof(complext<float>) << " bytes");

@@ -154,22 +154,6 @@ cmr_t2_mapping.h
 CmrParametricMappingGadget.h
 /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/cmr/CmrParametricMappingGadget.h
 
-/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/cmr/PureCmrCartesianKSpaceBinningCineGadget.cpp
-PureCmrCartesianKSpaceBinningCineGadget.h
-/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/cmr/PureCmrCartesianKSpaceBinningCineGadget.h
-boost/range/algorithm/copy.hpp
--
-
-/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/cmr/PureCmrCartesianKSpaceBinningCineGadget.h
-PureGadget.h
-/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/cmr/PureGadget.h
-cmr_kspace_binning.h
-/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/cmr/cmr_kspace_binning.h
-mri_core_data.h
-/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/cmr/mri_core_data.h
-ImageArraySendMixin.h
-/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/cmr/ImageArraySendMixin.h
-
 /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/gadgets/cmr/gadgetron_cmr_export.h
 
 /usr/local/cuda-10.0/include/builtin_types.h
@@ -719,10 +703,6 @@ unordered_map
 -
 io/from_string.h
 core/io/from_string.h
-
-core/PureGadget.h
-Node.h
-core/Node.h
 
 core/TypeTraits.h
 
