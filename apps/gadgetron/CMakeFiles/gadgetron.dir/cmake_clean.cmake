@@ -1,0 +1,41 @@
+file(REMOVE_RECURSE
+  "CMakeFiles/gadgetron.dir/Connection.cpp.o"
+  "CMakeFiles/gadgetron.dir/Server.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/Config.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/ConfigConnection.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/Core.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/Handlers.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/HeaderConnection.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/Loader.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/SocketStreamBuf.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/StreamConnection.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/VoidConnection.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/Writers.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/Distributed.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/External.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/Parallel.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/ParallelProcess.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/Processable.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/PureDistributed.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/PureStream.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/Stream.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/common/Configuration.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/common/Discovery.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/common/External.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/common/ExternalChannel.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/common/Serialization.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/distributed/Pool.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/distributed/Worker.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/external/Matlab.cpp.o"
+  "CMakeFiles/gadgetron.dir/connection/stream/external/Python.cpp.o"
+  "CMakeFiles/gadgetron.dir/main.cpp.o"
+  "CMakeFiles/gadgetron.dir/paths.cpp.o"
+  "CMakeFiles/gadgetron.dir/system_info.cpp.o"
+  "gadgetron"
+  "gadgetron.pdb"
+)
+
+# Per-language clean rules from dependency scanning.
+foreach(lang CXX)
+  include(CMakeFiles/gadgetron.dir/cmake_clean_${lang}.cmake OPTIONAL)
+endforeach()

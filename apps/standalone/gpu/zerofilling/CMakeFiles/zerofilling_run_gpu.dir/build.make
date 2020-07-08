@@ -63,56 +63,89 @@ RM = /usr/local/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling
+CMAKE_SOURCE_DIR = /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling
+CMAKE_BINARY_DIR = /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron
 
 # Include any dependencies generated for this target.
-include CMakeFiles/zerofilling_run_gpu.dir/depend.make
+include apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/depend.make
 
 # Include the progress variables for this target.
-include CMakeFiles/zerofilling_run_gpu.dir/progress.make
+include apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/progress.make
 
 # Include the compile flags for this target's objects.
-include CMakeFiles/zerofilling_run_gpu.dir/flags.make
+include apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/flags.make
 
-CMakeFiles/zerofilling_run_gpu.dir/zerofilling.o: CMakeFiles/zerofilling_run_gpu.dir/flags.make
-CMakeFiles/zerofilling_run_gpu.dir/zerofilling.o: zerofilling.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/zerofilling_run_gpu.dir/zerofilling.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/zerofilling_run_gpu.dir/zerofilling.o -c /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/zerofilling.cpp
+apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.o: apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/flags.make
+apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.o: apps/standalone/gpu/zerofilling/zerofilling.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.o"
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.o -c /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/zerofilling.cpp
 
-CMakeFiles/zerofilling_run_gpu.dir/zerofilling.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/zerofilling_run_gpu.dir/zerofilling.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/zerofilling.cpp > CMakeFiles/zerofilling_run_gpu.dir/zerofilling.i
+apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.i"
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/zerofilling.cpp > CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.i
 
-CMakeFiles/zerofilling_run_gpu.dir/zerofilling.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/zerofilling_run_gpu.dir/zerofilling.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/zerofilling.cpp -o CMakeFiles/zerofilling_run_gpu.dir/zerofilling.s
+apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.s"
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/zerofilling.cpp -o CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.s
 
 # Object files for target zerofilling_run_gpu
 zerofilling_run_gpu_OBJECTS = \
-"CMakeFiles/zerofilling_run_gpu.dir/zerofilling.o"
+"CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.o"
 
 # External object files for target zerofilling_run_gpu
 zerofilling_run_gpu_EXTERNAL_OBJECTS =
 
-zerofilling_run_gpu: CMakeFiles/zerofilling_run_gpu.dir/zerofilling.o
-zerofilling_run_gpu: CMakeFiles/zerofilling_run_gpu.dir/build.make
-zerofilling_run_gpu: CMakeFiles/zerofilling_run_gpu.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable zerofilling_run_gpu"
-	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/zerofilling_run_gpu.dir/link.txt --verbose=$(VERBOSE)
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/zerofilling.cpp.o
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/build.make
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/mri/pmri/gpu/libgadgetron_toolbox_gpuparallelmri.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/image_io/libgadgetron_toolbox_image_analyze_io.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/dwt/gpu/libgadgetron_toolbox_gpudwt.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/core/cpu/hostutils/libgadgetron_toolbox_hostutils.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/solvers/gpu/libgadgetron_toolbox_gpusolvers.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/operators/gpu/libgadgetron_toolbox_gpuoperators.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/local/cuda-10.0/lib64/libcudart.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/core/cpu/math/libgadgetron_toolbox_cpucore_math.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/liblapacke.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libopenblas.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/nfft/gpu/libgadgetron_toolbox_gpunfft.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/fft/gpu/libgadgetron_toolbox_gpufft.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/core/gpu/libgadgetron_toolbox_gpucore.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/local/cuda-10.0/lib64/libcusparse.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/local/cuda-10.0/lib64/libcudart.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/core/cpu/libgadgetron_toolbox_cpucore.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: toolboxes/log/libgadgetron_toolbox_log.so.4.1.1
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libboost_system.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libboost_program_options.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libboost_timer.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libboost_chrono.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libpython3.6m.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libboost_python3.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /home/benoit/gadgetron_install_dir/gadgetron4_sms/local/lib/libismrmrd.so.1.4.2
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/hdf5/serial/libhdf5.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libpthread.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libsz.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libz.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libdl.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/lib/x86_64-linux-gnu/libm.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/local/cuda-10.0/lib64/libcufft.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: /usr/local/cuda-10.0/lib64/libcublas.so
+apps/standalone/gpu/zerofilling/zerofilling_run_gpu: apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable zerofilling_run_gpu"
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/zerofilling_run_gpu.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
-CMakeFiles/zerofilling_run_gpu.dir/build: zerofilling_run_gpu
+apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/build: apps/standalone/gpu/zerofilling/zerofilling_run_gpu
 
-.PHONY : CMakeFiles/zerofilling_run_gpu.dir/build
+.PHONY : apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/build
 
-CMakeFiles/zerofilling_run_gpu.dir/clean:
-	$(CMAKE_COMMAND) -P CMakeFiles/zerofilling_run_gpu.dir/cmake_clean.cmake
-.PHONY : CMakeFiles/zerofilling_run_gpu.dir/clean
+apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/clean:
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling && $(CMAKE_COMMAND) -P CMakeFiles/zerofilling_run_gpu.dir/cmake_clean.cmake
+.PHONY : apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/clean
 
-CMakeFiles/zerofilling_run_gpu.dir/depend:
-	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/DependInfo.cmake --color=$(COLOR)
-.PHONY : CMakeFiles/zerofilling_run_gpu.dir/depend
+apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/depend:
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/DependInfo.cmake --color=$(COLOR)
+.PHONY : apps/standalone/gpu/zerofilling/CMakeFiles/zerofilling_run_gpu.dir/depend
 

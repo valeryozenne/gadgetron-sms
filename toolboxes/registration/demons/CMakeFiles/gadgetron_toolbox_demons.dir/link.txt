@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgadgetron_toolbox_demons.a  CMakeFiles/gadgetron_toolbox_demons.dir/demons_registration.cpp.o
+/usr/bin/ranlib libgadgetron_toolbox_demons.a

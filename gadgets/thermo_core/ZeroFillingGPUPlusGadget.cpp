@@ -257,7 +257,7 @@ void ZeroFillingGPUPlusGadget::perform_zerofilling_array_gpu(IsmrmrdImageArray& 
     
     Gadgetron::clear(out.data_);
 
-    out.data_.fill(10);
+    //out.data_.fill(10);
 
     hoNDArray< complext<float> > data_in(reinterpret_cast<hoNDArray<complext<float>>&>(in.data_));
     hoNDArray< complext<float> > data_out(reinterpret_cast<hoNDArray<complext<float>>&>(out.data_));
@@ -265,29 +265,30 @@ void ZeroFillingGPUPlusGadget::perform_zerofilling_array_gpu(IsmrmrdImageArray& 
     ///////////////////////////////////////////////////////////////
     //tmp allocation - to change
 
-    
-    // cuNDArray< complext<float> > cu_data(data_in);
-    // cuNDArray< complext<float> > cu_data_out(data_out);
-    
     ///////////////////////////////////////////////////////////////
 
     ///////////////////////////////////////////////////////////////
     //Correct allocation
-    complext<float> *in_ptr, *out_ptr, *cu_in_ptr, *cu_out_ptr;
-    in_ptr = data_in.get_data_ptr();
-    out_ptr = data_out.get_data_ptr();
-    cu_in_ptr = cu_data.get_data_ptr();
-    cu_out_ptr = cu_data_out.get_data_ptr();
+
+    cu_data.create(RO, E1, E2, CHA, N, S, SLC);
+    cu_data_out.create(RO * oversampling, E1 * oversampling, E2, CHA, N, S, SLC);
+
+    // complext<float> *in_ptr, *out_ptr, *cu_in_ptr, *cu_out_ptr;
+    // in_ptr = data_in.get_data_ptr();
+    // out_ptr = data_out.get_data_ptr();
+    // cu_in_ptr = cu_data.get_data_ptr();
+    // cu_out_ptr = cu_data_out.get_data_ptr();
     
-    if (cudaMalloc((void **)(&(cu_in_ptr)), sizeof(complext<float>) * RO * E1 * E2 * CHA * N * S * SLC) != cudaSuccess)
-    {
-        GERROR("CANNOT ALLOCATE CU_IN_PTR\n");
-    }
-    if (cudaMalloc((void **)(&(cu_out_ptr)), sizeof(complext<float>) * RO * oversampling.value() * E1 * oversampling.value() * E2 * CHA * N * S * SLC) != cudaSuccess)
-    {
-        GERROR("CANNOT ALLOCATE CU_OUT_PTR\n");
-    }
-    if (cudaMemcpy(cu_in_ptr, in_ptr, RO * E1 * E2 * CHA * N * S * SLC * sizeof(complext<float>), cudaMemcpyHostToDevice) != cudaSuccess)
+    // if (cudaMalloc((void **)(&(cu_in_ptr)), sizeof(complext<float>) * RO * E1 * E2 * CHA * N * S * SLC) != cudaSuccess)
+    // {
+    //     GERROR("CANNOT ALLOCATE CU_IN_PTR\n");
+    // }
+    // if (cudaMalloc((void **)(&(cu_out_ptr)), sizeof(complext<float>) * RO * oversampling.value() * E1 * oversampling.value() * E2 * CHA * N * S * SLC) != cudaSuccess)
+    // {
+    //     GERROR("CANNOT ALLOCATE CU_OUT_PTR\n");
+    // }
+    std::complex<float> *pIn = &(in.data_(0, 0, 0, 0, 0, 0, 0));
+    if (cudaMemcpy(cu_data.get_data_ptr(), pIn, RO * E1 * E2 * CHA * N * S * SLC * sizeof(std::complex<float>), cudaMemcpyHostToDevice) != cudaSuccess)
         GERROR("Upload to device from in_data failed\n");
 
     // ///////////////////////////////////////////////////////////////
@@ -299,19 +300,22 @@ void ZeroFillingGPUPlusGadget::perform_zerofilling_array_gpu(IsmrmrdImageArray& 
     cuNDFFT<float>::instance()->ifft2(&cu_data_out);
     
     ///////////////////////////////////////////////////////////////////////////////
-    //Code to be removed when below will be functionnal
-    // auto output_ptr = cu_data_out.to_host();
-    // out.data_ =  std::move(reinterpret_cast<hoNDArray<std::complex<float>>&>(*output_ptr));
+    //Code for solution 1 - WORKS
+    //auto output_ptr = cu_data_out.to_host();
+    //out.data_ =  std::move(reinterpret_cast<hoNDArray<std::complex<float>>&>(*output_ptr));
 
-
+    //code for solution 2 - WORKS BUT ERRORS WITH FFT
+    std::complex<float> *pOut = &(out.data_(0, 0, 0, 0, 0, 0, 0));
+    if (cudaMemcpy(pOut, cu_data_out.get_data_ptr(), RO * oversampling * E1 * oversampling * E2 * CHA * N * S * SLC * sizeof(std::complex<float>), cudaMemcpyDeviceToHost) != cudaSuccess)
+        GERROR("Upload to device from in_data failed\n");
     ///////////////////////////////////////////////////////////////////////////////
     // GDEBUG_STREAM("data_out memory size: " << data_out.get_number_of_bytes() << " bytes");
     // GDEBUG_STREAM("copy size: " << RO * oversampling.value() * E1 * oversampling.value() * E2 * CHA * N * S * SLC * sizeof(complext<float>) << " bytes");
     // GDEBUG_STREAM("cu_data_out size: " << cu_data_out.get_number_of_bytes() << " bytes");
     // int error = cudaGetLastError();
     // GDEBUG_STREAM("Last CUDA error before memcpy: " << error);
-    if (cudaMemcpy(out_ptr, cu_out_ptr, RO * oversampling.value() * E1 * oversampling.value() * E2 * CHA * N * S * SLC * sizeof(complext<float>), cudaMemcpyDeviceToHost) != cudaSuccess)
-        GERROR("Upload to host from cu_data_out failed\n");
+    // if (cudaMemcpy(out_ptr, cu_out_ptr, RO * oversampling.value() * E1 * oversampling.value() * E2 * CHA * N * S * SLC * sizeof(complext<float>), cudaMemcpyDeviceToHost) != cudaSuccess)
+    //     GERROR("Upload to host from cu_data_out failed\n");
         
         
         

@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC  -fopenmp -Werror=return-type -Werror=terminate -Werror=non-virtual-dtor -O2 -g -DNDEBUG  -shared -Wl,-soname,libgadgetron_toolbox_log.so.4.1 -o libgadgetron_toolbox_log.so.4.1.1 CMakeFiles/gadgetron_toolbox_log.dir/log.cpp.o  -Wl,-rpath,::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: 

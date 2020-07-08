@@ -68,24 +68,71 @@ RM = /usr/local/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling
+CMAKE_SOURCE_DIR = /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling
+CMAKE_BINARY_DIR = /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron
 
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/local/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
+# Special rule for the target install/strip
+install/strip: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip
 
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
+# Special rule for the target install/strip
+install/strip/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
+	/usr/local/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
+.PHONY : install/strip/fast
 
-.PHONY : rebuild_cache/fast
+# Special rule for the target install/local
+install/local: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local
+
+# Special rule for the target install/local
+install/local/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
+	/usr/local/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
+.PHONY : install/local/fast
+
+# Special rule for the target install
+install: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/local/bin/cmake -P cmake_install.cmake
+.PHONY : install
+
+# Special rule for the target install
+install/fast: preinstall/fast
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
+	/usr/local/bin/cmake -P cmake_install.cmake
+.PHONY : install/fast
+
+# Special rule for the target package
+package: preinstall
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool..."
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && /usr/local/bin/cpack --config ./CPackConfig.cmake
+.PHONY : package
+
+# Special rule for the target package
+package/fast: package
+
+.PHONY : package/fast
+
+# Special rule for the target package_source
+package_source:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Run CPack packaging tool for source..."
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && /usr/local/bin/cpack --config ./CPackSourceConfig.cmake /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CPackSourceConfig.cmake
+.PHONY : package_source
+
+# Special rule for the target package_source
+package_source/fast: package_source
+
+.PHONY : package_source/fast
 
 # Special rule for the target edit_cache
 edit_cache:
@@ -98,16 +145,37 @@ edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
 
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/local/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
+
+# Special rule for the target list_install_components
+list_install_components:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\" \"main\" \"scripts\""
+.PHONY : list_install_components
+
+# Special rule for the target list_install_components
+list_install_components/fast: list_install_components
+
+.PHONY : list_install_components/fast
+
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/CMakeFiles /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/CMakeFiles/progress.marks
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling/CMakeFiles 0
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/progress.marks
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/zerofilling_memcpy/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
 clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 clean
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/zerofilling_memcpy/clean
 .PHONY : clean
 
 # The main clean target
@@ -117,46 +185,60 @@ clean/fast: clean
 
 # Prepare targets for installation.
 preinstall: all
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 preinstall
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/zerofilling_memcpy/preinstall
 .PHONY : preinstall
 
 # Prepare targets for installation.
 preinstall/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 preinstall
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/zerofilling_memcpy/preinstall
 .PHONY : preinstall/fast
 
 # clear depends
 depend:
-	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
 
-#=============================================================================
-# Target rules for targets named zerofilling_run_gpu
+# Convenience name for target.
+apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/rule:
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/rule
+.PHONY : apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/rule
 
-# Build rule for target.
-zerofilling_run_gpu: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 zerofilling_run_gpu
-.PHONY : zerofilling_run_gpu
+# Convenience name for target.
+zerofilling_memcpy_run_gpu: apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/rule
+
+.PHONY : zerofilling_memcpy_run_gpu
 
 # fast build rule for target.
-zerofilling_run_gpu/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/zerofilling_run_gpu.dir/build.make CMakeFiles/zerofilling_run_gpu.dir/build
-.PHONY : zerofilling_run_gpu/fast
+zerofilling_memcpy_run_gpu/fast:
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(MAKE) $(MAKESILENT) -f apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/build.make apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/build
+.PHONY : zerofilling_memcpy_run_gpu/fast
 
-# target to build an object file
-zerofilling.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/zerofilling_run_gpu.dir/build.make CMakeFiles/zerofilling_run_gpu.dir/zerofilling.o
+zerofilling.o: zerofilling.cpp.o
+
 .PHONY : zerofilling.o
 
-# target to preprocess a source file
-zerofilling.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/zerofilling_run_gpu.dir/build.make CMakeFiles/zerofilling_run_gpu.dir/zerofilling.i
+# target to build an object file
+zerofilling.cpp.o:
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(MAKE) $(MAKESILENT) -f apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/build.make apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/zerofilling.cpp.o
+.PHONY : zerofilling.cpp.o
+
+zerofilling.i: zerofilling.cpp.i
+
 .PHONY : zerofilling.i
 
-# target to generate assembly for a file
-zerofilling.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/zerofilling_run_gpu.dir/build.make CMakeFiles/zerofilling_run_gpu.dir/zerofilling.s
+# target to preprocess a source file
+zerofilling.cpp.i:
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(MAKE) $(MAKESILENT) -f apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/build.make apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/zerofilling.cpp.i
+.PHONY : zerofilling.cpp.i
+
+zerofilling.s: zerofilling.cpp.s
+
 .PHONY : zerofilling.s
+
+# target to generate assembly for a file
+zerofilling.cpp.s:
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(MAKE) $(MAKESILENT) -f apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/build.make apps/standalone/gpu/zerofilling_memcpy/CMakeFiles/zerofilling_memcpy_run_gpu.dir/zerofilling.cpp.s
+.PHONY : zerofilling.cpp.s
 
 # Help Target
 help:
@@ -165,8 +247,14 @@ help:
 	@echo "... clean"
 	@echo "... depend"
 	@echo "... edit_cache"
+	@echo "... install"
+	@echo "... install/local"
+	@echo "... install/strip"
+	@echo "... list_install_components"
+	@echo "... package"
+	@echo "... package_source"
 	@echo "... rebuild_cache"
-	@echo "... zerofilling_run_gpu"
+	@echo "... zerofilling_memcpy_run_gpu"
 	@echo "... zerofilling.o"
 	@echo "... zerofilling.i"
 	@echo "... zerofilling.s"
@@ -181,6 +269,6 @@ help:
 # No rule that depends on this can have commands that come from listfiles
 # because they might be regenerated.
 cmake_check_build_system:
-	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
+	cd /home/benoit/gadgetron_install_dir/gadgetron4_sms/mrprogs/gadgetron && $(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 0
 .PHONY : cmake_check_build_system
 
