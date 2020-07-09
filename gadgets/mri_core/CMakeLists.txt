@@ -149,6 +149,7 @@ set(gadgetron_mricore_config_files
         config/Generic_Cartesian_FFT_EPI.xml
         config/Generic_Cartesian_FFT_EPI_python.xml
         config/Generic_Cartesian_Grappa.xml
+        config/Generic_Cartesian_Grappa_Python.xml
         config/Generic_Cartesian_Grappa_SNR.xml
         config/Generic_Cartesian_Grappa_T2W.xml
         config/Generic_Cartesian_Grappa_RealTimeCine.xml

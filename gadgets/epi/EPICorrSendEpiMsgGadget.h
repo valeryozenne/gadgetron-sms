@@ -6,8 +6,8 @@
 #include "hoArmadillo.h"
 #include "gadgetron_epi_export.h"
 #include "SMS_utils.h"
-#include <ismrmrd.h>
-#include "xml.h"
+#include "ismrmrd/xml.h"
+//#include "xml.h"
 #include <complex>
 
 #define _USE_MATH_DEFINES
