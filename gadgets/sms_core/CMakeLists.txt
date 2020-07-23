@@ -11,6 +11,10 @@ add_library(gadgetron_smscore SHARED
     WriteSingleBandFlagsGadget.h
     EmptyGadget.cpp
     EmptyGadget.h
+    ImageArrayEmptyGadget.cpp
+    ImageArrayEmptyGadget.h
+    #EmptyImageGadget.cpp
+    #EmptyImageGadget.h
     GenericReconBase_gadget1of2.h
     GenericReconBase_gadget1of2.cpp
     GenericReconSMSBase.h
@@ -103,3 +107,4 @@ install (FILES  gadgetron_smscore_export.h
 add_subdirectory(config)
 
 set(GADGETRON_BUILD_RPATH "${CMAKE_CURRENT_BINARY_DIR};${GADGETRON_BUILD_RPATH}" PARENT_SCOPE)
+
