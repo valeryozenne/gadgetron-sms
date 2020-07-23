@@ -85,8 +85,7 @@ int GenericReconSMSPrepGadget_1of2::process(Gadgetron::GadgetContainerMessage<s_
             GDEBUG_STREAM("SMSPrepGadget_1of2::process EPICorr - slice " << m2->getObjectPtr()->hdr.idx.slice << " - epiNavPos_noExp : " << *(epi_nav_pos_no_exp_.begin()) << " - " << *(epi_nav_pos_no_exp_.end()));
         }*/
         
-    }
-    
+    }    
 
     if (this->next()->putq(m2) < 0)
     {
@@ -408,9 +407,6 @@ void GenericReconSMSPrepGadget_1of2::apply_averaged_epi_ghost_correction_sb(hoND
     {
         GDEBUG("GenericReconSMSPrepGadget_1of2::Process using data from disk");
         load_epi_data();
-
-
-
 
     }
     

@@ -108,7 +108,7 @@
         <property><name>downstream_coil_compression_num_modesKept</name><value>0</value></property>
 
         <!-- parameters for debug and timing -->
-        <property><name>debug_folder</name><value></value></property>
+        <property><name>debug_folder</name><value>grappa</value></property>
         <property><name>perform_timing</name><value>true</value></property>
         <property><name>verbose</name><value>true</value></property>
 

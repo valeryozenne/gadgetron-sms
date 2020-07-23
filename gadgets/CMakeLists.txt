@@ -12,6 +12,7 @@ add_subdirectory(T1)
 add_subdirectory(sms_core)
 add_subdirectory(thermo_core)
 
+
 if(BART_FOUND)
   add_subdirectory(bart)
 else()

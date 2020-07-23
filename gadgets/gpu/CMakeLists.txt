@@ -4,7 +4,9 @@ endif ()
 
 add_library(gadgetron_gpugadget SHARED
         cuFFTGadget.h
-        cuFFTGadget.cpp)
+        cuFFTGadget.cpp
+        EmptyGadget_GPUBenoit.h
+        EmptyGadget_GPUBenoit.cpp)
 
 set_target_properties(gadgetron_gpugadget PROPERTIES VERSION ${GADGETRON_VERSION_STRING} SOVERSION ${GADGETRON_SOVERSION})
 
@@ -14,6 +16,7 @@ target_link_libraries(gadgetron_gpugadget
 
 install(FILES
         cuFFTGadget.h
+        EmptyGadget_GPUBenoit.h
         DESTINATION ${GADGETRON_INSTALL_INCLUDE_PATH} COMPONENT main)
 
 install(TARGETS gadgetron_gpugadget

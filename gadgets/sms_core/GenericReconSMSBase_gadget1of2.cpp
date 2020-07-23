@@ -1077,7 +1077,7 @@ int GenericReconSMSBase_gadget1of2::CheckComplexNumberEqualInMatrix(hoNDArray< s
         for (size_t ro = 0; ro < input.get_size(0); ro++)
         {
             if (input2(ro,s)!=input(ro,s))
-            {GERROR_STREAM("CheckComplexNumberEqualInMatrix hoNDArray"<< input2(ro,s) << " "<<  input(ro,s) <<  " ro: "<<  ro << " s: "<< s );
+            { GERROR_STREAM("CheckComplexNumberEqualInMatrix hoNDArray" << input2(ro,s) << " "<<  input(ro,s) <<  " ro: "<<  ro << " s: "<< s );
                 //return GADGET_FAIL;
             }
         }
