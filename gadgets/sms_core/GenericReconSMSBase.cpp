@@ -594,18 +594,22 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
             read_dir(j)=curr_header.read_dir[j];
             phase_dir(j)=curr_header.phase_dir[j];
             slice_dir(j)=curr_header.slice_dir[j];
-            std::cout <<  curr_header.position[j]<< " "  <<  curr_header.read_dir[j] << " "  <<  curr_header.phase_dir[j]  << " "  <<  curr_header.slice_dir[j]  << std::endl;
+            //std::cout  << " slc  "  <<  s   << " j  "  <<  j  <<  "  position " << curr_header.position[j]<< " read "  <<  curr_header.read_dir[j] << " phase  "  <<  curr_header.phase_dir[j]  << "  dir "  <<  curr_header.slice_dir[j]  << std::endl;
             debug_iso(j,s)=shift_from_isocenter(j);
             debug_slice_dir(j,s)=slice_dir(j);
         }
 
         z_offset(s) = dot(shift_from_isocenter,slice_dir);
+
+       // std::cout<< "z_offset " <<  z_offset(s) << std::endl;
     }
 
+    if (!debug_folder_full_path_.empty())
+    {
     gt_exporter_.export_array(debug_iso, debug_folder_full_path_ + "shift_from_iso");
     gt_exporter_.export_array(debug_slice_dir, debug_folder_full_path_ + "slice_dir");
     gt_exporter_.export_array(debug_slice_tickness, debug_folder_full_path_ + "slice_thickness");
-
+    }
     //std::cout << z_offset <<std::endl;
     //std::cout << "   " <<z_offset.max()<< " " <<z_offset.min() << std::endl;
 
@@ -642,24 +646,32 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
 
     z_gap.set_size(MB-1);
 
+
+
     for (a = 0; a < 1; a++)
     {
         //MapSliceSMS.row(a).print();
         index=MapSliceSMS[a];//.row(a).t();
 
+        for (m =0; m< MB ; m++)
+        {
+            GDEBUG_STREAM(" liste m : "<< m  <<" index[m] : "<< index[m]  <<  "  z_offset_geo : " <<z_offset_geo(index[m])) ;
+        }
+
         for (m = 0; m < MB-1; m++)
         {
+
+
             if (z_offset_geo[index[m+1]]>z_offset_geo[index[m]])
             {
-                GDEBUG_STREAM("distance au centre de la coupe la proche: " <<z_offset_geo(index[m])) ;
-                GDEBUG_STREAM("distance entre les coupes simultanées: " <<  z_offset_geo(index[m + 1])-z_offset_geo(index[m])) ;
+                GDEBUG_STREAM(" m : "<< m <<"  distance au centre de la coupe la proche: " <<z_offset_geo(index[m])) ;
+                GDEBUG_STREAM(" m : "<< m <<"  distance entre les coupes simultanées: " <<  z_offset_geo(index[m + 1])-z_offset_geo(index[m])) ;
 
-                z_gap(m)=z_offset_geo(index[m+1]-z_offset_geo(index[m]));
+                z_gap(m)=z_offset_geo(index[m + 1])-z_offset_geo(index[m]);
+                GDEBUG_STREAM(" z_gap: " <<  z_gap(m) ) ;
             }
         }
     }
-
-    // std::cout << z_gap<< std::endl;
 }
 
 void GenericReconSMSBase::save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
@@ -1409,8 +1421,8 @@ void GenericReconSMSBase::define_usefull_parameters(IsmrmrdReconBit &recon_bit, 
     start_E1_MB = std::get<0>(t);
     end_E1_MB = std::get<1>(t);
 
-    //GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - start_E1_SB - end_E1_SB  : " << start_E1_SB << " - " << end_E1_SB);
-    //GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - start_E1_MB - end_E1_MB  : " << start_E1_MB << " - " << end_E1_MB);
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - start_E1_SB - end_E1_SB  : " << start_E1_SB << " - " << end_E1_SB);
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - start_E1_MB - end_E1_MB  : " << start_E1_MB << " - " << end_E1_MB);
 
     SamplingLimit sampling_limits_SB[3], sampling_limits_MB[3];
     for (int i = 0; i < 3; i++)
@@ -1419,7 +1431,7 @@ void GenericReconSMSBase::define_usefull_parameters(IsmrmrdReconBit &recon_bit, 
     for (int i = 0; i < 3; i++)
         sampling_limits_MB[i] = recon_bit.data_.sampling_.sampling_limits_[i];
 
-    /*for (int i = 0; i < 3; i++)
+   /*for (int i = 0; i < 3; i++)
     {
         std::cout << "  sampling_limits_SB[i].min_ "<< sampling_limits_SB[i].min_ << "  sampling_limits_MB[i].min_ "<< sampling_limits_MB[i].min_ << std::endl;
         std::cout << "  sampling_limits_SB[i].center_ "<< sampling_limits_SB[i].center_ << "  sampling_limits_MB[i].center_ "<< sampling_limits_MB[i].center_ << std::endl;
@@ -1522,13 +1534,26 @@ void GenericReconSMSBase::define_usefull_parameters_simple_version(IsmrmrdReconB
     start_E1_SB = std::get<0>(t);
     end_E1_SB = std::get<1>(t);
 
+    if (start_E1_SB>end_E1_SB)
+    {
+        GDEBUG_STREAM("start_E1_SB>end_E1_SB");
+        size_t inverse_limit=start_E1_SB;
+        start_E1_SB=end_E1_SB;
+        end_E1_SB= inverse_limit;
+    }
+    else if (start_E1_SB==end_E1_SB)
+    {
+        GERROR_STREAM("start_E1_SB==end_E1_SB");
+    }
+
+
     /*size_t start_E1_MB(0), end_E1_MB(0);
-    t = Gadgetron::detect_sampled_region_E1(recon_bit.data_.data_);
+    auto t = Gadgetron::detect_sampled_region_E1(recon_bit.data_.data_);
     start_E1_MB = std::get<0>(t);
     end_E1_MB = std::get<1>(t);*/
 
-    //GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_SB - end_E1_SB  : " << start_E1_SB << " - " << end_E1_SB);
-    //GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_MB - end_E1_MB  : " << start_E1_MB << " - " << end_E1_MB);
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_SB - end_E1_SB  : " << start_E1_SB << " - " << end_E1_SB);
+  //  GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_MB - end_E1_MB  : " << start_E1_MB << " - " << end_E1_MB);
 
     SamplingLimit sampling_limits_SB[3]; //, sampling_limits_MB[3];
     for (int i = 0; i < 3; i++)
@@ -1539,9 +1564,9 @@ void GenericReconSMSBase::define_usefull_parameters_simple_version(IsmrmrdReconB
 
     /*for (int i = 0; i < 3; i++)
     {
-        std::cout << "  sampling_limits_SB[i].min_ "<< sampling_limits_SB[i].min_ << "  sampling_limits_MB[i].min_ "<< sampling_limits_MB[i].min_ << std::endl;
-        std::cout << "  sampling_limits_SB[i].center_ "<< sampling_limits_SB[i].center_ << "  sampling_limits_MB[i].center_ "<< sampling_limits_MB[i].center_ << std::endl;
-        std::cout << "  sampling_limits_SB[i].max_ "<< sampling_limits_SB[i].max_ << "  sampling_limits_MB[i].max_ "<< sampling_limits_MB[i].max_ << std::endl;
+        std::cout << "  sampling_limits_SB[i].min_ "<< sampling_limits_SB[i].min_ << std::endl; // "  sampling_limits_MB[i].min_ "<< sampling_limits_MB[i].min_ << std::endl;
+        std::cout << "  sampling_limits_SB[i].center_ "<< sampling_limits_SB[i].center_ << std::endl; //"  sampling_limits_MB[i].center_ "<< sampling_limits_MB[i].center_ << std::endl;
+        std::cout << "  sampling_limits_SB[i].max_ "<< sampling_limits_SB[i].max_ << std::endl; //"  sampling_limits_MB[i].max_ "<< sampling_limits_MB[i].max_ << std::endl;
     }*/
 
     /*for (int i = 0; i < 3; i++)
@@ -1551,8 +1576,8 @@ void GenericReconSMSBase::define_usefull_parameters_simple_version(IsmrmrdReconB
         GADGET_CHECK_THROW(sampling_limits_SB[i].max_ <= sampling_limits_MB[i].max_);
     }*/
 
-    //std::cout << start_E1_SB << "  "<< end_E1_SB << "  "<<  acceFactorSMSE1_[e] << std::endl;
-    //std::cout << start_E1_MB << "  "<< end_E1_MB << "  "<<  acceFactorSMSE1_[e] << std::endl;
+    std::cout << start_E1_SB << "  "<< end_E1_SB << "  "<<  acceFactorSMSE1_[e] << std::endl;
+   // std::cout << start_E1_MB << "  "<< end_E1_MB << "  "<<  acceFactorSMSE1_[e] << std::endl;
 
     size_t reduced_E1_SB_=get_reduced_E1_size(start_E1_SB,end_E1_SB, acceFactorSMSE1_[e] );
     //size_t reduced_E1_MB_=get_reduced_E1_size(start_E1_MB,end_E1_MB, acceFactorSMSE1_[e] );
@@ -1589,7 +1614,7 @@ void GenericReconSMSBase::define_usefull_parameters_simple_version(IsmrmrdReconB
     end_E1_=end_E1_SB;
     reduced_E1_=reduced_E1_SB_;
 
-    //GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - start_E1_ - end_E1_  : " << start_E1_ << " - " << end_E1_);
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - start_E1_ - end_E1_  : " << start_E1_ << " - " << end_E1_);
 
 }
 
@@ -2376,7 +2401,7 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
     long long m, a, n, s;
     long long index;
 
-    std::cout << "!!!!!!!!afmoqsmqklk!!!!!!!!!!!!!!!!!" << std::endl;
+    //std::cout << "!!!!!!!!afmoqsmqklk!!!!!!!!!!!!!!!!!" << std::endl;
 
     std::complex<double> ii(0,1);
 
@@ -2395,6 +2420,10 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
 
             std::complex<double> lala=  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
             std::complex<float>  lili=  static_cast< std::complex<float> >(lala) ;
+            //std::cout << "  z_offset_geo(index) : "<< z_offset_geo(index) <<  "  z_gap(0) :  " << z_gap(0)  << std::endl;
+            //std::cout << "  lala : "<< lala <<  "  lili :  " << lili  << std::endl;
+
+
 
             for (s = 0; s < S; s++)
             {

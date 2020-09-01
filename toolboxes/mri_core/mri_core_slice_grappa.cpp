@@ -245,7 +245,10 @@ template <typename T> void remove_unnecessary_kspace(hoNDArray<T>& input, hoNDAr
                             T* out = &(output(0, index, cha, m, a, n, s));
 
                             memcpy(out , in, sizeof(T)*RO);
-                            //if (m==0 && cha==0 && a==0) { std::cout << " e1 " << e1 <<  " index "<< index <<" e1 +2 " << e1 +2 <<  std::endl;}
+                            if (m==0 && cha==0 && a==0)
+                            //{
+                            //    std::cout << " e1 " << e1 <<  " index "<< index <<" e1 +2 " << e1 +2<< " " <<input(0, e1, 0, cha, m, a, n, s) <<  std::endl;
+                            //}
                             index++;
                         }
                     }

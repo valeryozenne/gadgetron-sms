@@ -282,8 +282,11 @@ void GenericReconSMSPrepGadget::apply_blip_caipi_shift_sb(hoNDArray< std::comple
         }
 
         // si WIP on applique le blip caipi
-        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::apply_relative_phase_shift"); }
+        if (perform_timing.value()) {
+            gt_timer_local_.start("GenericReconSMSPrepGadget::apply_relative_phase_shift");
+        }
         apply_relative_phase_shift(sb_8D, false);
+
         if (perform_timing.value()) { gt_timer_local_.stop(); }
 
         if (!debug_folder_full_path_.empty())

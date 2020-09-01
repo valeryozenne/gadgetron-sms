@@ -1,6 +1,6 @@
 #include "ImageArrayEmptyGadget.h"
 #include "mri_core_utility.h"
-
+#include <math.h>
 namespace Gadgetron{
 
 ImageArrayEmptyGadget::ImageArrayEmptyGadget()
@@ -80,6 +80,21 @@ int ImageArrayEmptyGadget::process( GadgetContainerMessage<IsmrmrdImageArray>* m
                     *cm3->getObjectPtr() = imagearr.meta_[mindex];
 
                     //coordinate in double as in IceGadgetron with 4 points
+
+
+
+                    hoNDArray<double> endo(35,2);
+
+                    int count=0;
+                    for (int ll=0; ll < 360; ll+=10 )
+                    {
+                        endo(count,0) = 50 + 20* cos((double)ll/180*M_PI);
+                        endo(count,1) = 50 + 20* sin((double)ll/180*M_PI);
+                        std::cout <<count << " "<< ll<< " " << endo(count,0)<< " " <<  endo(count,1)<<std::endl;
+                        count=count+1;
+                    }
+
+                    /*
                     hoNDArray<double> endo(5,2);
 
                     endo(0,0)=50;
@@ -95,7 +110,7 @@ int ImageArrayEmptyGadget::process( GadgetContainerMessage<IsmrmrdImageArray>* m
                     endo(3,1)=70;
 
                     endo(4,0)=55;
-                    endo(4,1)=75;
+                    endo(4,1)=75;*/
 
 
                     size_t n_endo = endo.get_size(0);
@@ -114,11 +129,11 @@ int ImageArrayEmptyGadget::process( GadgetContainerMessage<IsmrmrdImageArray>* m
                         endo_prepared[2 * pt + 1 + 4] = endo(pt, 1);
                     }
 
-                    std::string roi_label = GADGETRON_2D_ROI + std::string("_ENDO1");
+                    std::string roi_label = GADGETRON_2D_ROI ; //+ std::string("_ENDO1");
 
                     std::vector<std::string> dataRole;
 
-                   //typical modification that works
+                    //typical modification that works
                     //cm3->getObjectPtr()->set(GADGETRON_IMAGE_COLORMAP, "Perfusion.pal");
                     cm3->getObjectPtr()->set(GADGETRON_IMAGECOMMENT, "Bordeaux Thermometry");
                     cm3->getObjectPtr()->set(GADGETRON_SEQUENCEDESCRIPTION, "Temperature ");
@@ -128,7 +143,7 @@ int ImageArrayEmptyGadget::process( GadgetContainerMessage<IsmrmrdImageArray>* m
                     // adding the following line make the image reco failed (no imae reception on siemens host)
                     //code compile and execute offline but image reconstruction failed from host side , logviewer tell me iimage reco failed and this in particular:
                     //"MRUIBackends_PAScontainer :  GetValue() failed for exam memory item MR AA results"
-                    /*setISMRMRMetaValues(*cm3->getObjectPtr(), roi_label, endo_prepared);
+                    setISMRMRMetaValues(*cm3->getObjectPtr(), roi_label, endo_prepared);
 
                     std::vector<double> endo_prepared_check;
 
@@ -137,15 +152,12 @@ int ImageArrayEmptyGadget::process( GadgetContainerMessage<IsmrmrdImageArray>* m
                     for (size_t j = 0; j < endo_prepared_check.size(); j++)
                     {
                         std::cout << endo_prepared_check[j] << std::endl;
-
-                    }*/
+                    }
 
                     cm2->cont(cm3);
 
                     std::cout << "end" <<std::endl;
                 }
-
-
 
                 //Pass the image down the chain
                 if (this->next()->putq(cm1) < 0) {

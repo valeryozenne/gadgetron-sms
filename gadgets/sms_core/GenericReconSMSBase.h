@@ -154,6 +154,7 @@ namespace Gadgetron {
 
         arma::vec z_offset_geo;
         arma::vec z_gap;
+        //float z_gap_float;
 
         virtual void reorganize_arma_nav(arma::cx_fmat &data, std::vector<unsigned int> indice);
 

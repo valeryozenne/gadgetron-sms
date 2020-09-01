@@ -654,12 +654,12 @@ void GenericReconSMSBase_gadget1of2::get_header_and_position_and_gap(hoNDArray< 
                 GDEBUG_STREAM("distance au centre de la coupe la proche: " <<z_offset_geo[index[m]]) ;
                 GDEBUG_STREAM("distance entre les coupes simultanées: " <<  z_offset_geo[index[m+1]]-z_offset_geo[index[m]]) ;
 
-                z_gap[m]=z_offset_geo[index[m+1]]-z_offset_geo[index[m]];
+                z_gap(m)=z_offset_geo[index[m+1]]-z_offset_geo[index[m]];
             }
         }
     }
 
-    // std::cout << z_gap<< std::endl;
+     std::cout << z_gap(0)<< std::endl;
 }
 
 void GenericReconSMSBase_gadget1of2::save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
@@ -2413,7 +2413,7 @@ void GenericReconSMSBase_gadget1of2::apply_absolute_phase_shift(hoNDArray< std::
     long long m, a, n, s;
     long long index;
 
-    std::cout << "!!!!!!!!afmoqsmqklk!!!!!!!!!!!!!!!!!" << std::endl;
+    //std::cout << "!!!!!!!!afmoqsmqklk!!!!!!!!!!!!!!!!!" << std::endl;
 
     std::complex<double> ii(0,1);
 

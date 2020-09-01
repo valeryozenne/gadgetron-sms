@@ -395,7 +395,6 @@ void compute_im2col_2D( cuNDArray<T> *data_out, cuNDArray<T> *data_in , const si
 
 
 
-
 template<class T> __global__ static void
 im2col_5D_kernel( T *output,  T *input, size_t CHA, size_t MB,  size_t block_RO,  size_t block_E1,  size_t grappa_kSize_RO,  size_t grappa_kSize_E1)
 {
