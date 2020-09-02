@@ -34,120 +34,138 @@ int GenericReconSMSPostGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
         GWARN_STREAM("Incoming recon_bit has more encoding spaces than the protocol : " << recon_bit_->rbit_.size() << " instead of " << num_encoding_spaces_);
     }
 
+    size_t e=0;
+    size_t  n, s, slc;
 
-    // for every encoding space, prepare the recon_bit_->rbit_[e].ref_
-    size_t e, n, s, slc;
-    for (e = 0; e < recon_bit_->rbit_.size(); e++)
+    auto & rbit = recon_bit_->rbit_[e];
+    std::stringstream os;
+    os << "_encoding_" << e;
+
+    //Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m2 = m1->duplicate();
+
+    Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m2 = new GadgetContainerMessage< IsmrmrdReconData >();
+    *m2->getObjectPtr() = *m1->getObjectPtr();
+
+    if (rbit.ref_)
     {
-        auto & rbit = recon_bit_->rbit_[e];
-        std::stringstream os;
-        os << "_encoding_" << e;
+        std::cout << "------debut ref---------" <<std::endl;
 
-        if (recon_bit_->rbit_[e].ref_)
+        // std::cout << " je suis la structure qui contient les données acs" << std::endl;
+
+        hoNDArray< std::complex<float> >& ref_8D = rbit.ref_->data_;
+
+        size_t RO = ref_8D.get_size(0);
+        size_t E1 = ref_8D.get_size(1);
+        size_t E2 = ref_8D.get_size(2);
+        size_t CHA = ref_8D.get_size(3);
+        size_t MB = ref_8D.get_size(4);
+        size_t STK = ref_8D.get_size(5);
+        size_t N = ref_8D.get_size(6);
+        size_t S = ref_8D.get_size(7);
+
+        //GDEBUG_STREAM("GenericReconSMSPostGadget - incoming data array ref : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
+
+        hoNDArray< std::complex<float> > ref_7D;
+
+        ref_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
+
+        post_process_ref_data(ref_8D, ref_7D  ,e);
+
+        m2->getObjectPtr()->rbit_[e].ref_->data_ = ref_7D;
+
+        if (!debug_folder_full_path_.empty())
         {
-            // std::cout << " je suis la structure qui contient les données acs" << std::endl;
+            save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(ref_7D, "FID_REF_fin", os.str());
+        }
 
-            hoNDArray< std::complex<float> >& ref_8D = recon_bit_->rbit_[e].ref_->data_;
+        std::cout << "------fin ref---------" <<std::endl;
 
-            size_t RO = ref_8D.get_size(0);
-            size_t E1 = ref_8D.get_size(1);
-            size_t E2 = ref_8D.get_size(2);
-            size_t CHA = ref_8D.get_size(3);
-            size_t MB = ref_8D.get_size(4);
-            size_t STK = ref_8D.get_size(5);
-            size_t N = ref_8D.get_size(6);
-            size_t S = ref_8D.get_size(7);
+    }
 
-            //GDEBUG_STREAM("GenericReconSMSPostGadget - incoming data array ref : [RO E1 E2 CHA N S SLC] - [" << RO << " " << E1 << " " << E2 << " " << CHA << " " << N << " " << S << " " << SLC << "]");
+    if (rbit.data_.data_.get_number_of_elements() > 0)
+    {
 
-            hoNDArray< std::complex<float> > ref_7D;
+        std::cout << "------debut sb and mb---------" <<std::endl;
 
-            ref_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
+        bool is_single_band=false;
+        bool is_first_repetition=detect_first_repetition(rbit);
+        if (is_first_repetition==true) {  is_single_band=detect_single_band_data(rbit);    }
 
-            post_process_ref_data(ref_8D, ref_7D  ,e);
+        show_size(rbit.data_.data_, "GenericReconSMSPostGadget - incoming data array data");
 
-            m1->getObjectPtr()->rbit_[e].ref_->data_ = ref_7D;
+        hoNDArray< std::complex<float> >& data_8D = rbit.data_.data_;
+        //hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =rbit.data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
+
+        size_t RO = data_8D.get_size(0);
+        size_t E1 = data_8D.get_size(1);
+        size_t E2 = data_8D.get_size(2);
+        size_t CHA = data_8D.get_size(3);
+        size_t MB = data_8D.get_size(4);
+        size_t STK = data_8D.get_size(5);
+        size_t N = data_8D.get_size(6);
+        size_t S = data_8D.get_size(7);
+
+        if (is_single_band==true)  //presence de single band
+        {
+            headers_buffered=rbit.data_.headers_;
+
+            hoNDArray< std::complex<float> > data_7D;
+
+            data_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
+
+            define_usefull_parameters_simple_version(rbit, e);
+
+            post_process_sb_data(data_8D, data_7D , rbit.data_.headers_ ,e);
+
+            m2->getObjectPtr()->rbit_[e].data_.data_ = data_7D;
 
             if (!debug_folder_full_path_.empty())
             {
-                save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(ref_7D, "FID_REF_fin", os.str());
+                save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(m1->getObjectPtr()->rbit_[e].data_.data_, "FID_SB_fin", os.str());
             }
 
+            std::cout << "------fin sb ---------" <<std::endl;
         }
-
-        if (recon_bit_->rbit_[e].data_.data_.get_number_of_elements() > 0)
+        else
         {
 
-            bool is_single_band=false;
-            bool is_first_repetition=detect_first_repetition(recon_bit_->rbit_[e]);
-            if (is_first_repetition==true) {  is_single_band=detect_single_band_data(recon_bit_->rbit_[e]);    }
+            hoNDArray< std::complex<float> > data_7D;
 
-            show_size(recon_bit_->rbit_[e].data_.data_, "GenericReconSMSPostGadget - incoming data array data");
+            data_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
 
-            hoNDArray< std::complex<float> >& data_8D = recon_bit_->rbit_[e].data_.data_;
-            //hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =recon_bit_->rbit_[e].data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
+            define_usefull_parameters_simple_version(rbit, e);
 
-            size_t RO = data_8D.get_size(0);
-            size_t E1 = data_8D.get_size(1);
-            size_t E2 = data_8D.get_size(2);
-            size_t CHA = data_8D.get_size(3);
-            size_t MB = data_8D.get_size(4);
-            size_t STK = data_8D.get_size(5);
-            size_t N = data_8D.get_size(6);
-            size_t S = data_8D.get_size(7);
+            post_process_mb_data(data_8D, data_7D , rbit.data_.headers_, e);
 
-            if (is_single_band==true)  //presence de single band
-            {
-                headers_buffered=recon_bit_->rbit_[e].data_.headers_;
+            std::cout << "------fin post_process_mb_data ---------" <<std::endl;
 
-                hoNDArray< std::complex<float> > data_7D;
+            m2->getObjectPtr()->rbit_[e].data_.data_ = data_7D;
 
-                data_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
+            //set_idx(headers_buffered,  rbit.data_.headers_(2, 2, 0, 0, 0).idx.repetition , 0);
 
-                define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
+            m2->getObjectPtr()->rbit_[e].data_.headers_=headers_buffered;
 
-                post_process_sb_data(data_8D, data_7D , recon_bit_->rbit_[e].data_.headers_ ,e);
+            //if (!debug_folder_full_path_.empty())
+            //{
+                save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(m1->getObjectPtr()->rbit_[e].data_.data_, "FID_MB_fin", os.str());
+            //}
 
-                m1->getObjectPtr()->rbit_[e].data_.data_ = data_7D;
-
-                if (!debug_folder_full_path_.empty())
-                {
-                    save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(m1->getObjectPtr()->rbit_[e].data_.data_, "FID_SB_fin", os.str());
-                }
-
-            }
-            else
-            {
-
-                hoNDArray< std::complex<float> > data_7D;
-
-                data_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
-
-                define_usefull_parameters_simple_version(recon_bit_->rbit_[e], e);
-
-                post_process_mb_data(data_8D, data_7D , recon_bit_->rbit_[e].data_.headers_, e);
-
-                m1->getObjectPtr()->rbit_[e].data_.data_ = data_7D;
-
-                //set_idx(headers_buffered,  recon_bit_->rbit_[e].data_.headers_(2, 2, 0, 0, 0).idx.repetition , 0);
-
-                recon_bit_->rbit_[e].data_.headers_=headers_buffered;
-
-                if (!debug_folder_full_path_.empty())
-                {
-                    save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(m1->getObjectPtr()->rbit_[e].data_.data_, "FID_MB_fin", os.str());
-                }
-            }
+            std::cout << "------fin mb ---------" <<std::endl;
         }
+
     }
 
     if (perform_timing.value()) { gt_timer_.stop(); }
 
-    if (this->next()->putq(m1) < 0)
+    m1->release();
+
+    if (this->next()->putq(m2) < 0)
     {
         GERROR_STREAM("Put IsmrmrdReconData to Q failed ... ");
         return GADGET_FAIL;
     }
+
+    std::cout << "------fin ---------" <<std::endl;
 
     return GADGET_OK;
 }
@@ -294,6 +312,8 @@ void GenericReconSMSPostGadget::post_process_mb_data(hoNDArray< std::complex<flo
 
     }
 
+    std::cout << "  ok undo_blip_caipi_shift= " <<std::endl;
+
 
     if (!debug_folder_full_path_.empty())
     {
@@ -324,6 +344,8 @@ void GenericReconSMSPostGadget::post_process_mb_data(hoNDArray< std::complex<flo
     }
 
 
+    std::cout << "  ok apply_ghost_correction_with_STK6= " <<std::endl;
+
     if(use_omp.value()==true)
     {
         if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPrepGadget::undo_stacks_ordering_to_match_gt_organisation_open"); }
@@ -337,7 +359,7 @@ void GenericReconSMSPostGadget::post_process_mb_data(hoNDArray< std::complex<flo
         if (perform_timing.value()) { gt_timer_local_.stop();}
     }
 
-
+    std::cout << "  ok undo_stacks_ordering_to_match_gt_organisation= " <<std::endl;
 }
 
 
@@ -370,6 +392,7 @@ void GenericReconSMSPostGadget::set_idx(hoNDArray< ISMRMRD::AcquisitionHeader > 
             }
         }
     }
+
     catch (...)
     {
         GADGET_THROW("Errors happened in GenericReconSMSPostGadget::set_idx(...) ... ");
@@ -382,82 +405,92 @@ void GenericReconSMSPostGadget::set_idx(hoNDArray< ISMRMRD::AcquisitionHeader > 
 
 void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & headers, size_t e, bool undo_absolute, bool is_mb, bool compute_header)
 {
-    std::stringstream os;
-    os << "_encoding_" << e;
-    std::string suffix = os.str();
 
-    if (is_wip_sequence==1)
+    try
     {
-        // et on applique aussi l'offset de phase
-        // recupération de l'offset de position dans la direction de coupe
-        if (undo_absolute==true)
+
+        std::stringstream os;
+        os << "_encoding_" << e;
+        std::string suffix = os.str();
+
+        if (is_wip_sequence==1)
         {
-            // true means single band data
-            if (compute_header==true)
+            // et on applique aussi l'offset de phase
+            // recupération de l'offset de position dans la direction de coupe
+            if (undo_absolute==true)
             {
-               get_header_and_position_and_gap(data, headers);
+                // true means single band data
+                if (compute_header==true)
+                {
+                    get_header_and_position_and_gap(data, headers);
+                }
+
+                if (MB_factor==2)
+                {
+                    apply_absolute_phase_shift(data, true, is_mb);
+                }
+                else if (MB_factor==3)
+                {
+                    apply_absolute_phase_shift(data, true, is_mb);
+                }
+
+                if (MB_factor==2)
+                {
+                    apply_relative_phase_shift(data, true);
+                }
+                else if (MB_factor==3)
+                {
+                    apply_relative_phase_shift(data, false);
+                }
+            }
+            else
+            {
+                // false means multiband data
+                if (MB_factor==2)
+                {
+                    apply_relative_phase_shift_test(data, true);
+                }
+                else if (MB_factor==3)
+                {
+                    apply_relative_phase_shift_test(data, false);
+                }
             }
 
-            if (MB_factor==2)
-            {
-            apply_absolute_phase_shift(data, true, is_mb);
-            }
-            else if (MB_factor==3)
-            {
-            apply_absolute_phase_shift(data, true, is_mb);
-            }
 
-            if (MB_factor==2)
-            {
-                apply_relative_phase_shift(data, true);
-            }
-            else if (MB_factor==3)
-            {
-                apply_relative_phase_shift(data, false);
-            }
+            //if (!debug_folder_full_path_.empty())
+            //{
+            //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data, "FID_SB4D_relative_shift", os.str());
+            //}
+
+            //if (!debug_folder_full_path_.empty())
+            //{
+            //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB4D_absolute_shift", os.str());
+            //}
+
+        }
+        else if (is_cmrr_sequence==1 && is_wip_sequence==0)
+        {
+            // si CMMR on ne fait rien
+
+
+            if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::apply_relative_phase_shift"); }
+            apply_relative_phase_shift(data, false);
+            if (perform_timing.value()) { gt_timer_local_.stop();}
+            //if (!debug_folder_full_path_.empty())
+            //{
+            //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data, "FID_SB4D_relative_shift", os.str());
+            //}
+
         }
         else
         {
-            // false means multiband data
-            if (MB_factor==2)
-            {
-                apply_relative_phase_shift_test(data, true);
-            }
-            else if (MB_factor==3)
-            {
-                apply_relative_phase_shift_test(data, false);
-            }
+            GERROR("is_wip_sequence && is_cmrr_sequence");
         }
 
-
-        //if (!debug_folder_full_path_.empty())
-        //{
-        //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data, "FID_SB4D_relative_shift", os.str());
-        //}
-
-        //if (!debug_folder_full_path_.empty())
-        //{
-        //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB4D_absolute_shift", os.str());
-        //}
-
     }
-    else if (is_cmrr_sequence==1 && is_wip_sequence==0)
+    catch (...)
     {
-        // si CMMR on ne fait rien
-
-
-        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::apply_relative_phase_shift"); }
-        apply_relative_phase_shift(data, false);
-        if (perform_timing.value()) { gt_timer_local_.stop();}
-        //if (!debug_folder_full_path_.empty())
-        //{
-        //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data, "FID_SB4D_relative_shift", os.str());
-        //}
-
-    }
-    else
-    {
-        GERROR("is_wip_sequence && is_cmrr_sequence");
+        GADGET_THROW("Errors happened in GenericReconSMSPostGadget::undo_blip_caipi_shift(...) ... ");
     }
 }
 

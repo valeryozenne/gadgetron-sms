@@ -301,6 +301,10 @@ void GenericReconSMSBase::save_4D_data(hoNDArray< std::complex<float> >& input, 
 
 void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive )
 {
+
+    try
+    {
+
     // à définir dans SMS Base car c'est aussi utilisé dans SMSPostGadget
     // vecteur_in_E1_direction=exp(1i*([1:1:size(reconSB,2)]- 1*center_k_space_sample   )*2*pi/PE_shift*(nband-1)) ;
     //  test=repmat( vecteur_in_E1_direction ,[ size(reconSB,1) 1 size(reconSB,3) size(reconSB,4) size(reconSB,5) size(reconSB,6)]  );
@@ -317,8 +321,8 @@ void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<flo
 
     //show_size(data, "avant blip caipi");
 
-    hoNDArray< std::complex<float> > tempo;
-    tempo.create(RO, E1, E2, CHA);
+    //hoNDArray< std::complex<float> > tempo;
+    //tempo.create(RO, E1, E2, CHA);
 
     hoNDArray< std::complex<float> > phase_shift;
     phase_shift.create(RO, E1, E2, CHA, MB);
@@ -414,6 +418,13 @@ void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<flo
         }
     }*/
 
+
+    }
+    catch (...)
+    {
+        GERROR("Error apply_relative_phase_shift");
+    }
+
 }
 
 
@@ -426,6 +437,11 @@ void GenericReconSMSBase::apply_relative_phase_shift_test(hoNDArray< std::comple
     //  test=repmat( vecteur_in_E1_direction ,[ size(reconSB,1) 1 size(reconSB,3) size(reconSB,4) size(reconSB,5) size(reconSB,6)]  );
     //  reconSB(:,:,:,:,:,1,nt,nband)=reconSB(:,:,:,:,:,:,nt,nband).*test;
 
+    try
+    {
+
+        std::cout << " apply_relative_phase_shift_test coucou  "<< std::endl;
+
     size_t RO=data.get_size(0);
     size_t E1=data.get_size(1);
     size_t E2=data.get_size(2);
@@ -435,13 +451,13 @@ void GenericReconSMSBase::apply_relative_phase_shift_test(hoNDArray< std::comple
     size_t N=data.get_size(6);
     size_t S=data.get_size(7);
 
-    //show_size(data, "avant blip caipi");
+    // show_size(data, "avant blip caipi");
 
-    hoNDArray< std::complex<float> > tempo;
-    tempo.create(RO, E1, E2, CHA);
+    //hoNDArray< std::complex<float> > tempo;
+    //tempo.create(RO, E1, E2, CHA);
 
     hoNDArray< std::complex<float> > phase_shift;
-    phase_shift.create(RO, E1, E2, CHA);
+    phase_shift.create(RO, E1, E2, CHA,MB);
 
     center_k_space_E1=round(E1/2);
 
@@ -484,7 +500,8 @@ void GenericReconSMSBase::apply_relative_phase_shift_test(hoNDArray< std::comple
 
         shift_to_apply=exp(phase*caipi_factor);
 
-        for (e1 = 0; e1 < E1; e1++)
+        //modif septembre 2020
+        /*for (e1 = 0; e1 < E1; e1++)
         {
             for (ro = 0; ro < RO; ro++)
             {
@@ -496,9 +513,27 @@ void GenericReconSMSBase::apply_relative_phase_shift_test(hoNDArray< std::comple
                     }
                 }
             }
+        }*/
+
+        for (cha = 0; cha < CHA; cha++)
+        {
+            for (e2 = 0; e2 < E2; e2++)
+            {
+                for (e1 = 0; e1 < E1; e1++)
+                {
+                    for (ro = 0; ro < RO; ro++)
+                    {
+                        phase_shift(ro,e1,e2,cha,m)=shift_to_apply(e1);  // repmat variation only along e1 and mb once added TODO
+                    }
+                }
+            }
         }
 
-        for (a = 0; a < lNumberOfStacks_; a++) {
+
+        //modif septembre 2020
+         data *= phase_shift;
+
+        /*for (a = 0; a < lNumberOfStacks_; a++) {
 
             for (s = 0; s < S; s++)
             {
@@ -520,8 +555,17 @@ void GenericReconSMSBase::apply_relative_phase_shift_test(hoNDArray< std::comple
 
                 }
             }
-        }
+        }*/
+
+         std::cout << "couc cou ok "<< std::endl;
     }
+
+}
+catch (...)
+{
+    GERROR("Error apply_relative_phase_shift_test");
+}
+
 }
 
 
@@ -566,7 +610,7 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
             read_dir(j)=curr_header.read_dir[j];
             phase_dir(j)=curr_header.phase_dir[j];
             slice_dir(j)=curr_header.slice_dir[j];
-            std::cout <<  curr_header.position[j]<< " "  <<  curr_header.read_dir[j] << " "  <<  curr_header.phase_dir[j]  << " "  <<  curr_header.slice_dir[j]  << std::endl;
+            //std::cout <<  curr_header.position[j]<< " "  <<  curr_header.read_dir[j] << " "  <<  curr_header.phase_dir[j]  << " "  <<  curr_header.slice_dir[j]  << std::endl;
             debug_iso(j,s)=shift_from_isocenter(j);
             debug_slice_dir(j,s)=slice_dir(j);
         }
@@ -619,6 +663,11 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
         MapSliceSMS.row(a).print();
         index=MapSliceSMS.row(a).t();
 
+        for (m =0; m< MB ; m++)
+        {
+                    GDEBUG_STREAM(" liste m : "<< m  <<" index[m] : "<< index[m]  <<  "  z_offset_geo : " <<z_offset_geo(index[m])) ;
+        }
+
         for (m = 0; m < MB-1; m++)
         {
             if (z_offset_geo(index(m+1))>z_offset_geo(index(m)))
@@ -626,12 +675,13 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
                 GDEBUG_STREAM("distance au centre de la coupe la proche: " <<z_offset_geo(index(m))) ;
                 GDEBUG_STREAM("distance entre les coupes simultanées: " <<  z_offset_geo(index(m+1))-z_offset_geo(index(m))) ;
 
-                z_gap(m)=z_offset_geo(index(m+1))-z_offset_geo(index(m));
+                z_gap(m)=z_offset_geo(index(m + 1))-z_offset_geo(index(m));
+                GDEBUG_STREAM(" z_gap: " <<  z_gap(m) ) ;
             }
         }
     }
 
-    // std::cout << z_gap<< std::endl;
+
 }
 
 void GenericReconSMSBase::save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number)
@@ -1494,12 +1544,26 @@ void GenericReconSMSBase::define_usefull_parameters_simple_version(IsmrmrdReconB
     start_E1_SB = std::get<0>(t);
     end_E1_SB = std::get<1>(t);
 
+    if (start_E1_SB>end_E1_SB)
+    {
+        GDEBUG_STREAM("start_E1_SB>end_E1_SB");
+        size_t inverse_limit=start_E1_SB;
+        start_E1_SB=end_E1_SB;
+        end_E1_SB= inverse_limit;
+    }
+    else if (start_E1_SB==end_E1_SB)
+    {
+        GERROR_STREAM("start_E1_SB==end_E1_SB");
+    }
+
+
+
     /*size_t start_E1_MB(0), end_E1_MB(0);
     t = Gadgetron::detect_sampled_region_E1(recon_bit.data_.data_);
     start_E1_MB = std::get<0>(t);
     end_E1_MB = std::get<1>(t);*/
 
-    //GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_SB - end_E1_SB  : " << start_E1_SB << " - " << end_E1_SB);
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_SB - end_E1_SB  : " << start_E1_SB << " - " << end_E1_SB);
     //GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_MB - end_E1_MB  : " << start_E1_MB << " - " << end_E1_MB);
 
     SamplingLimit sampling_limits_SB[3]; //, sampling_limits_MB[3];
@@ -1561,7 +1625,7 @@ void GenericReconSMSBase::define_usefull_parameters_simple_version(IsmrmrdReconB
     end_E1_=end_E1_SB;
     reduced_E1_=reduced_E1_SB_;
 
-    //GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - start_E1_ - end_E1_  : " << start_E1_ << " - " << end_E1_);
+    GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - start_E1_ - end_E1_  : " << start_E1_ << " - " << end_E1_);
 
 }
 
@@ -2068,6 +2132,8 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK6_gpu(hoNDArray< std::c
 
 void GenericReconSMSBase::apply_ghost_correction_with_STK6(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc, bool undo, bool optimal , bool ifft , std::string msg)
 {
+
+
     size_t RO = data.get_size(0);
     size_t E1 = data.get_size(1);
     size_t E2 = data.get_size(2);
