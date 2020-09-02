@@ -154,7 +154,12 @@ int Gadgetron::GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMes
             size_t hS = m1->getObjectPtr()->rbit_[e].data_.headers_.get_size(3);
             size_t hSLC = m1->getObjectPtr()->rbit_[e].data_.headers_.get_size(4);
 
+
+
+
             GDEBUG_STREAM("GenericSMSSplitGadget - incoming mb headers_ array : [E1, E2, N, S, LOC] - [" << hE1 << " " << hE2 << " " << hN << " " << hS << " " << hSLC << "]");
+
+            //GDEBUG_STREAM("--------- repetition  "<< get_max_repetition_number(recon_bit_->rbit_[e].data_.headers_) );
 
             if (this->next()->putq(m1) < 0)
             {

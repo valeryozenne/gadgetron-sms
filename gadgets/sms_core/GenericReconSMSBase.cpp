@@ -2441,5 +2441,23 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
     }
 }
 
+
+int GenericReconSMSBase::get_max_repetition_number(hoNDArray< ISMRMRD::AcquisitionHeader > acquisition_headers)
+{
+    int repetition=0;
+
+    for (size_t ii=0; ii<acquisition_headers.get_number_of_elements(); ii++)
+    {
+        if( acquisition_headers(ii).idx.repetition>0 )
+        {
+            repetition=acquisition_headers(ii).idx.repetition;
+            break;
+        }
+    }
+
+    return repetition;
+
+}
+
 GADGET_FACTORY_DECLARE(GenericReconSMSBase)
 }

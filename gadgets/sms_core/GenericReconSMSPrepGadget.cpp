@@ -100,6 +100,9 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
             hoNDArray< std::complex<float> >& data = rbit.data_.data_;
             hoNDArray< ISMRMRD::AcquisitionHeader > headers_ =rbit.data_.headers_;  //5D, fixed order [E1, E2, N, S, LOC]
 
+
+
+
             // create to new hoNDArray [8D] for the sb and mb data
 
             if (is_single_band==true)
@@ -113,6 +116,8 @@ int GenericReconSMSPrepGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
             {
                 // only mb data
                 //then apply standard proccesing on mb
+
+                //GDEBUG_STREAM("--------- repetition  "<< get_max_repetition_number(recon_bit_->rbit_[e].data_.headers_) );
 
                 size_t RO = data.get_size(0);
                 size_t E1 = data.get_size(1);

@@ -115,6 +115,14 @@ int GenericReconSMSPostGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
                     save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(m1->getObjectPtr()->rbit_[e].data_.data_, "FID_SB_fin", os.str());
                 }
 
+                /*for (size_t ii=0; ii<m1->getObjectPtr()->rbit_[e].data_.headers_.get_number_of_elements(); ii++)
+                {
+                    if (m1->getObjectPtr()->rbit_[e].data_.headers_(ii).sample_time_us>0)
+                    {
+                        m1->getObjectPtr()->rbit_[e].data_.headers_(ii).idx.set=1;
+                    }
+                }*/
+
             }
             else
             {
@@ -129,9 +137,22 @@ int GenericReconSMSPostGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
 
                 m1->getObjectPtr()->rbit_[e].data_.data_ = data_7D;
 
-                //set_idx(headers_buffered,  recon_bit_->rbit_[e].data_.headers_(2, 2, 0, 0, 0).idx.repetition , 0);
+                //int repetition=get_max_repetition_number(recon_bit_->rbit_[e].data_.headers_);
+                //GDEBUG_STREAM("--------- repetition  "<< repetition );
 
-                recon_bit_->rbit_[e].data_.headers_=headers_buffered;
+                //set_idx(headers_buffered,  repetition , 0);
+
+                m1->getObjectPtr()->rbit_[e].data_.headers_=headers_buffered;
+
+                /*for (size_t ii=0; ii<m1->getObjectPtr()->rbit_[e].data_.headers_.get_number_of_elements(); ii++)
+                {
+                   if (m1->getObjectPtr()->rbit_[e].data_.headers_(ii).sample_time_us>0)
+                   {
+                       m1->getObjectPtr()->rbit_[e].data_.headers_(ii).idx.repetition=repetition;
+                   }
+                }*/
+
+                //GDEBUG_STREAM("--------- repetition  after "<< get_max_repetition_number(m1->getObjectPtr()->rbit_[e].data_.headers_) );
 
                 if (!debug_folder_full_path_.empty())
                 {
@@ -337,24 +358,25 @@ void GenericReconSMSPostGadget::set_idx(hoNDArray< ISMRMRD::AcquisitionHeader > 
 {
     try
     {
-        size_t RO = headers_.get_size(0);
-        size_t E1 = headers_.get_size(1);
+        size_t E1 = headers_.get_size(0);
+        size_t E2 = headers_.get_size(1);
         size_t N = headers_.get_size(2);
         size_t S = headers_.get_size(3);
         size_t SLC = headers_.get_size(4);
 
-        size_t ro,e1, n, s, slc;
+        size_t e1,e2, n, s, slc;
+
         for (slc=0; slc<SLC; slc++)
         {
             for (s=0; s<S; s++)
             {
                 for (n=0; n<N; n++)
                 {
-                    for (e1=0; e1<E1; e1++)
+                    for (e2=0; e2<E2; e2++)
                     {
-                        for (ro=0; ro<RO; ro++)
+                        for (e1=0; e1<E1; e1++)
                         {
-                            headers_(ro,e1,n, s, slc).idx.repetition = rep;
+                            headers_(e1,e2,n, s, slc).idx.repetition = rep;
                         }
                     }
                 }

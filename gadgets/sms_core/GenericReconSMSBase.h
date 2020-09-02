@@ -223,5 +223,7 @@ namespace Gadgetron {
         virtual void do_fft_for_ref_scan(hoNDArray< std::complex<float> >& data);
 
         virtual std::vector<unsigned int> sort_index(std::vector<unsigned int>data);
+
+        int get_max_repetition_number(hoNDArray< ISMRMRD::AcquisitionHeader > acquisition_headers);
     };
 }

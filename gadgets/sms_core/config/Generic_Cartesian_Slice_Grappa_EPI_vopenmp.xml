@@ -333,6 +333,20 @@
 </gadget>
 
 <!-- ImageArray to images -->
+ <!--
+<gadget>
+    <name>SortSliceGadget</name>
+    <dll>gadgetron_smscore</dll>
+    <classname>SortSliceGadget</classname>
+</gadget>-->
+ <!--
+<gadget>
+    <name>DisplayGadget</name>
+    <dll>gadgetron_smscore</dll>
+    <classname>DisplayGadget</classname>
+</gadget>-->
+
+
 <gadget>
     <name>ImageArraySplit</name>
     <dll>gadgetron_mricore</dll>
@@ -341,16 +355,17 @@
 
 <!-- after recon processing -->
 <!--<gadget>
-      <name>ExtractThermoI</name>
+      <name>ExtractGadget</name>
       <dll>gadgetron_mricore</dll>
-      <classname>ExtractThermoIGadget</classname>
+      <classname>ExtractGadget</classname>
+    
       <property>
-          <name>doOffline</name>
-          <value>1</value>
+          <name>extract_magnitude</name>
+          <value>true</value>
       </property>
       <property>
-          <name>extract_mask</name>
-          <value>9</value>
+          <name>extract_phase</name>
+          <value>true</value>
       </property>
 </gadget>-->
 

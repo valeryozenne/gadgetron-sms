@@ -38,7 +38,7 @@ namespace Gadgetron {
             switch (imtype) {
             case ISMRMRD::ISMRMRD_IMTYPE_MAGNITUDE: return extract(data, [](auto& val) { return std::abs(val); });
             case ISMRMRD::ISMRMRD_IMTYPE_PHASE:
-                return extract(data, [](auto& val) { return std::arg(val) + boost::math::constants::pi<float>(); });
+                return extract(data, [](auto& val) { return std::arg(val) ; });
             case ISMRMRD::ISMRMRD_IMTYPE_REAL: return extract(data, [&](auto& val) { return std::real(val) + offset; });
             case ISMRMRD::ISMRMRD_IMTYPE_IMAG: return extract(data, [&](auto& val) { return std::imag(val) + offset; });
             default: throw std::runtime_error("Illegal image tpye encounted in extract_image");

@@ -11,6 +11,10 @@ add_library(gadgetron_smscore SHARED
     WriteSingleBandFlagsGadget.h
     EmptyGadget.cpp
     EmptyGadget.h
+    DisplayGadget.cpp
+    DisplayGadget.h
+    SortSliceGadget.cpp
+    SortSliceGadget.h
     ImageArrayEmptyGadget.cpp
     ImageArrayEmptyGadget.h
     #EmptyImageGadget.cpp
