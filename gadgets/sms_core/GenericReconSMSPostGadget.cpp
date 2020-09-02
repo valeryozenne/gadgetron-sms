@@ -172,7 +172,11 @@ void GenericReconSMSPostGadget::post_process_sb_data(hoNDArray< std::complex<flo
     os << "_encoding_" << e;
     std::string suffix = os.str();
 
-    undo_blip_caipi_shift(data_8D, headers, e, true);
+    //avant
+    //undo_blip_caipi_shift(data_8D, headers, e, true);
+
+    undo_blip_caipi_shift(data_8D, headers, e, true, false, true);
+
 
     if (!debug_folder_full_path_.empty())
     {
@@ -284,7 +288,19 @@ void GenericReconSMSPostGadget::post_process_mb_data(hoNDArray< std::complex<flo
     os << "_encoding_" << e;
     std::string suffix = os.str();
 
-    undo_blip_caipi_shift(data_8D, headers, e, false);
+    //avant
+    //undo_blip_caipi_shift(data_8D, headers, e, false);
+
+    if (MB_factor==2)
+    {
+        undo_blip_caipi_shift(data_8D, headers, e, false, true, false);
+    }
+    else if (MB_factor==3)
+    {
+        undo_blip_caipi_shift(data_8D, headers, e, true, true, false);
+
+    }
+
 
     if (!debug_folder_full_path_.empty())
     {
@@ -367,9 +383,88 @@ void GenericReconSMSPostGadget::set_idx(hoNDArray< ISMRMRD::AcquisitionHeader > 
     }
 }
 
+void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & headers, size_t e, bool undo_absolute, bool is_mb, bool compute_header)
+{
+    std::stringstream os;
+    os << "_encoding_" << e;
+    std::string suffix = os.str();
+
+    if (is_wip_sequence==1)
+    {
+        // et on applique aussi l'offset de phase
+        // recupération de l'offset de position dans la direction de coupe
+        if (undo_absolute==true)
+        {
+            // true means single band data
+            if (compute_header==true)
+            {
+                get_header_and_position_and_gap(data, headers);
+            }
+
+            if (MB_factor==2)
+            {
+                apply_absolute_phase_shift(data, true, is_mb);
+            }
+            else if (MB_factor==3)
+            {
+                apply_absolute_phase_shift(data, true, is_mb);
+            }
+
+            if (MB_factor==2)
+            {
+                apply_relative_phase_shift(data, true);
+            }
+            else if (MB_factor==3)
+            {
+                apply_relative_phase_shift(data, false);
+            }
+        }
+        else
+        {
+            // false means multiband data
+            if (MB_factor==2)
+            {
+                apply_relative_phase_shift_test(data, true);
+            }
+            else if (MB_factor==3)
+            {
+                apply_relative_phase_shift_test(data, false);
+            }
+        }
 
 
+        //if (!debug_folder_full_path_.empty())
+        //{
+        //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data, "FID_SB4D_relative_shift", os.str());
+        //}
 
+        //if (!debug_folder_full_path_.empty())
+        //{
+        //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(sb_8D, "FID_SB4D_absolute_shift", os.str());
+        //}
+
+    }
+    else if (is_cmrr_sequence==1 && is_wip_sequence==0)
+    {
+        // si CMMR on ne fait rien
+
+
+        if (perform_timing.value()) { gt_timer_local_.start("GenericReconSMSPostGadget::apply_relative_phase_shift"); }
+        apply_relative_phase_shift(data, false);
+        if (perform_timing.value()) { gt_timer_local_.stop();}
+        //if (!debug_folder_full_path_.empty())
+        //{
+        //save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(data, "FID_SB4D_relative_shift", os.str());
+        //}
+
+    }
+    else
+    {
+        GERROR("is_wip_sequence && is_cmrr_sequence");
+    }
+}
+
+/*
 
 void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > & headers, size_t e, bool undo_absolute)
 {
@@ -426,7 +521,7 @@ void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<fl
         GERROR("is_wip_sequence && is_cmrr_sequence");
     }
 }
-
+*/
 
 
 

@@ -2379,10 +2379,127 @@ void GenericReconSMSBase::apply_ghost_correction_with_STK7(hoNDArray< std::compl
 }
 
 
+void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive, bool is_mb)
+{
+
+    size_t RO=data.get_size(0);
+    size_t E1=data.get_size(1);
+    size_t E2=data.get_size(2);
+    size_t CHA=data.get_size(3);
+    size_t MB=data.get_size(4);
+    size_t STK=data.get_size(5);
+    size_t N=data.get_size(6);
+    size_t S=data.get_size(7);
+
+    //GADGET_CHECK_THROW(CHA==lNumberOfChannels_)
+    GADGET_CHECK_THROW(STK==lNumberOfStacks_);
+
+    long long m, a, n, s;
+    long long index;
+
+    std::complex<double> ii(0,1);
+
+    int facteur;
+
+    if (is_positive==true)
+    {facteur=-1;}
+    else
+    {facteur=1;}
+
+    for (a = 0; a < STK; a++) {
+
+        for (m = 0; m < MB; m++) {
+
+            index = MapSliceSMS[a][m];
+
+            //std::complex<double> lala =  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
+
+            std::complex<double> lala;
+            std::complex<float> lolo;
+
+            if (MB==3){
+
+                if (m==0)
+                {
+                    lala = exp(arma::datum::pi*2/1*facteur*ii);
+                    lolo = 1;
+                }
+                else if (m==1)
+                {
+                    if (is_positive==true)
+                    {
+                        lala= exp(arma::datum::pi*2/3*facteur*ii);
+
+                        if (is_mb==true)
+                        {
+                            //std::cout << "on passe ici "<< index << " " << z_offset_geo(index)<< " "<< z_gap(0)<< std::endl;
+                            lolo= 1; //exp(arma::datum::pi*-1*ii*z_offset_geo(index)/z_gap(0));
+                        }
+                        else
+                        {
+                            lolo=1;
+                        }
+                    }
+                    else
+                    {
+                        lala= exp(arma::datum::pi*2/3*facteur*ii);
+                        lolo=1;
+                    }
+                }
+                else if (m==2)
+                {
+                    if (is_positive==true)
+                    {
+                        lala= exp(arma::datum::pi*2/6*facteur*ii);
+
+                        if (is_mb==true)
+                        {
+                            lolo= 1; //exp(arma::datum::pi*-1*ii*z_offset_geo(index)/z_gap(0));
+                        }
+                        else
+                        {
+                            lolo=1;
+                        }
+                    }
+                    else
+                    {
+                        lala= exp(arma::datum::pi*2/6*facteur*ii);
+                        lolo=1;
+                    }
+
+                }
+            }
+            else
+            {
+
+                {    lala=  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
+                     lolo=1;
+                }
+            }
 
 
 
+            std::complex<float>  lili=  static_cast< std::complex<float> >(lala) ;
 
+            for (s = 0; s < S; s++)
+            {
+                for (n = 0; n < N; n++)
+                {
+                    std::complex<float> *in = &(data(0, 0, 0, 0, m, a, n, s));
+
+                    for (long long j = 0; j < RO * E1 * E2 * CHA; j++) {
+
+                        in[j] = in[j]*lili*lolo;
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+/*
 void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive)
 {    
 
@@ -2440,6 +2557,8 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
         }
     }
 }
+*/
+
 
 GADGET_FACTORY_DECLARE(GenericReconSMSBase)
 }

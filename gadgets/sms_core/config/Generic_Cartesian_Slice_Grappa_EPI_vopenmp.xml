@@ -113,7 +113,7 @@
     <name>SMSPrepGadget</name>
     <dll>gadgetron_smscore</dll>
     <classname>GenericReconSMSPrepGadget</classname>   
-    <property><name>debug_folder</name><value></value></property>
+    <property><name>debug_folder</name><value>Prep</value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
     <property><name>use_omp</name><value>true</value></property>
@@ -339,20 +339,21 @@
     <classname>ImageArraySplitGadget</classname>
 </gadget>
 
+
 <!-- after recon processing -->
-<!--<gadget>
-      <name>ExtractThermoI</name>
+<gadget>
+      <name>Extract</name>
       <dll>gadgetron_mricore</dll>
-      <classname>ExtractThermoIGadget</classname>
+      <classname>ExtractGadget</classname>
       <property>
-          <name>doOffline</name>
-          <value>1</value>
+          <name>extract_magnitude</name>
+          <value>true</value>
       </property>
       <property>
-          <name>extract_mask</name>
-          <value>9</value>
+          <name>extract_phase</name>
+          <value>true</value>
       </property>
-</gadget>-->
+</gadget>
 
  <gadget>
         <name>ComplexToFloatAttrib</name>
