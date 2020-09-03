@@ -135,9 +135,9 @@ void ZeroFillingGPUGadget::perform_zerofilling_array(IsmrmrdImageArray& in, Ismr
 
 
 
-        out.data_.create(RO*oversampling.value(), E1*oversampling.value(), E2, CHA, N, S, SLC);
-        out.headers_.create(N, S, SLC);
-        out.meta_.resize(N*S*SLC);
+    out.data_.create(RO*oversampling.value(), E1*oversampling.value(), E2, CHA, N, S, SLC);
+    out.headers_.create(N, S, SLC);
+    out.meta_.resize(N*S*SLC);
 
 
     Gadgetron::clear(out.data_);

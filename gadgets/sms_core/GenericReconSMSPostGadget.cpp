@@ -98,7 +98,7 @@ int GenericReconSMSPostGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
 
             if (is_single_band==true)  //presence de single band
             {
-                headers_buffered=recon_bit_->rbit_[e].data_.headers_;
+                headers_sb_buffered=recon_bit_->rbit_[e].data_.headers_;
 
                 hoNDArray< std::complex<float> > data_7D;
 
@@ -118,6 +118,7 @@ int GenericReconSMSPostGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
             }
             else
             {
+                headers_mb_buffered=recon_bit_->rbit_[e].data_.headers_;
 
                 hoNDArray< std::complex<float> > data_7D;
 
@@ -131,7 +132,37 @@ int GenericReconSMSPostGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
 
                 //set_idx(headers_buffered,  recon_bit_->rbit_[e].data_.headers_(2, 2, 0, 0, 0).idx.repetition , 0);
 
-                recon_bit_->rbit_[e].data_.headers_=headers_buffered;
+                int repetition=get_max_repetition_number(recon_bit_->rbit_[e].data_.headers_);
+                GDEBUG_STREAM("--------- repetition  "<< repetition );
+
+                recon_bit_->rbit_[e].data_.headers_=headers_sb_buffered;
+
+                //il faut copier les informations manquantes à chaque coupe
+
+                for (size_t a=0; a<STK; a++)
+                {
+                    std::cout << "  "<<indice_slice_mb[a]<< std::endl;
+                    for (size_t m=0; m<MB; m++)
+                    {
+                      std::cout << "a "  << a  << "m "  << m <<"   " << MapSliceSMS[a][m]<< std::endl;
+                    }
+                }
+
+                //soit il fuat copier le header avant lorsque l'on fait le spit , soit ici.
+
+
+
+                for (size_t ii=0; ii<m1->getObjectPtr()->rbit_[e].data_.headers_.get_number_of_elements(); ii++)
+                {
+                    if (m1->getObjectPtr()->rbit_[e].data_.headers_(ii).sample_time_us>0)
+                    {
+                        m1->getObjectPtr()->rbit_[e].data_.headers_(ii).idx.repetition=repetition;
+                        m1->getObjectPtr()->rbit_[e].data_.headers_(ii).acquisition_time_stamp=headers_mb_buffered(ii).acquisition_time_stamp;
+                        m1->getObjectPtr()->rbit_[e].data_.headers_(ii).measurement_uid=headers_mb_buffered(ii).measurement_uid;
+                    }
+                }
+
+                GDEBUG_STREAM("--------- repetition  after "<< get_max_repetition_number(m1->getObjectPtr()->rbit_[e].data_.headers_) );
 
                 if (!debug_folder_full_path_.empty())
                 {

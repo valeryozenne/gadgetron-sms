@@ -40,7 +40,8 @@ namespace Gadgetron {
         //std::vector<Gadgetron::ismrmrdCALIBMODE> calib_mode_;
 
 
-        hoNDArray< ISMRMRD::AcquisitionHeader > headers_buffered;
+        hoNDArray< ISMRMRD::AcquisitionHeader > headers_sb_buffered;
+        hoNDArray< ISMRMRD::AcquisitionHeader > headers_mb_buffered;
 
         // --------------------------------------------------
         // variable for recon

@@ -15,6 +15,8 @@ add_library(gadgetron_thermocore SHARED
     ZeroFillingGPUGadget.h
     #ZeroFillingGPUPlusGadget.cpp
     #ZeroFillingGPUPlusGadget.h
+    ExtractThermoIGadget.cpp
+    ExtractThermoIGadget.h
   )
 
 set_target_properties(gadgetron_thermocore PROPERTIES VERSION ${GADGETRON_VERSION_STRING} SOVERSION ${GADGETRON_SOVERSION})

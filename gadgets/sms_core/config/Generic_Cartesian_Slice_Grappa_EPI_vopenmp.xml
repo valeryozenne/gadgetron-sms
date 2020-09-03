@@ -314,6 +314,14 @@
     <property><name>verbose</name><value>false</value></property>
 </gadget>
 
+
+<gadget>
+    <name>DisplayGadget</name>
+    <dll>gadgetron_smscore</dll>
+    <classname>DisplayGadget</classname>
+</gadget>
+
+
 <!-- Image Array Scaling -->
 <gadget>
     <name>Scaling</name>
@@ -340,8 +348,25 @@
 </gadget>
 
 
+
 <!-- after recon processing -->
+
 <gadget>
+      <name>ExtractThermoI</name>
+      <dll>gadgetron_thermocore</dll>
+      <classname>ExtractThermoIGadget</classname>
+      <property>
+          <name>doOffline</name>
+          <value>1</value>
+      </property>
+      <property>
+          <name>extract_mask</name>
+          <value>9</value>
+      </property>
+</gadget>
+
+<!-- after recon processing -->
+<!--<gadget>
       <name>Extract</name>
       <dll>gadgetron_mricore</dll>
       <classname>ExtractGadget</classname>
@@ -353,7 +378,7 @@
           <name>extract_phase</name>
           <value>true</value>
       </property>
-</gadget>
+</gadget>-->
 
  <gadget>
         <name>ComplexToFloatAttrib</name>
@@ -365,6 +390,12 @@
       <name>FloatToShortAttrib</name>
       <dll>gadgetron_mricore</dll>
       <classname>FloatToUShortGadget</classname>
+  </gadget>
+
+  <gadget>
+      <name>CheckImageGadget</name>
+      <dll>gadgetron_smscore</dll>
+      <classname>CheckImageGadget</classname>
   </gadget>
 
 

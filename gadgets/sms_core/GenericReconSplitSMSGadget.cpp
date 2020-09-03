@@ -82,7 +82,7 @@ int Gadgetron::GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMes
 
             size_t new_N=1;
 
-            std::cout << "allocation" << std::endl;
+            //std::cout << "allocation" << std::endl;
             headers_mb.create(E1, E2, new_N, S , SLC );
             mb.create(RO, E1, E2, CHA, new_N, S , SLC );
 
@@ -90,7 +90,7 @@ int Gadgetron::GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMes
             sb.create(RO, E1, E2, CHA, new_N, S , SLC );
 
             //TODO instead of using sb and headers_sb , it should be better to create something like  "recon_bit_sb->rbit_[e] "
-            std::cout << "ok" << std::endl;
+            //std::cout << "ok" << std::endl;
 
             if (use_omp.value()==true)
             {
