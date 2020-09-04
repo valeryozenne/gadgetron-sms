@@ -77,6 +77,8 @@ namespace Gadgetron {
         std::vector<unsigned int> indice_sb;
         std::vector<unsigned int> indice_slice_mb;
 
+        std::vector<unsigned int> MapSliceSMS_vectorize;
+
         unsigned int center_k_space_xml;
         unsigned int center_k_space_E1;
 
@@ -149,8 +151,8 @@ namespace Gadgetron {
         virtual int process_config(ACE_Message_Block* mb);
         virtual int process(Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m1);
 
-        virtual std::vector<unsigned int> map_interleaved_acquisitions(int number_of_slices, bool no_reordering );
-        virtual std::vector< std::vector<unsigned int> > get_map_slice_single_band(int MB_factor, int lNumberOfStacks, std::vector<unsigned int> order_of_acquisition_mb, bool no_reordering);
+       // virtual std::vector<unsigned int> map_interleaved_acquisitions(int number_of_slices, bool no_reordering );
+       // virtual std::vector< std::vector<unsigned int> > get_map_slice_single_band(int MB_factor, int lNumberOfStacks, std::vector<unsigned int> order_of_acquisition_mb, bool no_reordering);
 
         arma::vec z_offset_geo;
         arma::vec z_gap;
@@ -228,6 +230,8 @@ namespace Gadgetron {
 
 
         virtual int get_max_repetition_number(hoNDArray< ISMRMRD::AcquisitionHeader > acquisition_headers);
+
+
 
     };
 }

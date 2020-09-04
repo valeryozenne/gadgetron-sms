@@ -217,7 +217,6 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
     //    MapSliceSMS[i].create(MB_factor);
     // }
 
-
     //std::vector<unsigned int> plot_mb= arma::sort( indice_sb );
     // std::cout << plot_mb << std::endl;  ;
     //for (unsigned int i = 0; i < lNumberOfStacks_; i++)
@@ -225,10 +224,18 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
     //    std::cout << i <<   ;
     //}
 
-
-
     MapSliceSMS=get_map_slice_single_band( MB_factor,  lNumberOfStacks_,  order_of_acquisition_mb,  no_reordering);
     //std::cout <<  MapSliceSMS<< std::endl;
+
+    for (unsigned int a = 0; a < lNumberOfStacks_; a++)
+    {
+        for (unsigned int m = 0; m < MB_factor; m++)
+        {
+
+            MapSliceSMS_vectorize.push_back(MapSliceSMS[a][m]);
+        }
+    }
+
 
     center_k_space_xml=h.encoding[0].encodingLimits.kspace_encoding_step_1->center+1;
 
@@ -601,14 +608,14 @@ void GenericReconSMSBase::get_header_and_position_and_gap(hoNDArray< std::comple
 
         z_offset(s) = dot(shift_from_isocenter,slice_dir);
 
-       // std::cout<< "z_offset " <<  z_offset(s) << std::endl;
+        // std::cout<< "z_offset " <<  z_offset(s) << std::endl;
     }
 
     if (!debug_folder_full_path_.empty())
     {
-    gt_exporter_.export_array(debug_iso, debug_folder_full_path_ + "shift_from_iso");
-    gt_exporter_.export_array(debug_slice_dir, debug_folder_full_path_ + "slice_dir");
-    gt_exporter_.export_array(debug_slice_tickness, debug_folder_full_path_ + "slice_thickness");
+        gt_exporter_.export_array(debug_iso, debug_folder_full_path_ + "shift_from_iso");
+        gt_exporter_.export_array(debug_slice_dir, debug_folder_full_path_ + "slice_dir");
+        gt_exporter_.export_array(debug_slice_tickness, debug_folder_full_path_ + "slice_thickness");
     }
     //std::cout << z_offset <<std::endl;
     //std::cout << "   " <<z_offset.max()<< " " <<z_offset.min() << std::endl;
@@ -891,82 +898,8 @@ void GenericReconSMSBase::save_4D_8D_kspace(hoNDArray< std::complex<float> >& in
 
 
 
-std::vector<unsigned int> GenericReconSMSBase::map_interleaved_acquisitions(int number_of_slices, bool no_reordering )
-{
-
-    std::vector<unsigned int> index(number_of_slices, 0);
-    //index.zeros();
 
 
-    if(no_reordering)
-    {
-        GDEBUG("CAUTION there is no reordering for single band images \n");
-
-        for (unsigned int i = 0; i < number_of_slices; i++)
-        {
-            index[i]=i;
-        }
-    }
-    else
-    {
-        GDEBUG("Reordering with interleaved pattern for single band images \n");
-
-        if (number_of_slices%2)
-        {
-            index[0]=0;
-            GDEBUG("Number of single band images is odd \n");
-        }
-        else
-        {
-            index[0]=1;
-            GDEBUG("Number of single band images is even \n");
-        }
-
-        for (unsigned int i = 1; i < number_of_slices; i++)
-        {
-            index[i]=index[i-1]+2;
-
-            if (index[i]>=number_of_slices)
-            {
-                if (number_of_slices%2)
-                {
-                    index[i]=1;
-                }
-                else
-                {
-                    index[i]=0;
-                }
-            }
-        }
-    }
-    return index;
-}
-
-
-std::vector< std::vector<unsigned int> > GenericReconSMSBase::get_map_slice_single_band(int MB_factor, int lNumberOfStacks, std::vector<unsigned int> order_of_acquisition_mb, bool no_reordering)
-{
-    std::vector< std::vector<unsigned int> > output(lNumberOfStacks, std::vector<unsigned int>(MB_factor, 0));
-    //output.zeros();
-
-    if (lNumberOfStacks==1)
-    {
-        output[0]=map_interleaved_acquisitions(MB_factor, no_reordering );
-    }
-    else
-    {
-        for (unsigned int a = 0; a < lNumberOfStacks; a++)
-        {
-            int count_map_slice=order_of_acquisition_mb[a];
-
-            for (unsigned int m = 0; m < MB_factor; m++)
-            {
-                output[a][m] = count_map_slice;
-                count_map_slice=count_map_slice+lNumberOfStacks;
-            }
-        }
-    }
-    return output;
-}
 
 void GenericReconSMSBase::show_size(hoNDArray< std::complex<float> >& input, std::string name)
 {
@@ -1431,7 +1364,7 @@ void GenericReconSMSBase::define_usefull_parameters(IsmrmrdReconBit &recon_bit, 
     for (int i = 0; i < 3; i++)
         sampling_limits_MB[i] = recon_bit.data_.sampling_.sampling_limits_[i];
 
-   /*for (int i = 0; i < 3; i++)
+    /*for (int i = 0; i < 3; i++)
     {
         std::cout << "  sampling_limits_SB[i].min_ "<< sampling_limits_SB[i].min_ << "  sampling_limits_MB[i].min_ "<< sampling_limits_MB[i].min_ << std::endl;
         std::cout << "  sampling_limits_SB[i].center_ "<< sampling_limits_SB[i].center_ << "  sampling_limits_MB[i].center_ "<< sampling_limits_MB[i].center_ << std::endl;
@@ -1553,7 +1486,7 @@ void GenericReconSMSBase::define_usefull_parameters_simple_version(IsmrmrdReconB
     end_E1_MB = std::get<1>(t);*/
 
     GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_SB - end_E1_SB  : " << start_E1_SB << " - " << end_E1_SB);
-  //  GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_MB - end_E1_MB  : " << start_E1_MB << " - " << end_E1_MB);
+    //  GDEBUG_STREAM("GenericReconCartesianSliceGrappaGadget - detect_sampled_region_E1 - start_E1_MB - end_E1_MB  : " << start_E1_MB << " - " << end_E1_MB);
 
     SamplingLimit sampling_limits_SB[3]; //, sampling_limits_MB[3];
     for (int i = 0; i < 3; i++)
@@ -1577,7 +1510,7 @@ void GenericReconSMSBase::define_usefull_parameters_simple_version(IsmrmrdReconB
     }*/
 
     std::cout << start_E1_SB << "  "<< end_E1_SB << "  "<<  acceFactorSMSE1_[e] << std::endl;
-   // std::cout << start_E1_MB << "  "<< end_E1_MB << "  "<<  acceFactorSMSE1_[e] << std::endl;
+    // std::cout << start_E1_MB << "  "<< end_E1_MB << "  "<<  acceFactorSMSE1_[e] << std::endl;
 
     size_t reduced_E1_SB_=get_reduced_E1_size(start_E1_SB,end_E1_SB, acceFactorSMSE1_[e] );
     //size_t reduced_E1_MB_=get_reduced_E1_size(start_E1_MB,end_E1_MB, acceFactorSMSE1_[e] );
@@ -2473,7 +2406,7 @@ void GenericReconSMSBase::apply_absolute_phase_shift(hoNDArray< std::complex<flo
             {
 
                 {    lala=  exp(arma::datum::pi*facteur*ii*z_offset_geo(index)/z_gap(0));
-                     lolo=1;
+                    lolo=1;
                 }
             }
 

@@ -784,5 +784,112 @@ void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< T >& data, ho
 template EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> > &output, std::vector< std::vector<unsigned int> >& MapSliceSMS, std::vector<unsigned int>& indice_sb);
 
 
+//https://thispointer.com/c-how-to-find-an-element-in-vector-and-get-its-index/
+template < typename T>
+std::pair<bool, int > findInVector(const std::vector<T>  & vecOfElements, const T  & element)
+{
+    std::pair<bool, int > result;
+    // Find given element in vector
+    auto it = std::find(vecOfElements.begin(), vecOfElements.end(), element);
+    if (it != vecOfElements.end())
+    {
+        result.second = distance(vecOfElements.begin(), it);
+        result.first = true;
+    }
+    else
+    {
+        result.first = false;
+        result.second = -1;
+    }
+    return result;
+}
+
+template EXPORTMRICORE std::pair<bool, int > findInVector(const std::vector<unsigned int>  & vecOfElements, const unsigned int  & element);
+
+
+
+std::vector<unsigned int> map_interleaved_acquisitions(int number_of_slices, bool no_reordering )
+{
+
+    std::vector<unsigned int> index(number_of_slices, 0);
+
+    if(no_reordering)
+    {
+        GDEBUG("CAUTION there is no reordering for single band images \n");
+
+        for (unsigned int i = 0; i < number_of_slices; i++)
+        {
+            index[i]=i;
+        }
+    }
+    else
+    {
+        GDEBUG("Reordering with interleaved pattern for single band images \n");
+
+        if (number_of_slices%2)
+        {
+            index[0]=0;
+            GDEBUG("Number of single band images is odd \n");
+        }
+        else
+        {
+            index[0]=1;
+            GDEBUG("Number of single band images is even \n");
+        }
+
+        for (unsigned int i = 1; i < number_of_slices; i++)
+        {
+            index[i]=index[i-1]+2;
+
+            if (index[i]>=number_of_slices)
+            {
+                if (number_of_slices%2)
+                {
+                    index[i]=1;
+                }
+                else
+                {
+                    index[i]=0;
+                }
+            }
+        }
+    }
+    return index;
+}
+
+EXPORTMRICORE std::vector<unsigned int> map_interleaved_acquisitions(int number_of_slices, bool no_reordering );
+
+
+std::vector< std::vector<unsigned int> > get_map_slice_single_band(int MB_factor, int lNumberOfStacks, std::vector<unsigned int> order_of_acquisition_mb, bool no_reordering)
+{
+    std::vector< std::vector<unsigned int> > output(lNumberOfStacks, std::vector<unsigned int>(MB_factor, 0));
+
+    if (lNumberOfStacks==1)
+    {
+        output[0]=map_interleaved_acquisitions(MB_factor, no_reordering );
+    }
+    else
+    {
+        for (unsigned int a = 0; a < lNumberOfStacks; a++)
+        {
+            int count_map_slice=order_of_acquisition_mb[a];
+
+            for (unsigned int m = 0; m < MB_factor; m++)
+            {
+                output[a][m] = count_map_slice;
+                count_map_slice=count_map_slice+lNumberOfStacks;
+            }
+        }
+    }
+
+    return output;
+}
+
+EXPORTMRICORE std::vector< std::vector<unsigned int> > get_map_slice_single_band(int MB_factor, int lNumberOfStacks, std::vector<unsigned int> order_of_acquisition_mb, bool no_reordering);
+
+
+
+
+
 
 }

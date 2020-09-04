@@ -11,7 +11,7 @@
 #include "hoNDFFT.h"
 #include "hoNDArray_math.h"
 #include "gadgetron_smscore_export.h"
-//#include "mri_core_slice_grappa.h"
+#include "mri_core_slice_grappa.h"
 #include "hoArmadillo.h"
 
 namespace Gadgetron {
@@ -78,6 +78,8 @@ namespace Gadgetron {
         std::vector<unsigned int> indice_mb;
         std::vector<unsigned int> indice_sb;
         std::vector<unsigned int> indice_slice_mb;
+
+         std::vector<unsigned int> MapSliceSMS_vectorize;
 
         // function to perform the mapping
         // data: input image array [RO E1 E2 CHA N S SLC]

@@ -189,12 +189,6 @@ int DisplayGadget::process_config(ACE_Message_Block* mb)
     order_of_acquisition_mb=map_interleaved_acquisitions(lNumberOfStacks_, no_reordering);
     order_of_acquisition_sb=map_interleaved_acquisitions(lNumberOfSlices_, no_reordering);
 
-    //std::cout <<  order_of_acquisition_mb << std::endl;
-    //std::cout <<  order_of_acquisition_sb << std::endl;
-
-    // indice_mb =  arma::sort_index( order_of_acquisition_mb );
-    // indice_sb =  arma::sort_index( order_of_acquisition_sb );
-    // indice_slice_mb=indice_sb.rows(0,lNumberOfStacks_-1);
     indice_mb = sort_index(order_of_acquisition_mb);
     indice_sb = sort_index(order_of_acquisition_sb);
 
@@ -203,10 +197,16 @@ int DisplayGadget::process_config(ACE_Message_Block* mb)
         indice_slice_mb.push_back(indice_sb[i]);
     }
 
+    MapSliceSMS=get_map_slice_single_band( MB_factor,  lNumberOfStacks_,  order_of_acquisition_mb,  no_reordering);
 
-
-
-
+    for (unsigned int a = 0; a < lNumberOfStacks_; a++)
+    {
+        for (unsigned int m = 0; m < MB_factor; m++)
+        {
+           // std::cout << MapSliceSMS[a][m]    <<"  "  ;
+            MapSliceSMS_vectorize.push_back(MapSliceSMS[a][m]);
+        }
+    }
 
 
      counter_=0;
@@ -228,15 +228,12 @@ int DisplayGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageArray 
     // -------------------------------------------------------------
 
 
-
     if (counter_==0)
     {
         m1->release();
     }
     else
     {
-
-
 
     IsmrmrdImageArray* data = m1->getObjectPtr();
 
@@ -316,6 +313,55 @@ int DisplayGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageArray 
         GDEBUG_STREAM( "slc "<<slc  << " repetition :  "  << repetition  <<  " image_index :  "  << image_index   <<  " image_series_index :  "  << image_series_index  );
         GDEBUG_STREAM( "slc "<<slc  << " shift_from_isocenter  " <<shift_from_isocenter(0) <<"  "<< shift_from_isocenter(1) <<"  "<<shift_from_isocenter(2) <<"   z_offset(slc) "<<  z_offset(slc)<< " order_of_acquisition_sb  "<<order_of_acquisition_sb[slc] << " indice _sb "<<indice_sb[slc]);
     }
+
+    // add missing headers.
+    // for each stacks, we look the acquired slices in each stack , if MB =2 , half of them, if MB=3 a third of them
+    // once done we got the stack number called aa here,
+    // then we llok for the exact index of the acquird slices, it shouldcontianes the correct field in the header
+    // while the other fields of the non acqyired stack are empty.
+    // then we do the copy
+
+    for (unsigned int i = 0; i < lNumberOfStacks_; i++)
+   {    std::cout <<"  -------------------------------- "  << indice_slice_mb[i] <<std::endl;
+        std::cout <<"   slice test indice_slice_mb[i] "  << indice_slice_mb[i] <<std::endl;
+
+        std::pair<bool, unsigned int> result = findInVector<unsigned int>(MapSliceSMS_vectorize, indice_slice_mb[i]);
+
+        unsigned int index = result.second;
+
+         int aa= (index-index%MB_factor)/MB_factor;
+
+          for (unsigned int m = 0; m < MB_factor; m++)
+          {
+              std::cout << MapSliceSMS[aa][m]    <<"  "  ;
+          }
+          std::cout <<" " <<std::endl;
+
+          std::pair<bool, unsigned int> result_new = findInVector<unsigned int>(MapSliceSMS[aa], indice_slice_mb[i]);
+
+          int index_m = result_new.second;
+
+          for (unsigned int m = 0; m < MB_factor; m++)
+          {
+            if (m!=index_m)
+            {
+                std::cout << "m "<< m  <<" MapSliceSMS[aa][m] " << MapSliceSMS[aa][m] << std::endl;
+                std::cout << "headers_(0, 0,  slc) "<< headers_(0, 0, MapSliceSMS[aa][m] ).acquisition_time_stamp << std::endl;
+                std::cout << "headers_(0, 0,  slc) "<< headers_(0, 0, MapSliceSMS[aa][m] ).measurement_uid << std::endl;
+                m1->getObjectPtr()->headers_(0, 0, MapSliceSMS[aa][m]).acquisition_time_stamp=headers_(0, 0, MapSliceSMS[aa][index_m]).acquisition_time_stamp;
+                m1->getObjectPtr()->headers_(0, 0, MapSliceSMS[aa][m]).measurement_uid=headers_(0, 0, MapSliceSMS[aa][index_m]).measurement_uid;
+
+            }
+            else
+            {   std::cout << "index "<< index_m <<" MapSliceSMS[aa][m] " << MapSliceSMS[aa][m] << std::endl;
+                std::cout << "headers_(0, 0,  slc) "<< headers_(0, 0, MapSliceSMS[aa][m] ).acquisition_time_stamp << std::endl;
+                std::cout << "headers_(0, 0,  slc) "<< headers_(0, 0, MapSliceSMS[aa][m] ).measurement_uid << std::endl;
+            }
+          }
+
+    }
+
+
 
     // print out data info
     if (verbose.value())

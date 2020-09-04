@@ -100,6 +100,11 @@ int GenericReconSMSPostGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
             {
                 headers_sb_buffered=recon_bit_->rbit_[e].data_.headers_;
 
+                for (size_t ii=0; ii<m1->getObjectPtr()->rbit_[e].data_.headers_.get_number_of_elements(); ii++)
+                {
+                   headers_sb_buffered(ii).clearAllFlags();
+                }
+
                 hoNDArray< std::complex<float> > data_7D;
 
                 data_7D.create(RO, E1, E2, CHA, N, S, STK*MB);
@@ -137,28 +142,15 @@ int GenericReconSMSPostGadget::process(Gadgetron::GadgetContainerMessage< Ismrmr
 
                 recon_bit_->rbit_[e].data_.headers_=headers_sb_buffered;
 
-                //il faut copier les informations manquantes à chaque coupe
-
-                for (size_t a=0; a<STK; a++)
-                {
-                    std::cout << "  "<<indice_slice_mb[a]<< std::endl;
-                    for (size_t m=0; m<MB; m++)
-                    {
-                      std::cout << "a "  << a  << "m "  << m <<"   " << MapSliceSMS[a][m]<< std::endl;
-                    }
-                }
-
                 //soit il fuat copier le header avant lorsque l'on fait le spit , soit ici.
-
-
 
                 for (size_t ii=0; ii<m1->getObjectPtr()->rbit_[e].data_.headers_.get_number_of_elements(); ii++)
                 {
                     if (m1->getObjectPtr()->rbit_[e].data_.headers_(ii).sample_time_us>0)
                     {
                         m1->getObjectPtr()->rbit_[e].data_.headers_(ii).idx.repetition=repetition;
-                        m1->getObjectPtr()->rbit_[e].data_.headers_(ii).acquisition_time_stamp=headers_mb_buffered(ii).acquisition_time_stamp;
-                        m1->getObjectPtr()->rbit_[e].data_.headers_(ii).measurement_uid=headers_mb_buffered(ii).measurement_uid;
+                        //m1->getObjectPtr()->rbit_[e].data_.headers_(ii).acquisition_time_stamp=headers_mb_buffered(ii).acquisition_time_stamp;
+                        //m1->getObjectPtr()->rbit_[e].data_.headers_(ii).measurement_uid=headers_mb_buffered(ii).measurement_uid;
                     }
                 }
 

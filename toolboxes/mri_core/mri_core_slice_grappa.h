@@ -30,4 +30,9 @@ template <typename T> EXPORTMRICORE void create_stacks_of_slices_directly_mb_ope
 template <typename T> EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation(hoNDArray< T >& data, hoNDArray< T > &output, std::vector< std::vector<unsigned int> >& MapSliceSMS, std::vector<unsigned int>& indice_sb);
 template <typename T> EXPORTMRICORE void undo_stacks_ordering_to_match_gt_organisation_open(hoNDArray< T >& data, hoNDArray< T > &output, std::vector< std::vector<unsigned int> >& MapSliceSMS, std::vector<unsigned int>& indice_sb);
 
+template < typename T> EXPORTMRICORE std::pair<bool, int > findInVector(const std::vector<T>  & vecOfElements, const T  & element);
+
+EXPORTMRICORE std::vector< std::vector<unsigned int> > get_map_slice_single_band(int MB_factor, int lNumberOfStacks, std::vector<unsigned int> order_of_acquisition_mb, bool no_reordering);
+
+EXPORTMRICORE std::vector<unsigned int> map_interleaved_acquisitions(int number_of_slices, bool no_reordering );
 }
