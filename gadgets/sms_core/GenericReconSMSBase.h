@@ -28,6 +28,8 @@ namespace Gadgetron {
 
         GADGET_PROPERTY(use_omp, bool, "Whether to use omp acceleration", false);
         GADGET_PROPERTY(use_gpu, bool, "Whether to use gpu acceleration", false);
+        GADGET_PROPERTY(use_inverse_caipi_blip, bool, "use_inverse_caipi_blip", false);
+        // for some mysterious reason, the direction of the blip change ,
 
         GenericReconSMSBase();
         ~GenericReconSMSBase();
@@ -81,12 +83,10 @@ namespace Gadgetron {
 
         unsigned int center_k_space_xml;
         unsigned int center_k_space_E1;
-
         //
         size_t reduced_E1_;
         size_t start_E1_;
         size_t end_E1_;
-
 
         float slice_thickness;
 
@@ -132,7 +132,6 @@ namespace Gadgetron {
         hoNDArray< std::complex<float> > phase_shift;
         hoNDArray< std::complex<float> > tempo_hoND;
         hoNDArray< std::complex<float> > tempo_1D_hoND;
-
 
 
         cuNDArray<float_complext> device_epi_nav_pos_STK_test ;
@@ -228,8 +227,9 @@ namespace Gadgetron {
 
         virtual std::vector<unsigned int> sort_index(std::vector<unsigned int>data);
 
-
         virtual int get_max_repetition_number(hoNDArray< ISMRMRD::AcquisitionHeader > acquisition_headers);
+
+        virtual void PrintFiglet(std::string texte);
 
 
 

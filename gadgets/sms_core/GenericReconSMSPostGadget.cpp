@@ -428,9 +428,13 @@ void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<fl
             {
                 apply_absolute_phase_shift(data, true, is_mb);
             }
-            else if (MB_factor==3)
+            else if (MB_factor==3  && use_inverse_caipi_blip.value()==false)
             {
                 apply_absolute_phase_shift(data, true, is_mb);
+            }
+            else if (MB_factor==3  && use_inverse_caipi_blip.value()==true)
+            {
+                apply_absolute_phase_shift(data, false, is_mb);
             }
 
             if (MB_factor==2)
@@ -441,6 +445,15 @@ void GenericReconSMSPostGadget::undo_blip_caipi_shift(hoNDArray< std::complex<fl
             {
                 apply_relative_phase_shift(data, false);
             }
+
+            /*else if (MB_factor==3 && use_inverse_caipi_blip==false)
+            {
+                apply_relative_phase_shift(data, false);
+            }
+            else if (MB_factor==3 && use_inverse_caipi_blip==true)
+            {
+                apply_relative_phase_shift(data, true);
+            }*/
         }
         else
         {

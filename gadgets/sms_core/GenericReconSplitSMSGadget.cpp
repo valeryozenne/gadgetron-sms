@@ -105,7 +105,7 @@ int Gadgetron::GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMes
                 if (perform_timing.value()) { gt_timer_.stop(); }
             }
 
-            std::cout << "extraction ok " << std::endl;
+            //std::cout << "extraction ok " << std::endl;
 
             //Gadgetron::GadgetContainerMessage< IsmrmrdReconData >* m2 = new GadgetContainerMessage< IsmrmrdReconData >();
             //*m2->getObjectPtr() = *m1->getObjectPtr();
@@ -114,7 +114,7 @@ int Gadgetron::GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMes
             m1->getObjectPtr()->rbit_[e].data_.data_=sb;
             m1->getObjectPtr()->rbit_[e].data_.headers_=headers_sb;
 
-            std::cout << "prep putq sb m1 ok" << std::endl;
+            //std::cout << "prep putq sb m1 ok" << std::endl;
 
             if (this->next()->putq(m1) < 0)
             {
@@ -122,7 +122,7 @@ int Gadgetron::GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMes
                 return GADGET_FAIL;
             }
 
-            std::cout << "putq sb m1 " << std::endl;
+            //std::cout << "putq sb m1 " << std::endl;
 
             m2->getObjectPtr()->rbit_[e].data_.data_=mb;
             m2->getObjectPtr()->rbit_[e].data_.headers_=headers_mb;
@@ -130,7 +130,7 @@ int Gadgetron::GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMes
             //m2->getObjectPtr()->rbit_[e].ref_->clear();
             m2->getObjectPtr()->rbit_[e].ref_ = Core::none;
 
-            std::cout << "prep putq  m2" << std::endl;
+            //std::cout << "prep putq  m2" << std::endl;
 
             if (this->next()->putq(m2) < 0)
             {
@@ -138,13 +138,13 @@ int Gadgetron::GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMes
                 return GADGET_FAIL;
             }
 
-            std::cout << "putq m2 ok " << std::endl;
+            //std::cout << "putq m2 ok " << std::endl;
 
         }
         else
         {
 
-            std::cout << "prep putq mb m1" << std::endl;
+            //std::cout << "prep putq mb m1" << std::endl;
 
             //m1->getObjectPtr()->rbit_[e].data_.headers_=headers_mb;
 
@@ -162,7 +162,7 @@ int Gadgetron::GenericReconSplitSMSGadget::process(Gadgetron::GadgetContainerMes
                 return GADGET_FAIL;
             }
 
-            std::cout << "putq mb m1 ok" << std::endl;
+            //std::cout << "putq mb m1 ok" << std::endl;
 
         }
     }

@@ -171,8 +171,13 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
 
     if (is_wip_sequence==1 && acceFactorSMSE1_[0]>1)
     {
+        if (Blipped_CAIPI==4)
+        {}
+        else
+        {
         Blipped_CAIPI=Blipped_CAIPI*acceFactorSMSE1_[0];
         GDEBUG_STREAM("Find MB factor : " << MB_factor << " adjusted Blipped_CAIPI factor: "<< Blipped_CAIPI);
+        }
     }
 
     ISMRMRD::EncodingLimits e_limits = h.encoding[0].encodingLimits;
@@ -192,12 +197,6 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
     order_of_acquisition_mb=map_interleaved_acquisitions(lNumberOfStacks_, no_reordering);
     order_of_acquisition_sb=map_interleaved_acquisitions(lNumberOfSlices_, no_reordering);
 
-    //std::cout <<  order_of_acquisition_mb << std::endl;
-    //std::cout <<  order_of_acquisition_sb << std::endl;
-
-    // indice_mb =  arma::sort_index( order_of_acquisition_mb );
-    // indice_sb =  arma::sort_index( order_of_acquisition_sb );
-    // indice_slice_mb=indice_sb.rows(0,lNumberOfStacks_-1);
     indice_mb = sort_index(order_of_acquisition_mb);
     indice_sb = sort_index(order_of_acquisition_sb);
 
@@ -206,26 +205,7 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
         indice_slice_mb.push_back(indice_sb[i]);
     }
 
-
-    // std::cout <<  indice_mb << std::endl;
-    // std::cout <<  indice_sb << std::endl;
-    // std::cout <<  indice_slice_mb << std::endl;
-
-    // std::vector<hoNDArray<float> > MapSliceSMS;
-    // MapSliceSMS.resize(lNumberOfStacks_);
-    // for (size_t i = 0; i < MapSliceSMS.size(); ++i) {
-    //    MapSliceSMS[i].create(MB_factor);
-    // }
-
-    //std::vector<unsigned int> plot_mb= arma::sort( indice_sb );
-    // std::cout << plot_mb << std::endl;  ;
-    //for (unsigned int i = 0; i < lNumberOfStacks_; i++)
-    //{
-    //    std::cout << i <<   ;
-    //}
-
     MapSliceSMS=get_map_slice_single_band( MB_factor,  lNumberOfStacks_,  order_of_acquisition_mb,  no_reordering);
-    //std::cout <<  MapSliceSMS<< std::endl;
 
     for (unsigned int a = 0; a < lNumberOfStacks_; a++)
     {
@@ -389,11 +369,11 @@ void GenericReconSMSBase::apply_relative_phase_shift(hoNDArray< std::complex<flo
 
         if (is_positive==true)
         {
-            GDEBUG_STREAM(" apply Blipped_CAIPI  "<<   facteur*Blipped_CAIPI  << " caipi_factor    "<<  caipi_factor  );
+            GDEBUG_STREAM(" facteur  "<<   facteur<< " apply Blipped_CAIPI  "<<   facteur*Blipped_CAIPI  << " caipi_factor    "<<  caipi_factor  );
         }
         else
         {
-            GDEBUG_STREAM(" undo Blipped_CAIPI  "<<   facteur*Blipped_CAIPI  << " caipi_factor    "<<  caipi_factor  );
+            GDEBUG_STREAM(" facteur  "<<   facteur<<  " undo Blipped_CAIPI  "<<   facteur*Blipped_CAIPI  << " caipi_factor    "<<  caipi_factor  );
         }
 
         shift_to_apply=exp(phase*caipi_factor);
@@ -895,8 +875,6 @@ void GenericReconSMSBase::save_4D_8D_kspace(hoNDArray< std::complex<float> >& in
 
     output.clear();
 }
-
-
 
 
 
@@ -2510,6 +2488,13 @@ int GenericReconSMSBase::get_max_repetition_number(hoNDArray< ISMRMRD::Acquisiti
 
 }
 
+void GenericReconSMSBase::PrintFiglet (std::string texte)
+{
+        std::string str_temp = "figlet -c " + texte ;
+        const char * c_affichage=str_temp.c_str();
+        bool status=system(c_affichage);
+        std::cout <<  "\n" << std::endl;
+}
 
 GADGET_FACTORY_DECLARE(GenericReconSMSBase)
 }

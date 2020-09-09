@@ -42,7 +42,7 @@ int WriteSingleBandFlagsGadget::process_config(ACE_Message_Block *mb)
       meas_size_idx_.average = e_limits.average ? e_limits.average->maximum - e_limits.average->minimum + 1 : 1;
       meas_size_idx_.segment = e_limits.segment ? e_limits.segment->maximum - e_limits.segment->minimum + 1 : 1;
 
-      std::cout << " val: meas_size_idx_.kspace_encode_step_1 " << meas_size_idx_.kspace_encode_step_1 << std::endl;
+      /*std::cout << " val: meas_size_idx_.kspace_encode_step_1 " << meas_size_idx_.kspace_encode_step_1 << std::endl;
       std::cout << " val: meas_size_idx_.kspace_encode_step_2 " << meas_size_idx_.kspace_encode_step_2 << std::endl;
       std::cout << " val: meas_size_idx_.contrast " << meas_size_idx_.contrast << std::endl;
       std::cout << " val: meas_size_idx_.slice " << meas_size_idx_.slice << std::endl;
@@ -50,7 +50,7 @@ int WriteSingleBandFlagsGadget::process_config(ACE_Message_Block *mb)
       std::cout << " val: meas_size_idx_.average " << meas_size_idx_.average << std::endl;
       std::cout << " val: meas_size_idx_.segment " << meas_size_idx_.segment << std::endl;
       std::cout << " val: meas_size_idx_.phase " << meas_size_idx_.phase << std::endl;
-      std::cout << " val: meas_size_idx_.set " << meas_size_idx_.set << std::endl;
+      std::cout << " val: meas_size_idx_.set " << meas_size_idx_.set << std::endl;*/
 
       bool is_cartesian_sampling = (h.encoding[e].trajectory == ISMRMRD::TrajectoryType::CARTESIAN);
       bool is_epi_sampling= (h.encoding[e].trajectory == ISMRMRD::TrajectoryType::EPI);

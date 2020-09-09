@@ -166,11 +166,11 @@ int DisplayGadget::process_config(ACE_Message_Block* mb)
         }
     }
 
-    if (is_wip_sequence==1 && acceFactorSMSE1_[0]>1)
+    /*if (is_wip_sequence==1 && acceFactorSMSE1_[0]>1)
     {
         Blipped_CAIPI=Blipped_CAIPI*acceFactorSMSE1_[0];
         GDEBUG_STREAM("Find MB factor : " << MB_factor << " adjusted Blipped_CAIPI factor: "<< Blipped_CAIPI);
-    }
+    }*/
 
     ISMRMRD::EncodingLimits e_limits = h.encoding[0].encodingLimits;
     lNumberOfSlices_ = e_limits.slice? e_limits.slice->maximum+1 : 1;
@@ -310,8 +310,8 @@ int DisplayGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageArray 
 
         z_offset(slc) = dot(shift_from_isocenter,slice_dir);
 
-        GDEBUG_STREAM( "slc "<<slc  << " repetition :  "  << repetition  <<  " image_index :  "  << image_index   <<  " image_series_index :  "  << image_series_index  );
-        GDEBUG_STREAM( "slc "<<slc  << " shift_from_isocenter  " <<shift_from_isocenter(0) <<"  "<< shift_from_isocenter(1) <<"  "<<shift_from_isocenter(2) <<"   z_offset(slc) "<<  z_offset(slc)<< " order_of_acquisition_sb  "<<order_of_acquisition_sb[slc] << " indice _sb "<<indice_sb[slc]);
+       // GDEBUG_STREAM( "slc "<<slc  << " repetition :  "  << repetition  <<  " image_index :  "  << image_index   <<  " image_series_index :  "  << image_series_index  );
+       // GDEBUG_STREAM( "slc "<<slc  << " shift_from_isocenter  " <<shift_from_isocenter(0) <<"  "<< shift_from_isocenter(1) <<"  "<<shift_from_isocenter(2) <<"   z_offset(slc) "<<  z_offset(slc)<< " order_of_acquisition_sb  "<<order_of_acquisition_sb[slc] << " indice _sb "<<indice_sb[slc]);
     }
 
     // add missing headers.
@@ -322,8 +322,8 @@ int DisplayGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageArray 
     // then we do the copy
 
     for (unsigned int i = 0; i < lNumberOfStacks_; i++)
-   {    std::cout <<"  -------------------------------- "  << indice_slice_mb[i] <<std::endl;
-        std::cout <<"   slice test indice_slice_mb[i] "  << indice_slice_mb[i] <<std::endl;
+   {    //std::cout <<"  -------------------------------- "  << indice_slice_mb[i] <<std::endl;
+        //std::cout <<"   slice test indice_slice_mb[i] "  << indice_slice_mb[i] <<std::endl;
 
         std::pair<bool, unsigned int> result = findInVector<unsigned int>(MapSliceSMS_vectorize, indice_slice_mb[i]);
 
@@ -331,11 +331,11 @@ int DisplayGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageArray 
 
          int aa= (index-index%MB_factor)/MB_factor;
 
-          for (unsigned int m = 0; m < MB_factor; m++)
-          {
-              std::cout << MapSliceSMS[aa][m]    <<"  "  ;
-          }
-          std::cout <<" " <<std::endl;
+          //for (unsigned int m = 0; m < MB_factor; m++)
+          //{
+          //    std::cout << MapSliceSMS[aa][m]    <<"  "  ;
+          //}
+          //std::cout <<" " <<std::endl;
 
           std::pair<bool, unsigned int> result_new = findInVector<unsigned int>(MapSliceSMS[aa], indice_slice_mb[i]);
 
@@ -345,18 +345,18 @@ int DisplayGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageArray 
           {
             if (m!=index_m)
             {
-                std::cout << "m "<< m  <<" MapSliceSMS[aa][m] " << MapSliceSMS[aa][m] << std::endl;
-                std::cout << "headers_(0, 0,  slc) "<< headers_(0, 0, MapSliceSMS[aa][m] ).acquisition_time_stamp << std::endl;
-                std::cout << "headers_(0, 0,  slc) "<< headers_(0, 0, MapSliceSMS[aa][m] ).measurement_uid << std::endl;
+                //std::cout << "m "<< m  <<" MapSliceSMS[aa][m] " << MapSliceSMS[aa][m] << std::endl;
+                //std::cout << "headers_(0, 0,  slc) "<< headers_(0, 0, MapSliceSMS[aa][m] ).acquisition_time_stamp << std::endl;
+                //std::cout << "headers_(0, 0,  slc) "<< headers_(0, 0, MapSliceSMS[aa][m] ).measurement_uid << std::endl;
                 m1->getObjectPtr()->headers_(0, 0, MapSliceSMS[aa][m]).acquisition_time_stamp=headers_(0, 0, MapSliceSMS[aa][index_m]).acquisition_time_stamp;
                 m1->getObjectPtr()->headers_(0, 0, MapSliceSMS[aa][m]).measurement_uid=headers_(0, 0, MapSliceSMS[aa][index_m]).measurement_uid;
 
             }
-            else
+            /*else
             {   std::cout << "index "<< index_m <<" MapSliceSMS[aa][m] " << MapSliceSMS[aa][m] << std::endl;
                 std::cout << "headers_(0, 0,  slc) "<< headers_(0, 0, MapSliceSMS[aa][m] ).acquisition_time_stamp << std::endl;
                 std::cout << "headers_(0, 0,  slc) "<< headers_(0, 0, MapSliceSMS[aa][m] ).measurement_uid << std::endl;
-            }
+            }*/
           }
 
     }

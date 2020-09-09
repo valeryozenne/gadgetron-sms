@@ -293,10 +293,19 @@ void GenericReconSMSPrepGadget::apply_blip_caipi_shift_sb(hoNDArray< std::comple
         {
             apply_relative_phase_shift(sb_8D, false);
         }
-        else if (MB_factor==3)
+        else if (MB_factor==3 )
         {
             apply_relative_phase_shift(sb_8D, true);
         }
+
+        /*else if (MB_factor==3 && use_inverse_caipi_blip==false)
+        {
+            apply_relative_phase_shift(sb_8D, true);
+        }
+        else if (MB_factor==3 && use_inverse_caipi_blip==true)
+        {
+            apply_relative_phase_shift(sb_8D, false);
+        }*/
 
 
 
@@ -320,13 +329,18 @@ void GenericReconSMSPrepGadget::apply_blip_caipi_shift_sb(hoNDArray< std::comple
         //apply_absolute_phase_shift(sb_8D,false);
 
         if (MB_factor==2)
-                {
-                    apply_absolute_phase_shift(sb_8D,false, false);
-                }
-                else if (MB_factor==3)
-                {
-                    apply_absolute_phase_shift(sb_8D,false, false);
-                }
+        {
+            apply_absolute_phase_shift(sb_8D,false, false);
+        }        
+        else if (MB_factor==3 && use_inverse_caipi_blip.value()==false)
+        {
+            apply_absolute_phase_shift(sb_8D,false, false);
+        }
+        else if (MB_factor==3 && use_inverse_caipi_blip.value()==true)
+        {
+            PrintFiglet("use inverse");
+            apply_absolute_phase_shift(sb_8D, true, false);
+        }
 
 
         if (perform_timing.value()) { gt_timer_local_.stop(); }
