@@ -17,6 +17,12 @@ add_library(gadgetron_thermocore SHARED
     #ZeroFillingGPUPlusGadget.h
     ExtractThermoIGadget.cpp
     ExtractThermoIGadget.h
+    SimpleThermoGadget.cpp
+    SimpleThermoGadget.h
+    ThermoMappingBase.cpp
+    ThermoMappingBase.h
+    ThermoMappingGadget.cpp
+    ThermoMappingGadget.h
   )
 
 set_target_properties(gadgetron_thermocore PROPERTIES VERSION ${GADGETRON_VERSION_STRING} SOVERSION ${GADGETRON_SOVERSION})
