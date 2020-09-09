@@ -197,6 +197,7 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
     order_of_acquisition_mb=map_interleaved_acquisitions(lNumberOfStacks_, no_reordering);
     order_of_acquisition_sb=map_interleaved_acquisitions(lNumberOfSlices_, no_reordering);
 
+
     indice_mb = sort_index(order_of_acquisition_mb);
     indice_sb = sort_index(order_of_acquisition_sb);
 
@@ -205,7 +206,26 @@ int GenericReconSMSBase::process_config(ACE_Message_Block* mb)
         indice_slice_mb.push_back(indice_sb[i]);
     }
 
+
+    // std::cout <<  indice_mb << std::endl;
+    // std::cout <<  indice_sb << std::endl;
+    // std::cout <<  indice_slice_mb << std::endl;
+
+    // std::vector<hoNDArray<float> > MapSliceSMS;
+    // MapSliceSMS.resize(lNumberOfStacks_);
+    // for (size_t i = 0; i < MapSliceSMS.size(); ++i) {
+    //    MapSliceSMS[i].create(MB_factor);
+    // }
+
+    //std::vector<unsigned int> plot_mb= arma::sort( indice_sb );
+    // std::cout << plot_mb << std::endl;  ;
+    //for (unsigned int i = 0; i < lNumberOfStacks_; i++)
+    //{
+    //    std::cout << i <<   ;
+    //}
+
     MapSliceSMS=get_map_slice_single_band( MB_factor,  lNumberOfStacks_,  order_of_acquisition_mb,  no_reordering);
+    //std::cout <<  MapSliceSMS<< std::endl;
 
     for (unsigned int a = 0; a < lNumberOfStacks_; a++)
     {
@@ -879,6 +899,8 @@ void GenericReconSMSBase::save_4D_8D_kspace(hoNDArray< std::complex<float> >& in
 
 
 
+
+
 void GenericReconSMSBase::show_size(hoNDArray< std::complex<float> >& input, std::string name)
 {
     size_t RO = input.get_size(0);
@@ -1265,29 +1287,29 @@ void GenericReconSMSBase::prepare_epi_data(size_t e, size_t E1, size_t E2, size_
     if (use_gpu.value()==true)
     {
 
-        std::cout<< " coucou allocation GPU problem"<< std::endl;
+        std::cout<< " coucou allocation GPU problem ?"<< std::endl;
 
         // memory allocation
-        //device_epi_nav_pos_STK_test.create(RO, MB_factor, lNumberOfStacks_);
+        device_epi_nav_pos_STK_test.create(RO, MB_factor, lNumberOfStacks_);
         device_epi_nav_neg_STK_test.create(RO, MB_factor, lNumberOfStacks_);
 
         device_epi_nav_pos_STK_mean_test.create(RO,  lNumberOfStacks_);
         device_epi_nav_neg_STK_mean_test.create(RO,  lNumberOfStacks_);
 
-        device_epi_nav_pos_STK_test= reinterpret_cast< hoNDArray<float_complext> & >(epi_nav_pos_STK_);
+        //device_epi_nav_pos_STK_test= reinterpret_cast< hoNDArray<float_complext> & >(epi_nav_pos_STK_);
 
         // reintrepret
-        //  hoNDArray<float_complext>* host_epi_nav_pos_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_);
+        hoNDArray<float_complext>* host_epi_nav_pos_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_);
         hoNDArray<float_complext>* host_epi_nav_neg_STK_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_neg_STK_);
         hoNDArray<float_complext>* host_epi_nav_pos_STK_mean_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_pos_STK_mean_);
         hoNDArray<float_complext>* host_epi_nav_neg_STK_mean_ = reinterpret_cast< hoNDArray<float_complext>* >(&epi_nav_neg_STK_mean_);
 
         //cudaMemcpyHostToDevice
-        /*  if(cudaMemcpy(device_epi_nav_pos_STK_test.get_data_ptr(),
+         if(cudaMemcpy(device_epi_nav_pos_STK_test.get_data_ptr(),
                host_epi_nav_pos_STK_->get_data_ptr(),
                RO*MB_factor*lNumberOfStacks_*sizeof(std::complex<float>),
                cudaMemcpyHostToDevice)!= cudaSuccess )   {
-            GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}*/
+            GERROR_STREAM("Upload to device for device_epi_nav_pos_STK_test failed\n");}
 
         if(cudaMemcpy(device_epi_nav_neg_STK_test.get_data_ptr(),
                       host_epi_nav_neg_STK_->get_data_ptr(),

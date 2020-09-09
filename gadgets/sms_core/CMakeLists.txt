@@ -21,6 +21,8 @@ add_library(gadgetron_smscore SHARED
     #EmptyImageGadget.h
     GenericReconBase_gadget1of2.h
     GenericReconBase_gadget1of2.cpp
+    GenericReconBase1of2.h
+    GenericReconBase1of2.cpp
     GenericReconSMSBase.h
     GenericReconSMSBase.cpp
     GenericReconSMSBase_gadget1of2.h

@@ -27,16 +27,16 @@
 #include "SMS_utils.h"
 namespace Gadgetron {
 
-    template <typename T, typename U>
-    class EXPORTGADGETSSMSCORE GenericReconBase_gadget1of2 : public Gadget1Of2<T, U>
+    template <typename T, typename U> 
+    class EXPORTGADGETSSMSCORE GenericReconBase1of2 : public Gadget1Of2<T, U>
     {
     public:
-        GADGET_DECLARE(GenericReconBase_gadget1of2);
+        GADGET_DECLARE(GenericReconBase1of2);
 
         typedef Gadget1Of2<T, U> BaseClass;
 
-        GenericReconBase_gadget1of2();
-        ~GenericReconBase_gadget1of2();
+        GenericReconBase1of2();
+        ~GenericReconBase1of2();
 
         /// ------------------------------------------------------------------------------------
         /// debug and timing
@@ -77,47 +77,47 @@ namespace Gadgetron {
         virtual int process(GadgetContainerMessage<U>* m2);
     };
 
-    class EXPORTGADGETSSMSCORE GenericReconKSpaceReadoutBase_gadget1of2 :public GenericReconBase_gadget1of2 < ISMRMRD::AcquisitionHeader, s_EPICorrection >
+    class EXPORTGADGETSSMSCORE GenericReconKSpaceReadoutBase1of2 :public GenericReconBase1of2 < ISMRMRD::AcquisitionHeader, s_EPICorrection >
     {
     public:
-        GADGET_DECLARE(GenericReconKSpaceReadoutBase_gadget1of2);
+        GADGET_DECLARE(GenericReconKSpaceReadoutBase1of2);
 
-        typedef GenericReconBase_gadget1of2 < ISMRMRD::AcquisitionHeader, s_EPICorrection > BaseClass;
+        typedef GenericReconBase1of2 < ISMRMRD::AcquisitionHeader, s_EPICorrection > BaseClass;
 
-        GenericReconKSpaceReadoutBase_gadget1of2();
-        virtual ~GenericReconKSpaceReadoutBase_gadget1of2();
+        GenericReconKSpaceReadoutBase1of2();
+        virtual ~GenericReconKSpaceReadoutBase1of2();
     };
 
-    class EXPORTGADGETSSMSCORE GenericReconDataBase_gadget1of2 :public GenericReconBase_gadget1of2 < IsmrmrdReconData, s_EPICorrection >
+    class EXPORTGADGETSSMSCORE GenericReconDataBase1of2 :public GenericReconBase1of2 < IsmrmrdReconData, s_EPICorrection >
     {
     public:
-        GADGET_DECLARE(GenericReconDataBase_gadget1of2);
+        GADGET_DECLARE(GenericReconDataBase1of2);
 
-        typedef GenericReconBase_gadget1of2 < IsmrmrdReconData, s_EPICorrection > BaseClass;
+        typedef GenericReconBase1of2 < IsmrmrdReconData, s_EPICorrection > BaseClass;
 
-        GenericReconDataBase_gadget1of2();
-        virtual ~GenericReconDataBase_gadget1of2();
+        GenericReconDataBase1of2();
+        virtual ~GenericReconDataBase1of2();
     };
 
-    class EXPORTGADGETSSMSCORE GenericReconImageBase_gadget1of2 :public GenericReconBase_gadget1of2 < IsmrmrdImageArray, s_EPICorrection >
+    class EXPORTGADGETSSMSCORE GenericReconImageBase1of2 :public GenericReconBase1of2 < IsmrmrdImageArray, s_EPICorrection >
     {
     public:
-        GADGET_DECLARE(GenericReconImageBase_gadget1of2);
+        GADGET_DECLARE(GenericReconImageBase1of2);
 
-        typedef GenericReconBase_gadget1of2 < IsmrmrdImageArray, s_EPICorrection > BaseClass;
+        typedef GenericReconBase1of2 < IsmrmrdImageArray, s_EPICorrection > BaseClass;
 
-        GenericReconImageBase_gadget1of2();
-        virtual ~GenericReconImageBase_gadget1of2();
+        GenericReconImageBase1of2();
+        virtual ~GenericReconImageBase1of2();
     };
 
-    class EXPORTGADGETSSMSCORE GenericReconImageHeaderBase_gadget1of2 :public GenericReconBase_gadget1of2 < ISMRMRD::ImageHeader, s_EPICorrection >
+    class EXPORTGADGETSSMSCORE GenericReconImageHeaderBase1of2 :public GenericReconBase1of2 < ISMRMRD::ImageHeader, s_EPICorrection >
     {
     public:
-        GADGET_DECLARE(GenericReconImageHeaderBase_gadget1of2);
+        GADGET_DECLARE(GenericReconImageHeaderBase1of2);
 
-        typedef GenericReconBase_gadget1of2 < ISMRMRD::ImageHeader, s_EPICorrection > BaseClass;
+        typedef GenericReconBase1of2 < ISMRMRD::ImageHeader, s_EPICorrection > BaseClass;
 
-        GenericReconImageHeaderBase_gadget1of2();
-        virtual ~GenericReconImageHeaderBase_gadget1of2();
+        GenericReconImageHeaderBase1of2();
+        virtual ~GenericReconImageHeaderBase1of2();
     };
 }

@@ -276,7 +276,7 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
 
     if (!debug_folder_full_path_.empty())
     {
-    show_size(block_MB,"block_MB reshape");
+    //show_size(block_MB,"block_MB reshape");
     save_4D_with_STK_5(block_MB,"", "0");
     }
 
@@ -374,7 +374,7 @@ void GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_unwrapping(Ism
     if (!debug_folder_full_path_.empty())
     {
     show_size(unfolded_image,"unfolded_image_reshape");
-    save_4D_with_STK_5(unfolded_image, "unfolded_image_reshape", "0");
+    save_4D_with_STK_5(unfolded_image,  "unfolded_image_reshape", "0");
     }
 
     std::vector<size_t> newdims3;
@@ -423,7 +423,7 @@ void  GenericReconCartesianSliceGrappaGadget::perform_slice_grappa_calib(Ismrmrd
     if (!debug_folder_full_path_.empty())
     {
         //show_size(sb_reduce,"sb_reduce");
-        save_4D_with_STK_5(sb_reduce, "sb_reduce", "0");
+        save_4D_with_STK_5(sb_reduce,  "sb_reduce", "0");
     }
 
     ///////////////

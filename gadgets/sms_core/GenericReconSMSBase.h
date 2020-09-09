@@ -157,37 +157,33 @@ namespace Gadgetron {
         arma::vec z_gap;
         //float z_gap_float;
 
+        // size definition functions
+
+        virtual void define_usefull_parameters(IsmrmrdReconBit &recon_bit, size_t e);
+        virtual void define_usefull_parameters_simple_version(IsmrmrdReconBit &recon_bit, size_t e);
+
+        virtual bool detect_first_repetition(IsmrmrdReconBit &recon_bit);
+        virtual bool detect_single_band_data(IsmrmrdReconBit &recon_bit);
+
+        virtual int get_reduced_E1_size(size_t start_E1 , size_t end_E1, size_t acc );
+
+        //epi functions must be deleted at one point, armadillo must be removed
+
         virtual void reorganize_arma_nav(arma::cx_fmat &data, std::vector<unsigned int> indice);
 
         virtual void compute_mean_epi_arma_nav(arma::cx_fcube &input,  arma::cx_fmat& output_no_exp,  arma::cx_fmat& output);
 
         virtual void create_stacks_of_arma_nav(arma::cx_fmat &data, arma::cx_fcube &new_stack);
 
-        virtual void save_4D_data(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
+        virtual void create_stacks_of_nav(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack);
 
-        virtual void save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
+        virtual void reorganize_nav(hoNDArray< std::complex<float> >& data, std::vector<unsigned int> indice);
 
-        virtual void save_4D_with_STK_5(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
-
-        virtual void save_4D_with_STK_6(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
-
-        virtual void save_4D_with_STK_7(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
-
-        virtual void save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
-
-        virtual void save_4D_8D_kspace(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
-
-        virtual void save_4D_data(hoNDArray<float >& input, std::string name, std::string encoding_number);
-
-        virtual void show_size(hoNDArray< std::complex<float> >& input, std::string name);
+        //epi functions
 
         virtual void load_epi_data();
 
         virtual void compute_mean_epi_nav(hoNDArray< std::complex<float> >& input,  hoNDArray< std::complex<float> >& output_no_exp ,  hoNDArray< std::complex<float> >& output );
-
-        virtual void create_stacks_of_nav(hoNDArray< std::complex<float> >& data, hoNDArray< std::complex<float> >& new_stack);
-
-        virtual void reorganize_nav(hoNDArray< std::complex<float> >& data, std::vector<unsigned int> indice);
 
         virtual void prepare_epi_data(size_t e, size_t E1, size_t E2, size_t CHA );
 
@@ -203,15 +199,10 @@ namespace Gadgetron {
 
         virtual void apply_ghost_correction_with_STK7(hoNDArray< std::complex<float> >& data,  hoNDArray< ISMRMRD::AcquisitionHeader > headers_ , size_t acc , bool optimal);
 
-        virtual void define_usefull_parameters(IsmrmrdReconBit &recon_bit, size_t e);
-        virtual void define_usefull_parameters_simple_version(IsmrmrdReconBit &recon_bit, size_t e);
-
-        virtual bool detect_first_repetition(IsmrmrdReconBit &recon_bit);
-        virtual bool detect_single_band_data(IsmrmrdReconBit &recon_bit);
-
-        virtual int get_reduced_E1_size(size_t start_E1 , size_t end_E1, size_t acc );
+        // blip caipi function
 
         virtual void apply_relative_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
+
         virtual void apply_relative_phase_shift_test(hoNDArray< std::complex<float> >& data, bool is_positive );
 
         //virtual void apply_absolute_phase_shift(hoNDArray< std::complex<float> >& data, bool is_positive );
@@ -219,18 +210,39 @@ namespace Gadgetron {
 
         virtual void get_header_and_position_and_gap(hoNDArray< std::complex<float> >& data, hoNDArray< ISMRMRD::AcquisitionHeader > headers_);
 
-        virtual int CheckComplexNumberEqualInVector(hoNDArray< std::complex<float> >& input , arma::cx_fvec  input_arma);
-        virtual int CheckComplexNumberEqualInMatrix(hoNDArray< std::complex<float> >& input , arma::cx_fmat  input_arma);
-        virtual int CheckComplexNumberEqualInCube(hoNDArray< std::complex<float> >& input , arma::cx_fcube  input_arma);
-
         virtual void do_fft_for_ref_scan(hoNDArray< std::complex<float> >& data);
 
         virtual std::vector<unsigned int> sort_index(std::vector<unsigned int>data);
 
         virtual int get_max_repetition_number(hoNDArray< ISMRMRD::AcquisitionHeader > acquisition_headers);
 
+        //fonction for debugging EPI
+
+        virtual int CheckComplexNumberEqualInVector(hoNDArray< std::complex<float> >& input , arma::cx_fvec  input_arma);
+        virtual int CheckComplexNumberEqualInMatrix(hoNDArray< std::complex<float> >& input , arma::cx_fmat  input_arma);
+        virtual int CheckComplexNumberEqualInCube(hoNDArray< std::complex<float> >& input , arma::cx_fcube  input_arma);
+
+         //fonction for general debugging
+
         virtual void PrintFiglet(std::string texte);
 
+        virtual void save_4D_data(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
+
+        virtual void save_7D_containers_as_4D_matrix_with_a_loop_along_the_7th_dim(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
+
+        virtual void save_4D_with_STK_5(hoNDArray< std::complex<float> >& input,  std::string name, std::string encoding_number);
+
+        virtual void save_4D_with_STK_6(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
+
+        virtual void save_4D_with_STK_7(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
+
+        virtual void save_8D_containers_as_4D_matrix_with_a_loop_along_the_6th_dim_stk(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
+
+        virtual void save_4D_8D_kspace(hoNDArray< std::complex<float> >& input, std::string name, std::string encoding_number);
+
+        virtual void save_4D_data(hoNDArray<float >& input, std::string name, std::string encoding_number);
+
+        virtual void show_size(hoNDArray< std::complex<float> >& input, std::string name);
 
 
     };

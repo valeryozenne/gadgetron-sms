@@ -192,14 +192,49 @@ int SimpleThermoGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageA
             Gadgetron::subtract(phase, reference_p, temperature);
             Gadgetron::scal(k_value_, temperature);
 
-            if (!debug_folder_full_path_.empty()) {
+            /*if (!debug_folder_full_path_.empty()) {
                 this->gt_exporter_.export_array(temperature,
                                                 debug_folder_full_path_ + "temperature"+ os.str());
 
-            }
+            }*/
 
             memcpy(&buffer_temperature(0,0,0,0,0,0,0,idx_intervention), &temperature(0,0,0,0,0,0,0), sizeof(float)*RO*E1*E2*CHA*N*S*SLC);
             memcpy(&buffer_temperature_all(0,0,0,0,0,0,rep), &temperature(0,0,0,0,0,0,0), sizeof(float)*RO*E1*E2*CHA*N*S*SLC);
+
+
+            if (rep==100-1)
+            {
+                GDEBUG("--------repetition 200-----\n");
+
+                //compute_mean_std(buffer_temperature);
+
+
+                std::stringstream os;
+                buffer_magnitude_all.print(os);
+                GDEBUG_STREAM(os.str());
+
+                std::stringstream os2;
+                buffer_phase_all.print(os2);
+                GDEBUG_STREAM(os2.str());
+
+                std::stringstream os3;
+                buffer_temperature_all.print(os3);
+                GDEBUG_STREAM(os3.str());
+
+                if (!debug_folder_full_path_.empty()) {
+                    this->gt_exporter_.export_array(buffer_magnitude_all,
+                                                    debug_folder_full_path_ + "buffer_magnitude_200");    }
+
+                if (!debug_folder_full_path_.empty()) {
+                    this->gt_exporter_.export_array(buffer_phase_all,
+                                                    debug_folder_full_path_ + "buffer_phase_200");      }
+
+                if (!debug_folder_full_path_.empty()) {
+                    this->gt_exporter_.export_array(buffer_temperature_all,
+                                                    debug_folder_full_path_ + "buffer_temperature_200");        }
+
+            }
+
 
             if (rep==lNumberOfRepetitions_-1)
             {

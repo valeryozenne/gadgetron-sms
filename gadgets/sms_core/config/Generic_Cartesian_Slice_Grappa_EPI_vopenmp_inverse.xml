@@ -78,8 +78,6 @@
         <property><name>ignore_segment</name><value>true</value></property>
     </gadget>
 
-
-
 <!--
     <gadget>
         <name>CheckSize</name>
@@ -115,11 +113,12 @@
     <name>SMSPrepGadget</name>
     <dll>gadgetron_smscore</dll>
     <classname>GenericReconSMSPrepGadget</classname>   
-    <property><name>debug_folder</name><value></value></property>
+    <property><name>debug_folder</name><value>Prep</value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
     <property><name>use_omp</name><value>true</value></property>
-     <property><name>use_gpu</name><value>true</value></property>
+    <property><name>use_gpu</name><value>false</value></property>
+    <property><name>use_inverse_caipi_blip</name><value>true</value></property>
     </gadget>
 
 
@@ -144,7 +143,6 @@
 </gadget>
 
 
-
 <!--
 <gadget>
     <name>CheckSize</name>
@@ -158,17 +156,16 @@
 -->
 
     <gadget>
-
-    <name>SliceGrappavgpuGadget</name>
+    <name>GenericReconCartesianSliceGrappavgpu</name>
     <dll>gadgetron_smscore</dll>
     <classname>GenericReconCartesianSliceGrappavgpuGadget</classname>
     <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
 
-    <property><name>use_slice_grappa_gpu</name><value>false</value></property>
-    <property><name>use_gpu</name><value>true</value></property>
     <property><name>use_omp</name><value>true</value></property>
+    <property><name>use_gpu</name><value>false</value></property>
+
     <property><name>calib_fast</name><value>true</value></property>
     <property><name>grappa_kSize_RO</name><value>5</value></property>
     <property><name>grappa_kSize_E1</name><value>5</value></property>
@@ -188,7 +185,9 @@
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
     <property><name>use_omp</name><value>true</value></property>
-    <property><name>use_gpu</name><value>true</value></property>
+    <property><name>use_gpu</name><value>false</value></property>
+    <property><name>use_inverse_caipi_blip</name><value>true</value></property>
+
     </gadget>
 
 
@@ -317,6 +316,14 @@
     <property><name>verbose</name><value>false</value></property>
 </gadget>
 
+
+<gadget>
+    <name>DisplayGadget</name>
+    <dll>gadgetron_smscore</dll>
+    <classname>DisplayGadget</classname>
+</gadget>
+
+
 <!-- Image Array Scaling -->
 <gadget>
     <name>Scaling</name>
@@ -336,11 +343,38 @@
 </gadget>
 
 
-<gadget>
-    <name>DisplayGadget</name>
-    <dll>gadgetron_smscore</dll>
-    <classname>DisplayGadget</classname>
-</gadget>
+<!-- 
+ <gadget>
+        <name>ZeroFillingGadget</name>
+        <dll>gadgetron_thermocore</dll>
+        <classname>ZeroFillingGadget</classname>
+    </gadget>-->
+
+<!-- ImageArray to images -->
+   <!--  <gadget>
+        <name>ZeroFillingGPU</name>
+        <dll>gadgetron_thermocore</dll>
+        <classname>ZeroFillingGPUGadget</classname>
+        <property><name>perform_timing</name><value>true</value></property>
+        <property><name>verbose</name><value>true</value></property>
+        <property><name>use_gpu</name><value>false</value></property>
+       <property><name>oversampling</name><value>2</value></property>
+
+    </gadget>  -->
+
+
+    <gadget>
+        <name>SimpleThermo</name>
+        <dll>gadgetron_thermocore</dll>
+        <classname>SimpleThermoGadget</classname>
+        <property><name>perform_timing</name><value>true</value></property>
+        <property><name>verbose</name><value>true</value></property>
+        <property><name>debug_folder</name><value>thermo</value></property>
+        <property><name>reference_number</name><value>1</value></property>
+        <property><name>use_average_phase_for_reference</name><value>false</value></property>
+        <property><name>event_heating_time</name><value>5</value></property>
+    </gadget> 
+
 
 <!-- ImageArray to images -->
 <gadget>
@@ -349,23 +383,13 @@
     <classname>ImageArraySplitGadget</classname>
 </gadget>
 
+
+
+
+
 <!-- after recon processing -->
-<!--<gadget>
-      <name>ExtractThermoI</name>
-      <dll>gadgetron_mricore</dll>
-      <classname>ExtractThermoIGadget</classname>
-      <property>
-          <name>doOffline</name>
-          <value>1</value>
-      </property>
-      <property>
-          <name>extract_mask</name>
-          <value>9</value>
-      </property>
-</gadget>-->
 
-
- <gadget>
+<gadget>
       <name>ExtractThermoI</name>
       <dll>gadgetron_thermocore</dll>
       <classname>ExtractThermoIGadget</classname>
@@ -379,11 +403,38 @@
       </property>
 </gadget>
 
+<!-- after recon processing -->
+<!--<gadget>
+      <name>Extract</name>
+      <dll>gadgetron_mricore</dll>
+      <classname>ExtractGadget</classname>
+      <property>
+          <name>extract_magnitude</name>
+          <value>true</value>
+      </property>
+      <property>
+          <name>extract_phase</name>
+          <value>true</value>
+      </property>
+</gadget>-->
+
+ <gadget>
+        <name>ComplexToFloatAttrib</name>
+        <dll>gadgetron_mricore</dll>
+        <classname>ComplexToFloatGadget</classname>
+    </gadget>
+
   <gadget>
       <name>FloatToShortAttrib</name>
       <dll>gadgetron_mricore</dll>
       <classname>FloatToUShortGadget</classname>
   </gadget>
+ <!--
+  <gadget>
+      <name>CheckImageGadget</name>
+      <dll>gadgetron_smscore</dll>
+      <classname>CheckImageGadget</classname>
+  </gadget>-->
 
 
 <gadget>

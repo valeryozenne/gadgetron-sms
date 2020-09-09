@@ -1,5 +1,6 @@
 if (ARMADILLO_FOUND)
-   install (FILES     
+   install (FILES
+    Generic_Cartesian_Grappa_EPI_Thermo_v9.xml
     Generic_Cartesian_Grappa_EPI_Thermo_4.0_cpu.xml
     Generic_Cartesian_Grappa_EPI_Thermo_4.0_gpu.xml
     Generic_Cartesian_Grappa_EPI_Thermo_4.0_gpuplus.xml

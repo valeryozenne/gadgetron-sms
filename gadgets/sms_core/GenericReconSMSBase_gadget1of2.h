@@ -6,7 +6,7 @@
 
 #pragma once
 
-//#include "GenericReconBase.h"
+#include "GenericReconBase_gadget1of2.h"
 #include "mri_core_slice_grappa.h"
 #include "mri_core_utility_interventional.h"
 #include "hoNDArray_utils.h"
@@ -15,7 +15,7 @@
 #include "hoArmadillo.h"
 #include "test_slice_grappa.h"
 #include "gadgetron_smscore_export.h"
-#include "GenericReconBase_gadget1of2.h"
+
 
 namespace Gadgetron {
 

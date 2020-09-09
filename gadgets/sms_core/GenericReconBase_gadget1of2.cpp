@@ -4,19 +4,19 @@
 
 namespace Gadgetron {
 
-    template <typename T, typename U> 
+    template <typename T, typename U>
     GenericReconBase_gadget1of2<T, U>::GenericReconBase_gadget1of2() : num_encoding_spaces_(1), process_called_times_(0)
     {
         gt_timer_.set_timing_in_destruction(false);
         gt_timer_local_.set_timing_in_destruction(false);
     }
 
-    template <typename T, typename U> 
+    template <typename T, typename U>
     GenericReconBase_gadget1of2<T, U>::~GenericReconBase_gadget1of2()
     {
     }
 
-    template <typename T, typename U> 
+    template <typename T, typename U>
     int GenericReconBase_gadget1of2<T, U>::process_config(ACE_Message_Block* mb)
     {
         if (!debug_folder.value().empty())
