@@ -118,7 +118,7 @@
     <property><name>verbose</name><value>true</value></property>
     <property><name>use_omp</name><value>true</value></property>
     <property><name>use_gpu</name><value>false</value></property>
-    <property><name>use_inverse_caipi_blip</name><value>false</value></property>
+    <property><name>use_inverse_caipi_blip</name><value>true</value></property>
     </gadget>
 
 
@@ -186,7 +186,7 @@
     <property><name>verbose</name><value>true</value></property>
     <property><name>use_omp</name><value>true</value></property>
     <property><name>use_gpu</name><value>false</value></property>
-    <property><name>use_inverse_caipi_blip</name><value>false</value></property>
+    <property><name>use_inverse_caipi_blip</name><value>true</value></property>
 
     </gadget>
 
@@ -350,18 +350,16 @@
         <classname>ZeroFillingGadget</classname>
     </gadget>-->
 
-<!-- ImageArray to images -->
-   <!--  <gadget>
-        <name>ZeroFillingGPU</name>
+<gadget>
+        <name>ZeroFillingPlus</name>
         <dll>gadgetron_thermocore</dll>
         <classname>ZeroFillingGPUGadget</classname>
         <property><name>perform_timing</name><value>true</value></property>
         <property><name>verbose</name><value>true</value></property>
         <property><name>use_gpu</name><value>false</value></property>
-       <property><name>oversampling</name><value>2</value></property>
-
-    </gadget>  -->
-
+        <property><name>oversampling</name><value>2</value></property>
+        <property><name>debug_folder</name><value></value></property>
+    </gadget>
 
     <gadget>
         <name>SimpleThermo</name>

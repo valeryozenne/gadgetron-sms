@@ -35,4 +35,5 @@ template < typename T> EXPORTMRICORE std::pair<bool, int > findInVector(const st
 EXPORTMRICORE std::vector< std::vector<unsigned int> > get_map_slice_single_band(int MB_factor, int lNumberOfStacks, std::vector<unsigned int> order_of_acquisition_mb, bool no_reordering);
 
 EXPORTMRICORE std::vector<unsigned int> map_interleaved_acquisitions(int number_of_slices, bool no_reordering );
+
 }

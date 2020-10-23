@@ -113,7 +113,7 @@
     <name>SMSPrepGadget</name>
     <dll>gadgetron_smscore</dll>
     <classname>GenericReconSMSPrepGadget</classname>   
-    <property><name>debug_folder</name><value>Prep</value></property>
+    <property><name>debug_folder</name><value></value></property>
     <property><name>perform_timing</name><value>true</value></property>
     <property><name>verbose</name><value>true</value></property>
     <property><name>use_omp</name><value>true</value></property>
@@ -172,7 +172,7 @@
 
     <property><name>downstream_coil_compression</name><value>true</value></property>
     <property><name>downstream_coil_compression_thres</name><value>0.002</value></property>
-    <property><name>downstream_coil_compression_num_modesKept</name><value>8</value></property>
+    <property><name>downstream_coil_compression_num_modesKept</name><value></value></property>
 
     </gadget>
 

@@ -167,7 +167,7 @@ protected:
 
      std::string epi_dependency_folder_;
      std::string epi_dependency_prefix_;
-     std::string measurement_id_;;
+     std::string measurement_id_;
      std::string partial_name_stored_epi_dependency_;
      std::string full_name_stored_epi_dependency_;
 
