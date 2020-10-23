@@ -45,8 +45,51 @@ int SimpleThermoGadget::process_config(ACE_Message_Block* mb)
     ISMRMRD::EncodingLimits e_limits = h.encoding[0].encodingLimits;
 
 
+    if (h.measurementInformation)
+    {
+        if (h.measurementInformation->measurementID)
+        {
+            measurement_id_ = *h.measurementInformation->measurementID;
+            GDEBUG("Measurement ID is %s\n", measurement_id_.c_str());
 
-    // -------------------------------------------------
+            //catch FID number from Measurement ID
+            std::string s_example = measurement_id_;
+            std::string delimiter = "_";
+
+            size_t pos = 0;
+            std::string token;
+            while ((pos = s_example.find(delimiter)) != std::string::npos) {
+                token = s_example.substr(0, pos);
+                //std::cout << token << std::endl;
+                s_example.erase(0, pos + delimiter.length());
+            }
+
+            FID="MID0"+s_example;
+
+        }
+
+        if (h.measurementInformation->initialSeriesNumber)
+        {
+            int initial_series_number_ = *h.measurementInformation->initialSeriesNumber;
+            GDEBUG("initialSeriesNumber ID is %d\n", initial_series_number_);
+        }
+
+        if (h.measurementInformation->seriesDescription)
+        {
+            std::string series_description_ = *h.measurementInformation->seriesDescription;
+            GDEBUG("seriesDescription ID is %s\n", series_description_.c_str());
+        }
+
+        protocolName = h.measurementInformation.get().protocolName.get();
+        GDEBUG("protocolName is %s\n", protocolName.c_str());
+
+        output_filename=FID + "_" +protocolName;
+        GDEBUG("output_filename is %s\n", output_filename.c_str());
+
+    }
+
+
+
 
     return GADGET_OK;
 }
@@ -198,62 +241,18 @@ int SimpleThermoGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageA
 
             }*/
 
-            memcpy(&buffer_temperature(0,0,0,0,0,0,0,idx_intervention), &temperature(0,0,0,0,0,0,0), sizeof(float)*RO*E1*E2*CHA*N*S*SLC);
+            //memcpy(&buffer_temperature(0,0,0,0,0,0,0,idx_intervention), &temperature(0,0,0,0,0,0,0), sizeof(float)*RO*E1*E2*CHA*N*S*SLC);
             memcpy(&buffer_temperature_all(0,0,0,0,0,0,rep), &temperature(0,0,0,0,0,0,0), sizeof(float)*RO*E1*E2*CHA*N*S*SLC);
 
 
-            if (rep==100-1)
-            {
-                GDEBUG("--------repetition 200-----\n");
-
-                //compute_mean_std(buffer_temperature);
 
 
-                std::stringstream os;
-                buffer_magnitude_all.print(os);
-                GDEBUG_STREAM(os.str());
-
-                std::stringstream os2;
-                buffer_phase_all.print(os2);
-                GDEBUG_STREAM(os2.str());
-
-                std::stringstream os3;
-                buffer_temperature_all.print(os3);
-                GDEBUG_STREAM(os3.str());
-
-                if (!debug_folder_full_path_.empty()) {
-                    this->gt_exporter_.export_array(buffer_magnitude_all,
-                                                    debug_folder_full_path_ + "buffer_magnitude_200");    }
-
-                if (!debug_folder_full_path_.empty()) {
-                    this->gt_exporter_.export_array(buffer_phase_all,
-                                                    debug_folder_full_path_ + "buffer_phase_200");      }
-
-                if (!debug_folder_full_path_.empty()) {
-                    this->gt_exporter_.export_array(buffer_temperature_all,
-                                                    debug_folder_full_path_ + "buffer_temperature_200");        }
-
-            }
-
-
-            if (rep==lNumberOfRepetitions_-1)
+            if (rep==lNumberOfRepetitions_-1 || rep==lNumberOfRepetitions_-11 || rep==lNumberOfRepetitions_-31)
             {
                 GDEBUG("--------Last repetition -----\n");
 
-                compute_mean_std(buffer_temperature);
+                //compute_mean_std(buffer_temperature);
 
-
-                std::stringstream os;
-                buffer_magnitude_all.print(os);
-                GDEBUG_STREAM(os.str());
-
-                std::stringstream os2;
-                buffer_phase_all.print(os2);
-                GDEBUG_STREAM(os2.str());
-
-                std::stringstream os3;
-                buffer_temperature_all.print(os3);
-                GDEBUG_STREAM(os3.str());
 
                 if (!debug_folder_full_path_.empty()) {
                     this->gt_exporter_.export_array(buffer_magnitude_all,
@@ -266,6 +265,18 @@ int SimpleThermoGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImageA
                 if (!debug_folder_full_path_.empty()) {
                     this->gt_exporter_.export_array(buffer_temperature_all,
                                                     debug_folder_full_path_ + "buffer_temperature_all");        }
+
+                std::stringstream os;
+                buffer_magnitude_all.print(os);
+                GDEBUG_STREAM(os.str());
+
+                std::stringstream os2;
+                buffer_phase_all.print(os2);
+                GDEBUG_STREAM(os2.str());
+
+                std::stringstream os3;
+                buffer_temperature_all.print(os3);
+                GDEBUG_STREAM(os3.str());
 
             }
 

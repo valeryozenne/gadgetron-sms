@@ -64,7 +64,8 @@ int ZeroFillingGPUGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImag
 
     IsmrmrdImageArray* data = m1->getObjectPtr();
 
-    Gadgetron::GadgetContainerMessage<IsmrmrdImageArray>* cm2 = new Gadgetron::GadgetContainerMessage<IsmrmrdImageArray>();
+    //Gadgetron::GadgetContainerMessage<IsmrmrdImageArray>* cm2 = new Gadgetron::GadgetContainerMessage<IsmrmrdImageArray>();
+    Gadgetron::GadgetContainerMessage< IsmrmrdImageArray >* cm2 = m1->duplicate();
 
     IsmrmrdImageArray map_sd;
 
@@ -93,14 +94,18 @@ int ZeroFillingGPUGadget::process(Gadgetron::GadgetContainerMessage< IsmrmrdImag
         GDEBUG_STREAM(os2.str());
     }
 
-    *(cm2->getObjectPtr()) = map_sd;
+
+    *(cm2->getObjectPtr()) = map_sd;    
+
+    m1->release();
+
     if (this->next()->putq(cm2) == -1)
     {
         GERROR("CmrParametricMappingGadget::process, passing sd map on to next gadget");
         return GADGET_FAIL;
     }
 
-    m1->release();
+
 
 
     //put data on the gpu
@@ -132,8 +137,6 @@ void ZeroFillingGPUGadget::perform_zerofilling_array(IsmrmrdImageArray& in, Ismr
     size_t SLC = in.data_.get_size(6);
 
     size_t rep   = in.headers_(0, 0, 0).repetition;
-
-
 
     out.data_.create(RO*oversampling.value(), E1*oversampling.value(), E2, CHA, N, S, SLC);
     out.headers_.create(N, S, SLC);

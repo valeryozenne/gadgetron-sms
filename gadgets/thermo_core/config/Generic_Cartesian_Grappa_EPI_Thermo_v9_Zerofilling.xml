@@ -215,7 +215,6 @@
     </gadget>
 
 
-    <!-- ImageArray to images -->
     <gadget>
         <name>ZeroFillingPlus</name>
         <dll>gadgetron_thermocore</dll>
@@ -227,6 +226,19 @@
         <property><name>debug_folder</name><value></value></property>
     </gadget>
 
+
+   <gadget>
+        <name>SimpleThermo</name>
+        <dll>gadgetron_thermocore</dll>
+        <classname>SimpleThermoGadget</classname>
+        <property><name>perform_timing</name><value>true</value></property>
+        <property><name>verbose</name><value>true</value></property>
+        <property><name>debug_folder</name><value>thermo</value></property>
+        <property><name>reference_number</name><value>1</value></property>
+        <property><name>use_average_phase_for_reference</name><value>false</value></property>
+        <property><name>event_heating_time</name><value>5</value></property>
+    </gadget> 
+
     <!-- ImageArray to images -->
     <gadget>
         <name>ImageArraySplit</name>
@@ -235,11 +247,20 @@
     </gadget>
 
     <!-- after recon processing -->
-       <gadget>
-        <name>ComplexToFloatAttrib</name>
-        <dll>gadgetron_mricore</dll>
-        <classname>ComplexToFloatGadget</classname>
-    </gadget>
+
+   <gadget>
+      <name>ExtractThermoI</name>
+      <dll>gadgetron_thermocore</dll>
+      <classname>ExtractThermoIGadget</classname>
+      <property>
+          <name>doOffline</name>
+          <value>1</value>
+      </property>
+      <property>
+          <name>extract_mask</name>
+          <value>9</value>
+      </property>
+</gadget>
 
     <gadget>
         <name>FloatToShortAttrib</name>

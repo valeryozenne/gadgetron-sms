@@ -67,6 +67,11 @@ namespace Gadgetron {
         hoNDArray<float > buffer_temperature_all;
 
 
+         std::string measurement_id_;
+         std::string FID;
+         std::string protocolName;
+         std::string output_filename;
+
 
         // function to perform the mapping
         // data: input image array [RO E1 E2 CHA N S SLC]
