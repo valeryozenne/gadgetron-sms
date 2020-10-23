@@ -374,12 +374,102 @@ namespace Gadgetron {
                 Gadgetron::coil_map_Inati_Iter(complex_im_recon_buf_, coil_map, ks, kz, iterNum, thres);
             }
 
+
+            GDEBUG("coil_map \n");
+            std::stringstream os;
+            coil_map.print(os);
+            GDEBUG_STREAM(os.str());
+
             if (!debug_folder_full_path_.empty()) {
                 std::stringstream os;
                 os << "encoding_" << e;
 
                 gt_exporter_.export_array_complex(coil_map, debug_folder_full_path_ + "coil_map_" + os.str());
             }
+        } catch (...) {
+            GADGET_THROW("Errors happened in GenericReconGadget::perform_coil_map_estimation(...) ... ");
+        }
+    }
+
+
+
+    void GenericReconGadget::perform_coil_map_estimation_hack_2D3D(
+        const hoNDArray<std::complex<float>>& ref_coil_map, hoNDArray<std::complex<float>>& coil_map, size_t e) {
+        try {
+            coil_map = ref_coil_map;
+            Gadgetron::clear(coil_map);
+
+            GDEBUG("perform_coil_map_estimation_hack_2D3D  ... \n");
+
+            size_t RO = ref_coil_map.get_size(0);
+            size_t E1 = ref_coil_map.get_size(1);
+            size_t E2 = ref_coil_map.get_size(2);
+            size_t CHA = ref_coil_map.get_size(3);
+            size_t N = ref_coil_map.get_size(4);
+            size_t S = ref_coil_map.get_size(5);
+            size_t SLC = ref_coil_map.get_size(6);
+
+            hoNDArray <std::complex<float> > input(RO,E1,SLC,CHA,N,S,E2);
+            hoNDArray <std::complex<float> > buffer(RO,E1,SLC,CHA,N,S,E2);
+            hoNDArray <std::complex<float> > output(RO,E1,SLC,CHA,N,S,E2);
+
+            // nouvelle fonction hack
+            // nouvelle allocation concernant complex_im_recon_buf_
+            // nouvelle allocation concernant ref_coil_map
+
+            memcpy(input.begin(), ref_coil_map.begin(), ref_coil_map.get_number_of_bytes());
+
+            Gadgetron::hoNDFFT<float>::instance()->ifft2c(input, buffer);
+
+
+            size_t ks    = this->coil_map_kernel_size_readout.value();
+            size_t kz    = this->coil_map_kernel_size_phase.value();
+            size_t power = 3;
+
+            Gadgetron::coil_map_Inati(buffer, output, ks, kz, power);
+
+            memcpy(coil_map.begin(), output.begin(), output.get_number_of_bytes());
+
+
+            if (!debug_folder_full_path_.empty()) {
+                std::stringstream os;
+                os << "encoding_" << e;
+
+                gt_exporter_.export_array_complex(coil_map, debug_folder_full_path_ + "coil_map_hack_2D3D_" + os.str());
+            }
+
+
+            /*size_t E2 = ref_coil_map.get_size(2);
+            if (E2 > 1) {
+                Gadgetron::hoNDFFT<float>::instance()->ifft3c(ref_coil_map, complex_im_recon_buf_);
+            } else {
+                Gadgetron::hoNDFFT<float>::instance()->ifft2c(ref_coil_map, complex_im_recon_buf_);
+            }
+
+            if (!debug_folder_full_path_.empty()) {
+                std::stringstream os;
+                os << "encoding_" << e;
+
+                gt_exporter_.export_array_complex(
+                    complex_im_recon_buf_, debug_folder_full_path_ + "complex_im_for_coil_map_" + os.str());
+            }
+
+            if (coil_map_algorithm.value() == "Inati") {
+                size_t ks    = this->coil_map_kernel_size_readout.value();
+                size_t kz    = this->coil_map_kernel_size_phase.value();
+                size_t power = 3;
+
+                Gadgetron::coil_map_Inati(complex_im_recon_buf_, coil_map, ks, kz, power);
+            } else {
+                size_t ks      = this->coil_map_kernel_size_readout.value();
+                size_t kz      = this->coil_map_kernel_size_phase.value();
+                size_t iterNum = this->coil_map_num_iter.value();
+                float thres    = this->coil_map_thres_iter.value();
+
+                Gadgetron::coil_map_Inati_Iter(complex_im_recon_buf_, coil_map, ks, kz, iterNum, thres);
+            }*/
+
+
         } catch (...) {
             GADGET_THROW("Errors happened in GenericReconGadget::perform_coil_map_estimation(...) ... ");
         }

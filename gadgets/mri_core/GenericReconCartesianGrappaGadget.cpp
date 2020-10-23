@@ -151,7 +151,21 @@ namespace Gadgetron {
                 if (perform_timing.value()) {
                     gt_timer_.start("GenericReconCartesianGrappaGadget::perform_coil_map_estimation");
                 }
-                this->perform_coil_map_estimation(recon_obj_[e].ref_coil_map_, recon_obj_[e].coil_map_, e);
+
+                if (use_hack_2D3D)
+                {
+                    this->perform_coil_map_estimation_hack_2D3D(recon_obj_[e].ref_coil_map_, recon_obj_[e].coil_map_, e);
+                }
+                else
+                {
+                    GDEBUG("recon_obj_[e].ref_coil_map_\n");
+                    std::stringstream os;
+                    recon_obj_[e].ref_coil_map_.print(os);
+                    GDEBUG_STREAM(os.str());
+
+                    this->perform_coil_map_estimation(recon_obj_[e].ref_coil_map_, recon_obj_[e].coil_map_, e);
+                }
+
                 if (perform_timing.value()) { gt_timer_.stop(); }
 
                 // ---------------------------------------------------------------

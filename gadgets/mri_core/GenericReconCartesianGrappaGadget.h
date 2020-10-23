@@ -70,6 +70,8 @@ namespace Gadgetron {
         GADGET_PROPERTY(send_out_gfactor, bool, "Whether to send out gfactor map", false);
         GADGET_PROPERTY(send_out_snr_map, bool, "Whether to send out SNR map", false);
 
+        GADGET_PROPERTY(use_hack_2D3D, bool, "use_hack_2D3D", false);
+
         /// ------------------------------------------------------------------------------------
         /// Grappa parameters
         GADGET_PROPERTY(grappa_kSize_RO, int, "Grappa kernel size RO", 5);

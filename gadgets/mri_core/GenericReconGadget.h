@@ -92,6 +92,9 @@ namespace Gadgetron {
         // estimate coil map
         virtual void perform_coil_map_estimation(const hoNDArray< std::complex<float> >& ref_coil_map, hoNDArray< std::complex<float> >& coil_map, size_t encoding);
 
+        virtual void perform_coil_map_estimation_hack_2D3D(const hoNDArray< std::complex<float> >& ref_coil_map, hoNDArray< std::complex<float> >& coil_map, size_t encoding);
+
+
         // compute image header
         virtual void compute_image_header(IsmrmrdReconBit& recon_bit, IsmrmrdImageArray& res, size_t encoding);
 
